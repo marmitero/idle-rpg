@@ -67,6 +67,16 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `environments/hunts/rw_env_hunt_wyrm.png` | hunt wyrm |
 | 10 | `environments/hunts/rw_env_hunt_hydra.png` | hunt hidra |
 
-## lote-06 (fila)
+## lote-06 (feito)
 
-Ash Cloister + Crown of Sleep plates; passivas/comandos dos 6; clips atk/hit.
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `environments/biomes/rw_env_battle_ash.png` | plate (sem magenta) |
+| 2 | `environments/biomes/rw_env_battle_crown.png` | plate (sem magenta) |
+| 3–8 | `ui/icons/skills/rw_skill_*_cmd.png` | comando dos 6 |
+| 9 | `characters/battle/rw_hero_warrior_atk.png` | clip atk |
+| 10 | `vfx/rw_vfx_heal.png` | VFX |
+
+## lote-07 (fila)
+
+Passivas dos 6; atk dos outros 5 heróis; hit/die.

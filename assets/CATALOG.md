@@ -86,8 +86,8 @@ Ultimates dos 6 heróis do slice + `rw_vfx_hit_slash` (lote-04). Faltam passiva/
 
 ## Buracos do 1.0 (não inventar no código)
 
-- plates: hub, Font, hall, 3 biomas de batalha, 3 hunts (lote-05). Faltam Ash Cloister e Crown of Sleep
-- sprites idle: 6/6 heróis; bosses 3/3; clips atk/hit/die ainda faltam
+- plates: hub, Font, hall, 6 biomas (incl. Ash + Crown), 3 hunts
+- sprites idle: 6/6 heróis; bosses 3/3; atk só guerreiro; hit/die faltam
 - 0 áudio
 - logo: `marketing/rw_brand_logo.png` (lote-02)
 - 0 fontes licenciadas
