@@ -37,13 +37,21 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `ui/icons/directives/rw_directive_execute.png` | diretiva |
 | 10 | `ui/icons/directives/rw_directive_mare.png` | diretiva |
 
-## lote-04 (fila, cutouts)
+## lote-04 (feito) — fundo `#FF00FF`
 
-1. `rw_enemy_boss_pale_hydra_idle`  
-2. `rw_directive_pacto`  
-3. `rw_directive_cisma`  
-4–10. a completar no kickoff (skills dos 6, etc.)
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `enemies/rw_enemy_boss_pale_hydra_idle.png` | sprite |
+| 2 | `ui/icons/directives/rw_directive_pacto.png` | diretiva |
+| 3 | `ui/icons/directives/rw_directive_cisma.png` | diretiva |
+| 4 | `ui/icons/skills/rw_skill_warrior_ult.png` | ultimate |
+| 5 | `ui/icons/skills/rw_skill_guardian_ult.png` | ultimate |
+| 6 | `ui/icons/skills/rw_skill_mage_ult.png` | ultimate |
+| 7 | `ui/icons/skills/rw_skill_archer_ult.png` | ultimate |
+| 8 | `ui/icons/skills/rw_skill_rogue_ult.png` | ultimate |
+| 9 | `ui/icons/skills/rw_skill_cleric_ult.png` | ultimate |
+| 10 | `vfx/rw_vfx_hit_slash.png` | VFX |
 
-## lote-05 (plates, sem magenta)
+## lote-05 (fila, plates, sem magenta)
 
 Hub, batalha cap. 1, hall da guilda. Lote marcado `plate`.

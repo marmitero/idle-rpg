@@ -23,7 +23,7 @@ Faltam: splash, cut-in, sheets de atk/ult/hit, 22 heróis do 1.0.
 | --- | --- | --- |
 | `portrait_boss_goblin_king` | `rw_enemy_boss_goblin_king_*` | Hunt / cap. cedo |
 | `portrait_boss_ash_wyrm` | `rw_enemy_boss_ash_wyrm_*` | Emberworks / raid |
-| `portrait_boss_pale_hydra` | `rw_enemy_boss_pale_hydra_*` | Tidevault / raid — **idle de batalha ainda falta** (lote-04) |
+| `portrait_boss_pale_hydra` | `rw_enemy_boss_pale_hydra_*` | Tidevault / raid |
 
 ## Frames de raridade
 
@@ -76,7 +76,11 @@ Complemento: atk, spd.
 
 ## Diretivas
 
-`foco` `guarda` `execute` `mare` (lote-03). Faltam `pacto` e `cisma`.
+Seis: `foco` `guarda` `execute` `mare` (lote-03) · `pacto` `cisma` (lote-04).
+
+## Skills / VFX
+
+Ultimates dos 6 heróis do slice + `rw_vfx_hit_slash` (lote-04). Faltam passiva/comando.
 
 ## Buracos do 1.0 (não inventar no código)
 
