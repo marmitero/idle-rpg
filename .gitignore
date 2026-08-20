@@ -35,6 +35,7 @@ tmp
 # generated large packs (keep source, ignore unpacked dumps)
 assets/_inbox/**
 !assets/_inbox/README.md
+!assets/_inbox/TRIAGE.md
 assets/raw/**/*.psd
 assets/raw/**/*.ai
 assets/raw/**/*.blend
