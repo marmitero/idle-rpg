@@ -2,7 +2,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { randomInt, randomUUID } from "node:crypto";
 import { DAILIES, ENEMIES, HERO_BY_ID, HEROES, HUNTS, STAGES } from "@relicwake/content";
 import { simulate, type LoadoutUnit } from "@relicwake/sim";
-import { bumpDaily, credit, getOrCreate, publicState, save, type Account } from "./store.ts";
+import { bumpDaily, credit, getByEmail, getById, getOrCreate, publicState, save, bindEmail, type Account } from "./store.ts";
+import { hashPassword, signJwt, validEmail, verifyJwt, verifyPassword } from "./auth.ts";
 
 const PORT = Number(process.env.API_PORT ?? 3000);
 const STAMINA_CAP = 120;
@@ -13,7 +14,7 @@ function json(res: ServerResponse, code: number, body: unknown) {
   res.writeHead(code, {
     "content-type": "application/json; charset=utf-8",
     "access-control-allow-origin": "*",
-    "access-control-allow-headers": "content-type, x-device-id, idempotency-key",
+    "access-control-allow-headers": "content-type, x-device-id, authorization, idempotency-key",
     "access-control-allow-methods": "GET,POST,OPTIONS",
   });
   res.end(data);
@@ -41,13 +42,29 @@ function device(req: IncomingMessage): string | null {
   return v && v.length >= 8 ? v : null;
 }
 
+function bearer(req: IncomingMessage): { sub: string; dev: string } | null {
+  const h = req.headers.authorization;
+  const v = Array.isArray(h) ? h[0] : h;
+  if (!v?.startsWith("Bearer ")) return null;
+  return verifyJwt(v.slice(7));
+}
+
 function account(req: IncomingMessage, res: ServerResponse): Account | null {
-  const id = device(req);
-  if (!id) {
+  const tok = bearer(req);
+  const dev = device(req);
+  if (tok) {
+    const a = getById(tok.sub, dev || tok.dev || `jwt-${tok.sub}`);
+    if (!a) {
+      json(res, 401, { error: "invalid_token" });
+      return null;
+    }
+    return a;
+  }
+  if (!dev) {
     json(res, 401, { error: "missing_device" });
     return null;
   }
-  return getOrCreate(id);
+  return getOrCreate(dev);
 }
 
 function regen(a: Account) {
@@ -79,7 +96,7 @@ const server = createServer(async (req, res) => {
   if (req.method === "OPTIONS") {
     res.writeHead(204, {
       "access-control-allow-origin": "*",
-      "access-control-allow-headers": "content-type, x-device-id, idempotency-key",
+      "access-control-allow-headers": "content-type, x-device-id, authorization, idempotency-key",
       "access-control-allow-methods": "GET,POST,OPTIONS",
     });
     res.end();
@@ -95,6 +112,40 @@ const server = createServer(async (req, res) => {
       const a = account(req, res);
       if (!a) return;
       json(res, 200, { state: publicState(a) });
+      return;
+    }
+    if (req.method === "POST" && url === "/api/auth/register") {
+      const dev = device(req);
+      if (!dev) return json(res, 401, { error: "missing_device" });
+      const body = await readBody(req);
+      const email = String(body.email ?? "").trim();
+      const password = String(body.password ?? "");
+      if (!validEmail(email) || password.length < 8) return json(res, 400, { error: "invalid_credentials" });
+      if (getByEmail(email)) return json(res, 409, { error: "email_taken" });
+      const a = getOrCreate(dev);
+      if (a.email) return json(res, 409, { error: "already_bound" });
+      bindEmail(a.id, email, hashPassword(password));
+      a.email = email.toLowerCase();
+      save(a);
+      json(res, 200, { token: signJwt(a.id, dev), state: publicState(a) });
+      return;
+    }
+    if (req.method === "POST" && url === "/api/auth/login") {
+      const body = await readBody(req);
+      const email = String(body.email ?? "").trim().toLowerCase();
+      const password = String(body.password ?? "");
+      const row = getByEmail(email);
+      if (!row?.password_hash || !verifyPassword(password, row.password_hash)) {
+        return json(res, 401, { error: "invalid_credentials" });
+      }
+      const dev = device(req) ?? `login-${row.id}`;
+      const a = getById(row.id, dev);
+      if (!a) return json(res, 401, { error: "invalid_credentials" });
+      json(res, 200, { token: signJwt(a.id, dev), state: publicState(a) });
+      return;
+    }
+    if (req.method === "GET" && url === "/api/auth/oauth/google") {
+      json(res, 501, { error: "oauth_not_configured", hint: "Google/Apple exigem client id de produção." });
       return;
     }
     if (req.method === "GET" && url === "/api/state") {
@@ -175,7 +226,7 @@ const server = createServer(async (req, res) => {
       if (!hunt) return json(res, 400, { error: "unknown_hunt" });
       if (a.stamina < hunt.stamina) return json(res, 400, { error: "no_breath" });
       if (a.sweep < 1) return json(res, 400, { error: "no_echo" });
-      a.stamina -= hunt.stamina;
+      credit(a, "stamina", -hunt.stamina, "hunt.sweep", hunt.id);
       credit(a, "sweep", -1, "hunt.sweep", hunt.id);
       credit(a, "gold", hunt.gold, "hunt.sweep", hunt.id);
       credit(a, "letters", hunt.letters, "hunt.sweep", hunt.id);

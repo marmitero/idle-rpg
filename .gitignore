@@ -2,6 +2,7 @@
 node_modules
 apps/web/dist
 services/api/data
+*.sqlite
 .pnpm-store
 .npm
 

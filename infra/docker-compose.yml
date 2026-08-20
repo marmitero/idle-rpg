@@ -1,0 +1,15 @@
+# Postgres de produção / staging. O slice local usa SQLite (mesmo schema).
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: relicwake
+      POSTGRES_PASSWORD: relicwake
+      POSTGRES_DB: relicwake
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+volumes:
+  pgdata:

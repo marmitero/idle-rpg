@@ -43,7 +43,7 @@ export function App() {
             {letters}
           </div>
           <div className="chip grow" style={{ border: "none", background: "transparent" }}>
-            Relicwake
+            {email ?? "Relicwake"}
           </div>
         </header>
         <main className="content">

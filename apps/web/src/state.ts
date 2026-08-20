@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { DirectiveId } from "@relicwake/shared";
 import type { BattleInput, BattleResult } from "@relicwake/sim";
-import { api } from "./api";
+import { api, setToken } from "./api";
 
 export type Tab = "hub" | "roster" | "battle" | "guild" | "menu";
 
@@ -23,6 +23,7 @@ export type Remote = {
   dailyDay: string;
   dailyProg: Record<string, number>;
   dailyClaimed: string[];
+  email: string | null;
 };
 
 export type FightPayload = {
@@ -48,6 +49,9 @@ type Store = Remote & {
   sweepHunt: (id: string) => Promise<{ ok: boolean; reason?: string; gold?: number }>;
   clearFight: () => void;
   pull: () => Promise<{ rarity: string; heroId: string }>;
+  register: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 };
 
 const empty: Remote = {
@@ -68,6 +72,7 @@ const empty: Remote = {
   dailyDay: "",
   dailyProg: {},
   dailyClaimed: [],
+  email: null,
 };
 
 export const useGame = create<Store>((set, get) => ({
@@ -145,5 +150,19 @@ export const useGame = create<Store>((set, get) => ({
     const r = await api<{ rarity: string; heroId: string; state: Remote }>("/api/gacha/pull", {});
     get().apply(r.state);
     return { rarity: r.rarity, heroId: r.heroId };
+  },
+  register: async (email, password) => {
+    const r = await api<{ token: string; state: Remote }>("/api/auth/register", { email, password });
+    setToken(r.token);
+    get().apply(r.state);
+  },
+  login: async (email, password) => {
+    const r = await api<{ token: string; state: Remote }>("/api/auth/login", { email, password });
+    setToken(r.token);
+    get().apply(r.state);
+  },
+  logout: () => {
+    setToken(null);
+    void get().hydrate();
   },
 }));

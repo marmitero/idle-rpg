@@ -25,6 +25,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
     headers: {
       "content-type": "application/json",
       "x-device-id": deviceId(),
+      ...(getToken() ? { authorization: `Bearer ${getToken()}` } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
