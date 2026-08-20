@@ -1,0 +1,17 @@
+{
+  "name": "relicwake",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Relicwake — idle auto-battle gacha RPG (web + iOS + Android)",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "lint": "echo \"lint pipeline will be wired in engineering kickoff\"",
+    "typecheck": "echo \"typecheck pipeline will be wired in engineering kickoff\"",
+    "test": "echo \"test pipeline will be wired in engineering kickoff\"",
+    "docs": "echo \"See /docs\""
+  },
+  "license": "UNLICENSED"
+}

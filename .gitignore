@@ -1,0 +1,48 @@
+# dependencies
+node_modules
+.pnpm-store
+.npm
+
+# build
+dist
+build
+out
+.next
+.turbo
+coverage
+*.tsbuildinfo
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# game / local
+*.log
+tmp
+.cache
+.playwright-mcp
+
+# generated large packs (keep source, ignore unpacked dumps)
+assets/_inbox/**
+!assets/_inbox/README.md
+assets/raw/**/*.psd
+assets/raw/**/*.ai
+assets/raw/**/*.blend
+assets/raw/**/*.clip
+
+# mobile
+android/.gradle
+ios/Pods
+*.apk
+*.aab
+*.ipa
