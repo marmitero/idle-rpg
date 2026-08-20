@@ -1,13 +1,11 @@
 # services/api
 
-Autoridade da economia do slice.
+Autoridade da economia + auth.
 
-- `POST /api/session` — cria conta por `X-Device-Id`
-- `POST /api/wake/collect` — idle no servidor
-- `POST /api/battle` — simula e credita no ledger
-- `POST /api/gacha/pull` — RNG `crypto`
-- `POST /api/hunt/sweep` · `POST /api/daily/claim`
+- Hóspede: `X-Device-Id`
+- Cloud save: `POST /api/auth/register` · `POST /api/auth/login` → JWT
+- `Authorization: Bearer` tem precedência sobre o device
+- Ledger em tabela SQL (`data/relicwake.sqlite` no slice)
+- Schema Postgres: `infra/schema.sql` + `infra/docker-compose.yml`
 
-Persistência: JSON em `data/` (dev). Postgres entra no passo seguinte.
-
-Bind `0.0.0.0:3000`. O cliente web fala só com `/api` (proxy Vite).
+OAuth Google/Apple: `501` até haver client id de produção.
