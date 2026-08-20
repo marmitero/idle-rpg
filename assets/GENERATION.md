@@ -77,6 +77,16 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `characters/battle/rw_hero_warrior_atk.png` | clip atk |
 | 10 | `vfx/rw_vfx_heal.png` | VFX |
 
-## lote-07 (fila)
+## lote-07 (feito) — fundo `#FF00FF`
 
-Passivas dos 6; atk dos outros 5 heróis; hit/die.
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1–6 | `ui/icons/skills/rw_skill_*_pas.png` | passiva dos 6 |
+| 7 | `characters/battle/rw_hero_guardian_atk.png` | atk |
+| 8 | `characters/battle/rw_hero_mage_atk.png` | atk |
+| 9 | `characters/battle/rw_hero_archer_atk.png` | atk |
+| 10 | `characters/battle/rw_hero_rogue_atk.png` | atk |
+
+## lote-08 (fila)
+
+Cleric atk; hit/die dos 6; atk dos 3 bosses.

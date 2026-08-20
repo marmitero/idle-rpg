@@ -82,7 +82,7 @@ Seis: `foco` `guarda` `execute` `mare` (lote-03) · `pacto` `cisma` (lote-04).
 
 ## Skills / VFX
 
-Ultimates dos 6 heróis do slice + `rw_vfx_hit_slash` (lote-04). Faltam passiva/comando.
+Ultimates + comandos + passivas dos 6. VFX: hit slash, heal.
 
 ## Buracos do 1.0 (não inventar no código)
 
