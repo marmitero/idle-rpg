@@ -72,7 +72,9 @@ Seis brasões: Embercourt, Tidebound, Thornveil, Ashen (lote-01) · Solstice, Na
 Pack: hp, def, crit, for.  
 Complemento: atk, spd.
 
-## Buracos do 1.0 (não inventar no código)
+## Ambientes (plates, lote-05)
+
+Hub Spire, Font, Guild hall, batalhas (base / Emberworks / Tidevault / Thorn), hunts (goblin / wyrm / hidra).
 
 ## Diretivas
 
@@ -84,8 +86,8 @@ Ultimates dos 6 heróis do slice + `rw_vfx_hit_slash` (lote-04). Faltam passiva/
 
 ## Buracos do 1.0 (não inventar no código)
 
-- 0 ambientes / plates (lote-05)
-- sprites idle: 6/6 heróis; bosses 2/3 (falta hidra); clips atk/ult/hit
+- plates: hub, Font, hall, 3 biomas de batalha, 3 hunts (lote-05). Faltam Ash Cloister e Crown of Sleep
+- sprites idle: 6/6 heróis; bosses 3/3; clips atk/hit/die ainda faltam
 - 0 áudio
 - logo: `marketing/rw_brand_logo.png` (lote-02)
 - 0 fontes licenciadas

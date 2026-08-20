@@ -52,6 +52,21 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `ui/icons/skills/rw_skill_cleric_ult.png` | ultimate |
 | 10 | `vfx/rw_vfx_hit_slash.png` | VFX |
 
-## lote-05 (fila, plates, sem magenta)
+## lote-05 (feito) — plates, SEM magenta
 
-Hub, batalha cap. 1, hall da guilda. Lote marcado `plate`.
+| # | Arquivo | Cena |
+| --- | --- | --- |
+| 1 | `environments/hub/rw_env_hub_spire.png` | hub |
+| 2 | `environments/biomes/rw_env_battle_spire_base.png` | batalha cap. 1 |
+| 3 | `environments/guild/rw_env_guild_hall.png` | hall |
+| 4 | `environments/hub/rw_env_font.png` | Font |
+| 5 | `environments/biomes/rw_env_battle_emberworks.png` | Emberworks |
+| 6 | `environments/biomes/rw_env_battle_tidevault.png` | Tidevault |
+| 7 | `environments/biomes/rw_env_battle_thorn.png` | Thorn Causeway |
+| 8 | `environments/hunts/rw_env_hunt_goblin.png` | hunt goblin |
+| 9 | `environments/hunts/rw_env_hunt_wyrm.png` | hunt wyrm |
+| 10 | `environments/hunts/rw_env_hunt_hydra.png` | hunt hidra |
+
+## lote-06 (fila)
+
+Ash Cloister + Crown of Sleep plates; passivas/comandos dos 6; clips atk/hit.
