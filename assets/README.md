@@ -1,6 +1,8 @@
 # Assets — Relicwake
 
-Leia primeiro: [`docs/10-pipeline-assets.md`](../docs/10-pipeline-assets.md) e [`docs/05-art-bible.md`](../docs/05-art-bible.md).
+Leia primeiro: [`CATALOG.md`](CATALOG.md), [`docs/10-pipeline-assets.md`](../docs/10-pipeline-assets.md), [`docs/05-art-bible.md`](../docs/05-art-bible.md), [`docs/12-responsividade.md`](../docs/12-responsividade.md).
+
+Estilo oficial: HD pixel ilustrado, UI ouro/navy. Pacote absorvido em 2026-08-20.
 
 | Pasta | O que vive aqui |
 | --- | --- |

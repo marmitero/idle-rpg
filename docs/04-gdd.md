@@ -239,9 +239,12 @@ Hub com **cinco destinos** + utilitários:
 barra:  Hub · Roster · Battle · Guild · Menu
 ```
 
-Retrato no telefone (390×844 base). Landscape opcional só na batalha em desktop.  
-Tablet: hub em duas colunas.  
-PC: o mesmo retrato em coluna central, laterais com lore / chat da guilda.
+Retrato-canônico. Spec completa: [Responsividade](12-responsividade.md).
+
+- Telefone: palco 100% largura, 390 de referência, bottom nav 5, safe-area.
+- Tablet: palco + 1 rail.
+- PC: palco 430–480 centrado + rails de lore/chat. O jogo **não** vira site landscape.
+- Batalha: canvas lógico 720×1280, letterbox no palco. Nav some durante a luta.
 
 ---
 

@@ -99,8 +99,9 @@ views (React)  →  application (stores, queries)
 
 - **React** para hub, lojas, roster, mail, settings. Acessível, i18n, rotas.
 - **PixiJS** para o canvas de batalha e o Spire do hub (parallax leve).
+- **Shell responsivo:** palco 390–480, container queries, 9-slice dos frames do pacote. Spec: [responsividade](12-responsividade.md), ADR 0004.
 - Estado de servidor via TanStack Query. Mutações otimistas só em UI cosmética.
-- Batalha: cliente prediz com `sim` para 3x speed fluido; o **resultado oficial** chega assinado do servidor. Divergência > ε gera resync e log.
+- Batalha: cliente prediz com `sim` para 3x speed fluido; o **resultado oficial** chega assinado do servidor. Divergência > ε gera resync e log. Pixi escala pelo retângulo do palco, não pela janela.
 
 ### 4.2 Plataformas
 

@@ -1,37 +1,43 @@
 # Art Bible — Relicwake
 
-**Status:** v1 provisória (pacote de assets do cliente **não chegou** ao git)  
+**Status:** v1.1 **travada no pacote real** (82 PNGs em `origin/main`, 2026-08-20)  
 **Dono:** Direção de arte  
-**Override:** assim que `assets/_inbox` tiver o pacote, esta bible vira v1.1 *em cima do material real*. O estilo do pacote vence esta hipótese — mas o *padrão de produção* (naming, cortes, tamanhos) permanece.
+**Override cumprido:** o pacote venceu a hipótese v1 (vitral/AFK). Escola oficial = **HD pixel ilustrado + UI ouro/navy**.  
+**Catálogo:** [`assets/CATALOG.md`](../assets/CATALOG.md) · **Tela:** [`docs/12-responsividade.md`](12-responsividade.md)
 
 ---
 
 ## 1. Promessa visual
 
-Relicwake parece um **vitral que esfriou**. Luz quente de forja atravessa vidro rachado. Formas sólidas, silhuetas de cartaz, pouca textura ruidosa. Não é anime genérico, não é pixel, não é 3D de Raid.
+Relicwake parece um **grimório pixelado de forja**. Bustos pintados em HD pixel (contorno grosso, cel, metal com rebite), molduras de ouro sobre marinho, itens que lêem a 48 px. Não é anime Live2D, não é vitral AFK, não é 3D de Raid.
 
-Palavra-guia: **crepúsculo forjado**.
+Palavra-guia: **crepúsculo forjado, em pixel**.
 
-Referências de *método* (não de cópia):
+Âncoras *do próprio pacote* (copiar estes, não Pinterest):
 
-- AFK Arena — linha colorida, pose com direção, quase nenhum preto puro. [1](https://www.creativebloq.com/art/digital-art/i-went-wild-with-warped-houses-gnarled-trees-and-jagged-shapes-how-tim-burton-influenced-the-creator-behind-afk-arenas-scene-art)
-- AFK Journey — cena como ilustração de livro, leitura clara à distância.
-- Dislyte — coragem de paleta (nós usamos isso nas *facções*, não no neon urbano).
-- Pride of Nindo — skill precisa ter *assinatura* visível em 1 segundo.
+- `portrait_warrior` / `portrait_mage` — massa, linha, luz de ¾.
+- `frame_lendario` + `ui_panel_ornate` — filigrana ouro, fill navy.
+- `icon_equip_weapon_t3` / `icon_ember_heart` — item ilustrado.
+- `icon_stat_hp` / `icon_ui_home` — HUD chapado (família B).
+
+Referências externas só de *método*: Idle Heroes / Sword Master Story (pixel de impacto), AFK só na *leitura de silhueta*.
 
 ---
 
-## 2. Escolas e decisão
+## 2. Escola travada
 
-| Escola | Uso em Relicwake |
-| --- | --- |
-| Splash / key / gacha reveal | Ilustração pintada, 1 personagem, fundo de facção |
-| Battle unit | Sprite 2D sólido (cel), 8 direções não — só 2 facings (L/R) + 5 anims |
-| Hub / Spire | Parallax 3–5 camadas, silhueta de pico |
-| UI | Geometria em losango quebrado + serifas curtas nos títulos |
-| VFX | Poucas partículas, muito shape design (crescentes, cinzas, espinhos, maré) |
+| Peça | Escola | Fonte |
+| --- | --- | --- |
+| Retrato / gacha / perfil | HD pixel bust 512, fundo transparente | pack |
+| Ícone de roster | 256 contain do bust | derivado |
+| Item / material / raid | HD pixel 256, ¾, transparente | pack |
+| HUD / stat / nav | Pixel chapado, silhueta de brinquedo | pack família B |
+| Frame de raridade | Moldura 256, centro oco | pack + common gerado |
+| Chrome (botão, panel, barra) | Ouro + navy, **9-slice** | pack |
+| Battle unit (a produzir) | Mesma linha do bust, corpo ¾, 2 facings | *falta* |
+| Hub / bioma (a produzir) | Pixel pintado, 3 camadas, paleta do pack | *falta* |
 
-Se o pacote recebido for Live2D ou pixel, **adaptamos a escola de batalha** e mantemos a linguagem de UI/facção.
+Qualquer arte nova que pareça “oil painting”, chibi anime ou flat material design está **fora**.
 
 ---
 
@@ -70,10 +76,10 @@ Um ícone 72×72 de herói precisa ser identificável **só pela cor + silhueta*
 
 | Peça | Tamanho alvo | Notas |
 | --- | --- | --- |
-| Splash | 2048×2048 | gacha, perfil, marketing |
-| Bust / portrait | 1024×1024 | roster, diálogo, mail |
-| Icon | 256×256 (atlas 72) | lista |
-| Battle body | 512×512 sheet / spine-lite | idle, atk, hit, ult, die |
+| Splash | 1024–2048 (ainda não há) | gacha full; até existir, usa bust 512 |
+| Bust / portrait | **512×512** (pack) | roster, diálogo, mail, reveal |
+| Icon | **256×256** | lista, nav, item |
+| Battle body | 512 sheet (a produzir) | idle, atk, hit, ult, die |
 | Ultimate cut-in | 1920×640 | 0.9–1.3 s |
 | Skill icons (3) | 256×256 | leitura a 48 px |
 | Faction badge overlay | — | gerado |
@@ -188,15 +194,13 @@ Detalhe operacional: [pipeline](10-pipeline-assets.md).
 
 ---
 
-## 10. Quando o pacote chegar
+## 10. Absorção (feita)
 
-Procedimento de absorção (produção):
+1. Pacote achado em `origin/main` (raiz, 82 PNG).
+2. Cópia intacta em `assets/_inbox/2026-08-20_main-dump/`.
+3. `TRIAGE.md` preenchido. Originais de retrato também em `assets/raw/characters/`.
+4. Runtime em pastas canônicas com `rw_*`.
+5. Esta bible = v1.1.
+6. Âncora de personagem: `rw_hero_warrior_bust_512` + `rw_hero_mage_bust_512`.
 
-1. Descompactar em `assets/_inbox/{data}/`.
-2. Inventariar: tipo, resolução, consistência de linha/paleta, se há sheets ou só stills.
-3. Preencher `assets/_inbox/TRIAGE.md`.
-4. Mover para as pastas canônicas **sem renomear o original** — copiar e aplicar o naming.
-5. Atualizar esta bible (v1.1) com 6 screenshots-guia do próprio pacote.
-6. Gerar 1 herói “âncora” no estilo exato antes de produzir os outros 27.
-
-Até lá, qualquer arte nova gerada pelo estúdio segue **esta** v1.
+Arte nova (complemento ou roster) copia **esses** dois bustos + `frame_lendario` + `icon_ember_heart`.

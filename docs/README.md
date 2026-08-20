@@ -27,6 +27,8 @@ docs/
 ├── 08-qa-compliance.md             qualidade, lojas, gacha, LGPD
 ├── 09-lancamento.md                go-to-market
 ├── 10-pipeline-assets.md           pastas, naming, import
+├── 11-pitch-one-pager.md           uma página
+├── 12-responsividade.md            PC, tablet, telefone
 └── adr/                            decisões técnicas datadas
 ```
 

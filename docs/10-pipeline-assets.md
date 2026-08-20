@@ -8,7 +8,7 @@
 
 ## 1. Estado do pacote do cliente
 
-Em 2026-08-20 o repositório `marmitero/idle-rpg` contém apenas o commit inicial e uma issue vazia chamada `assets`. **Nenhum arquivo de arte foi encontrado** no git, nas releases, nem no workspace.
+Em 2026-08-20 o pacote apareceu em `origin/main`: **82 PNGs na raiz**. Organizado neste branch. Inbox = `assets/_inbox/2026-08-20_main-dump/`. Catálogo = `assets/CATALOG.md`.
 
 Procedimento quando o pacote chegar (zip, drive, anexo de issue, PR):
 

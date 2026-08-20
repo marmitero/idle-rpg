@@ -14,8 +14,9 @@ Este repositório é o estúdio: planejamento, conteúdo, cliente, simulação, 
 | Inventário de documentos de produção | Concluído |
 | GDD / TDD / Art Bible / Economia / Roadmap | v1 (living docs) |
 | Arquitetura de monorepo | Estruturada |
-| Pacote de assets do cliente | **Não recebido** — ver `assets/_inbox` |
-| Implementação de gameplay | Bloqueada até o kickoff de engenharia (pedido explícito: planejar antes de desenvolver) |
+| Pacote de assets do cliente | **Absorvido** — 82 PNG de `main`, organizados; ver `assets/CATALOG.md` |
+| Responsividade PC/mobile | Documentada em `docs/12-responsividade.md` |
+| Implementação de gameplay | Próximo: kickoff do vertical slice |
 
 Comece por [`docs/README.md`](docs/README.md).
 

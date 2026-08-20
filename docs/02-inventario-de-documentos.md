@@ -102,7 +102,7 @@ Templates em `docs/templates/` (criados no kickoff de design).
 | --- | --- |
 | A-01 ★ | [Art Bible](05-art-bible.md) |
 | A-02 ★ | [Pipeline de assets](10-pipeline-assets.md) |
-| A-03 | UI kit spec (tokens, grid, componentes) |
+| A-03 ★ | [Responsividade / shell](12-responsividade.md) + UI tokens |
 | A-04 | Iconography sheet |
 | A-05 | VFX language sheet |
 | A-06 | Character turnaround + expression sheet (por herói) |
