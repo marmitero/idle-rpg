@@ -107,13 +107,13 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `enemies/rw_enemy_boss_pale_hydra_hit.png` | boss hit |
 | 10 | `enemies/rw_enemy_boss_goblin_king_die.png` | boss die |
 
-## lote-10 (feito, 9/10) — fundo `#FF00FF`
+## lote-10 (feito) — fundo `#FF00FF`
 
 | # | Arquivo | Tipo |
 | --- | --- | --- |
 | 1 | `enemies/rw_enemy_boss_ash_wyrm_die.png` | boss die |
 | 2 | `enemies/rw_enemy_boss_pale_hydra_die.png` | boss die |
-| 3 | `characters/battle/rw_hero_warrior_ult.png` | **falhou** → lote-11 |
+| 3 | `characters/battle/rw_hero_warrior_ult.png` | ult pose *(retomado)* |
 | 4 | `characters/battle/rw_hero_guardian_ult.png` | ult pose |
 | 5 | `characters/battle/rw_hero_mage_ult.png` | ult pose |
 | 6 | `characters/battle/rw_hero_archer_ult.png` | ult pose |
@@ -122,6 +122,14 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `vfx/rw_vfx_ember.png` | VFX facção |
 | 10 | `vfx/rw_vfx_tide.png` | VFX facção |
 
-## lote-11 (fila)
+## lote-11 (feito, 5/10 — fecha a etapa) — fundo `#FF00FF`
 
-Ult pose do guerreiro; VFX Thorn, Ashen, Solstice, Nadir.
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `characters/battle/rw_hero_warrior_ult.png` | já no lote-10 retomado |
+| 2 | `vfx/rw_vfx_thorn.png` | VFX facção |
+| 3 | `vfx/rw_vfx_ashen.png` | VFX facção |
+| 4 | `vfx/rw_vfx_solstice.png` | VFX facção |
+| 5 | `vfx/rw_vfx_nadir.png` | VFX facção |
+
+Slice de combate (idle/atk/hit/die/ult + VFX das 6 facções) **fechado**.
