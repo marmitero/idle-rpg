@@ -17,6 +17,9 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: true,
     fs: { allow: [path.resolve(__dirname, "../..")] },
+    proxy: {
+      "/api": { target: "http://127.0.0.1:3000", changeOrigin: true },
+    },
   },
   preview: {
     host: "0.0.0.0",

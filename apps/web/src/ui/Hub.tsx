@@ -1,5 +1,5 @@
 import { DAILIES, UI } from "@relicwake/content";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useGame } from "../state";
 import { ChromaImg } from "./ChromaImg";
 
@@ -12,10 +12,7 @@ export function Hub() {
   const claimDaily = useGame((s) => s.claimDaily);
   const [msg, setMsg] = useState("");
   const hours = Math.min(cap, (Date.now() - last) / 3_600_000);
-  const tickStamina = useGame((s) => s.tickStamina);
-  useEffect(() => {
-    tickStamina();
-  }, [tickStamina]);
+
 
   return (
     <div className="hero-bg" style={{ backgroundImage: `url(${UI.hub})`, minHeight: "100%" }}>
@@ -27,9 +24,13 @@ export function Hub() {
         </p>
         <button
           className="cta"
-          onClick={() => {
-            const r = collect();
-            setMsg(r.gold > 0 ? `+${r.gold} ouro em ${r.hours.toFixed(1)} h de sono.` : "O Spire ainda não rendeu.");
+          onClick={async () => {
+            try {
+              const r = await collect();
+              setMsg(r.gold > 0 ? `+${r.gold} ouro em ${r.hours.toFixed(1)} h de sono.` : "O Spire ainda não rendeu.");
+            } catch (e) {
+              setMsg(e instanceof Error ? e.message : "servidor");
+            }
           }}
         >
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>

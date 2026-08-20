@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { UI } from "@relicwake/content";
 import { useGame, type Tab } from "../state";
 import { Hub } from "./Hub";
@@ -20,7 +21,14 @@ export function App() {
   const gold = useGame((s) => s.gold);
   const letters = useGame((s) => s.letters);
   const fighting = useGame((s) => s.fighting);
+  const ready = useGame((s) => s.ready);
+  const error = useGame((s) => s.error);
   const setTab = useGame((s) => s.setTab);
+  const hydrate = useGame((s) => s.hydrate);
+
+  useEffect(() => {
+    void hydrate();
+  }, [hydrate]);
 
   return (
     <div className="shell">
@@ -39,7 +47,8 @@ export function App() {
           </div>
         </header>
         <main className="content">
-          {tab === "hub" && <Hub />}
+          {!ready && <div className="panel">{error ? `API: ${error}` : "Acordando o Spire…"}</div>}
+          {ready && tab === "hub" && <Hub />}
           {tab === "roster" && <Roster />}
           {tab === "battle" && <Battle />}
           {tab === "guild" && <Guild />}

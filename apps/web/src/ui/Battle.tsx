@@ -1,7 +1,6 @@
-import { ENEMIES, HERO_BY_ID, HEROES, HUNTS, STAGES, UI } from "@relicwake/content";
+import { HUNTS, STAGES, UI } from "@relicwake/content";
 import { DIRECTIVES, type DirectiveId } from "@relicwake/shared";
-import { simulate, type BattleInput, type LoadoutUnit } from "@relicwake/sim";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useGame } from "../state";
 import { BattleView } from "./BattleView";
 import { ChromaImg } from "./ChromaImg";
@@ -15,94 +14,42 @@ const LABELS: Record<DirectiveId, string> = {
   cisma: "Cisma",
 };
 
-function scaled(stats: LoadoutUnit["stats"], s: number): LoadoutUnit["stats"] {
-  return {
-    hp: Math.round(stats.hp * s),
-    atk: Math.round(stats.atk * s),
-    def: Math.round(stats.def * s),
-    spd: stats.spd,
-    crit: stats.crit,
-  };
-}
-
 export function Battle() {
   const fighting = useGame((s) => s.fighting);
-  const teamIds = useGame((s) => s.team);
   const directives = useGame((s) => s.directives);
   const setDirectives = useGame((s) => s.setDirectives);
   const startFight = useGame((s) => s.startFight);
   const startHunt = useGame((s) => s.startHunt);
-  const endFight = useGame((s) => s.endFight);
+  const sweepHunt = useGame((s) => s.sweepHunt);
+  const clearFight = useGame((s) => s.clearFight);
   const cleared = useGame((s) => s.cleared);
   const stamina = useGame((s) => s.stamina);
   const sweep = useGame((s) => s.sweep);
-  const tickStamina = useGame((s) => s.tickStamina);
   const [speed, setSpeed] = useState(1);
-  const [outcome, setOutcome] = useState<null | { win: boolean; gold: number; letters: number }>(null);
+  const [done, setDone] = useState(false);
   const [huntMsg, setHuntMsg] = useState("");
   const settled = useRef(false);
 
-  const input: BattleInput | null = useMemo(() => {
-    if (!fighting) return null;
-    const stage = STAGES.find((s) => s.id === fighting);
-    const hunt = HUNTS.find((h) => h.id === fighting);
-    const allies: LoadoutUnit[] = teamIds.slice(0, 5).map((id, slot) => {
-      const h = HERO_BY_ID[id] ?? HEROES[0]!;
-      return { id: `a${slot}`, heroId: h.id, name: h.name, faction: h.faction, stats: h.stats, slot };
-    });
-    let enemies: LoadoutUnit[] = [];
-    if (stage) {
-      enemies = stage.enemies.map((e, i) => {
-        const def = ENEMIES.find((x) => x.id === e.enemyId) ?? ENEMIES[0]!;
-        return {
-          id: `e${i}`,
-          heroId: def.id,
-          name: def.name,
-          faction: def.faction,
-          stats: scaled(def.stats, e.scale),
-          slot: e.slot,
-        };
-      });
-    } else if (hunt) {
-      const def = ENEMIES.find((x) => x.id === hunt.enemyId) ?? ENEMIES[0]!;
-      enemies = [0, 2, 3].map((slot, i) => ({
-        id: `e${i}`,
-        heroId: def.id,
-        name: def.name,
-        faction: def.faction,
-        stats: scaled(def.stats, i === 0 ? 1 : 0.72),
-        slot,
-      }));
-    } else return null;
-    return { seed: (Date.now() ^ fighting.length) >>> 0, allies, enemies, directives };
-  }, [fighting, teamIds, directives]);
-
-  const result = useMemo(() => (input ? simulate(input) : null), [input]);
-
   const toggle = (id: DirectiveId) => {
     const has = directives.includes(id);
-    setDirectives(has ? directives.filter((d) => d !== id) : [...directives, id].slice(-3));
+    void setDirectives(has ? directives.filter((d) => d !== id) : [...directives, id].slice(-3));
   };
 
-  const finish = (win: boolean) => {
-    if (settled.current) return;
-    settled.current = true;
-    const r = endFight(win);
-    setOutcome({ win, gold: r.gold, letters: r.letters });
-  };
-
-  if (fighting && input && result && !outcome) {
-    const stage = STAGES.find((s) => s.id === fighting);
-    const hunt = HUNTS.find((h) => h.id === fighting);
-    const bg = stage?.bg ?? hunt?.bg ?? "";
+  if (fighting && !done) {
+    const stage = STAGES.find((s) => s.id === fighting.id);
+    const hunt = HUNTS.find((h) => h.id === fighting.id);
     return (
       <div>
         <BattleView
-          bg={bg}
-          input={input}
-          result={result}
+          bg={stage?.bg ?? hunt?.bg ?? ""}
+          input={fighting.input}
+          result={fighting.result}
           speed={speed}
-          onDone={() => finish(result.winner === "ally")}
+          onDone={() => {
+            if (settled.current) return;
+            settled.current = true;
+            setDone(true);
+          }}
         />
         <div className="panel" style={{ marginTop: 0 }}>
           <div style={{ display: "flex", gap: 8 }}>
@@ -111,7 +58,15 @@ export function Battle() {
                 {s}x{speed === s ? " •" : ""}
               </button>
             ))}
-            <button className="cta" style={{ flex: 1 }} onClick={() => finish(result.winner === "ally")}>
+            <button
+              className="cta"
+              style={{ flex: 1 }}
+              onClick={() => {
+                if (settled.current) return;
+                settled.current = true;
+                setDone(true);
+              }}
+            >
               Skip
             </button>
           </div>
@@ -120,13 +75,15 @@ export function Battle() {
     );
   }
 
-  if (outcome) {
+  if (fighting && done) {
+    const w = fighting.rewards.win;
     return (
       <div className="panel">
-        <h1>{outcome.win ? "O Sono cedeu" : "O Sono pesou"}</h1>
-        {outcome.win ? (
+        <h1>{w ? "O Sono cedeu" : "O Sono pesou"}</h1>
+        {w ? (
           <p className="muted">
-            +{outcome.gold} ouro{outcome.letters ? ` · +${outcome.letters} Letters` : ""}
+            +{fighting.rewards.gold} ouro
+            {fighting.rewards.letters ? ` · +${fighting.rewards.letters} Letters` : ""} · ledger no servidor
           </p>
         ) : (
           <p className="muted">Mude a formação ou as diretivas.</p>
@@ -135,7 +92,8 @@ export function Battle() {
           className="cta"
           onClick={() => {
             settled.current = false;
-            setOutcome(null);
+            setDone(false);
+            clearFight();
           }}
         >
           Continuar
@@ -170,9 +128,8 @@ export function Battle() {
             <div style={{ display: "flex", gap: 8 }}>
               <button
                 className="cta"
-                onClick={() => {
-                  tickStamina();
-                  const r = startHunt(h.id);
+                onClick={async () => {
+                  const r = await startHunt(h.id);
                   setHuntMsg(r.ok ? "" : (r.reason ?? ""));
                 }}
               >
@@ -180,10 +137,9 @@ export function Battle() {
               </button>
               <button
                 className="cta"
-                onClick={() => {
-                  tickStamina();
-                  const r = startHunt(h.id, true);
-                  setHuntMsg(r.ok ? `Sweep: +${h.gold} ouro` : (r.reason ?? ""));
+                onClick={async () => {
+                  const r = await sweepHunt(h.id);
+                  setHuntMsg(r.ok ? `Sweep: +${r.gold} ouro` : (r.reason ?? ""));
                 }}
               >
                 Sweep
@@ -204,7 +160,7 @@ export function Battle() {
             <p className="muted">
               +{s.gold} ouro · taxa Wake {s.wakeRate}/h
             </p>
-            <button className="cta" disabled={!open} onClick={() => startFight(s.id)}>
+            <button className="cta" disabled={!open} onClick={() => void startFight(s.id)}>
               {open ? "Lutar" : "Trancado"}
             </button>
           </div>
