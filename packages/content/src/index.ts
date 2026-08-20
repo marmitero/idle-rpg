@@ -145,67 +145,107 @@ const gob = (slot: number, scale: number) => ({
   scale,
 });
 
+const BG = {
+  spire: "/assets/environments/biomes/rw_env_battle_spire_base.png",
+  ember: "/assets/environments/biomes/rw_env_battle_emberworks.png",
+  tide: "/assets/environments/biomes/rw_env_battle_tidevault.png",
+  thorn: "/assets/environments/biomes/rw_env_battle_thorn.png",
+  ash: "/assets/environments/biomes/rw_env_battle_ash.png",
+  crown: "/assets/environments/biomes/rw_env_battle_crown.png",
+  goblin: "/assets/environments/hunts/rw_env_hunt_goblin.png",
+  wyrm: "/assets/environments/hunts/rw_env_hunt_wyrm.png",
+  hydra: "/assets/environments/hunts/rw_env_hunt_hydra.png",
+};
+
+function wave(
+  id: string,
+  chapter: number,
+  index: number,
+  name: string,
+  bg: string,
+  n: number,
+  scale: number,
+  gold: number,
+  wakeRate: number,
+  boss?: { enemyId: string; scale: number },
+): StageDef {
+  const enemies = Array.from({ length: Math.min(5, n) }, (_, i) => gob(i, scale - i * 0.02));
+  if (boss) enemies[0] = { enemyId: boss.enemyId, slot: 0, scale: boss.scale };
+  return { id, chapter, index, name, bg, enemies, gold, wakeRate };
+}
+
 export const STAGES: StageDef[] = [
+  wave("1-1", 1, 1, "A Base que respira", BG.spire, 3, 0.7, 40, 8),
+  wave("1-2", 1, 2, "Lanternas de Wake", BG.spire, 4, 0.74, 55, 10),
+  wave("1-3", 1, 3, "O primeiro Waker que mente", BG.spire, 5, 0.8, 70, 12),
+  wave("1-4", 1, 4, "Degrau das cinzas", BG.spire, 5, 0.86, 80, 13),
+  wave("1-5", 1, 5, "Trono de osso", BG.goblin, 4, 0.8, 180, 16, {
+    enemyId: "enemy.goblin_king",
+    scale: 1.12,
+  }),
+  wave("2-1", 2, 1, "Emberworks abre", BG.ember, 4, 0.88, 90, 16),
+  wave("2-2", 2, 2, "Canais de magma", BG.ember, 5, 0.92, 100, 17),
+  wave("2-3", 2, 3, "Wyrm na forja", BG.wyrm, 3, 0.85, 220, 20, {
+    enemyId: "enemy.ash_wyrm",
+    scale: 1.05,
+  }),
+  wave("3-1", 3, 1, "Tidevault", BG.tide, 4, 0.9, 110, 18),
+  wave("3-2", 3, 2, "A cisterna sem fundo", BG.hydra, 3, 0.88, 260, 22, {
+    enemyId: "enemy.pale_hydra",
+    scale: 1.08,
+  }),
+  wave("4-1", 4, 1, "Thorn Causeway", BG.thorn, 5, 0.94, 120, 20),
+  wave("5-1", 5, 1, "Ash Cloister", BG.ash, 5, 0.96, 130, 21),
+  wave("6-1", 6, 1, "Crown of Sleep", BG.crown, 5, 1.0, 160, 24),
+];
+
+export type HuntDef = {
+  id: string;
+  name: string;
+  bg: string;
+  enemyId: string;
+  stamina: number;
+  gold: number;
+  letters: number;
+};
+
+export const HUNTS: HuntDef[] = [
   {
-    id: "1-1",
-    chapter: 1,
-    index: 1,
-    name: "A Base que respira",
-    bg: "/assets/environments/biomes/rw_env_battle_spire_base.png",
-    enemies: [gob(0, 0.72), gob(2, 0.7), gob(3, 0.68)],
-    gold: 40,
-    wakeRate: 8,
-  },
-  {
-    id: "1-2",
-    chapter: 1,
-    index: 2,
-    name: "Lanternas de Wake",
-    bg: "/assets/environments/biomes/rw_env_battle_spire_base.png",
-    enemies: [gob(0, 0.78), gob(1, 0.76), gob(2, 0.74), gob(3, 0.72)],
-    gold: 55,
-    wakeRate: 10,
-  },
-  {
-    id: "1-3",
-    chapter: 1,
-    index: 3,
-    name: "O primeiro Waker que mente",
-    bg: "/assets/environments/biomes/rw_env_battle_spire_base.png",
-    enemies: [gob(0, 0.85), gob(1, 0.82), gob(2, 0.8), gob(3, 0.8), gob(4, 0.78)],
+    id: "hunt.goblin",
+    name: "Toca Goblin",
+    bg: BG.goblin,
+    enemyId: "enemy.goblin_king",
+    stamina: 8,
     gold: 70,
-    wakeRate: 12,
+    letters: 1,
   },
   {
-    id: "1-10",
-    chapter: 1,
-    index: 10,
-    name: "Trono de osso",
-    bg: "/assets/environments/hunts/rw_env_hunt_goblin.png",
-    enemies: [
-      gob(2, 0.7),
-      gob(3, 0.7),
-      gob(4, 0.7),
-      { enemyId: "enemy.goblin_king", slot: 0, scale: 1.15 },
-    ],
-    gold: 180,
-    wakeRate: 18,
+    id: "hunt.wyrm",
+    name: "Covil do Wyrm",
+    bg: BG.wyrm,
+    enemyId: "enemy.ash_wyrm",
+    stamina: 10,
+    gold: 95,
+    letters: 1,
   },
   {
-    id: "2-1",
-    chapter: 2,
-    index: 1,
-    name: "Emberworks",
-    bg: "/assets/environments/biomes/rw_env_battle_emberworks.png",
-    enemies: [
-      gob(0, 0.9),
-      gob(2, 0.85),
-      { enemyId: "enemy.ash_wyrm", slot: 1, scale: 0.95 },
-    ],
-    gold: 90,
-    wakeRate: 16,
+    id: "hunt.hydra",
+    name: "Cisterna da Hidra",
+    bg: BG.hydra,
+    enemyId: "enemy.pale_hydra",
+    stamina: 12,
+    gold: 120,
+    letters: 2,
   },
 ];
+
+export const DAILIES = [
+  { id: "wake", label: "Coletar Wake", target: 1, gold: 40, letters: 2, sweep: 1 },
+  { id: "fight", label: "Vencer 1 stage do Spire", target: 1, gold: 50, letters: 2, sweep: 1 },
+  { id: "hunt", label: "Completar 1 hunt", target: 1, gold: 50, letters: 1, sweep: 2 },
+  { id: "pull", label: "Puxar 1 Letter na Font", target: 1, gold: 20, letters: 1, sweep: 0 },
+  { id: "login", label: "Entrar no Spire hoje", target: 1, gold: 30, letters: 1, sweep: 1 },
+] as const;
 
 export const FACTION_LABEL: Record<Faction, string> = {
   embercourt: "Embercourt",
