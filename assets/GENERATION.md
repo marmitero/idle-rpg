@@ -87,6 +87,16 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `characters/battle/rw_hero_archer_atk.png` | atk |
 | 10 | `characters/battle/rw_hero_rogue_atk.png` | atk |
 
-## lote-08 (fila)
+## lote-08 (feito) — fundo `#FF00FF`
 
-Cleric atk; hit/die dos 6; atk dos 3 bosses.
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `characters/battle/rw_hero_cleric_atk.png` | atk |
+| 2–7 | `characters/battle/rw_hero_*_hit.png` | hit dos 6 |
+| 8 | `enemies/rw_enemy_boss_goblin_king_atk.png` | boss atk |
+| 9 | `enemies/rw_enemy_boss_ash_wyrm_atk.png` | boss atk |
+| 10 | `enemies/rw_enemy_boss_pale_hydra_atk.png` | boss atk |
+
+## lote-09 (fila)
+
+Die dos 6 heróis; hit/die dos 3 bosses.
