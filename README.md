@@ -16,7 +16,7 @@ Este repositório é o estúdio: planejamento, conteúdo, cliente, simulação, 
 | Arquitetura de monorepo | Estruturada |
 | Pacote de assets do cliente | **Absorvido** — ver `assets/CATALOG.md` |
 | Responsividade PC/mobile | `docs/12-responsividade.md` |
-| Vertical slice | Jogável: `npm run dev` — hub, roster, Spire 5v5, Font, guild hall |
+| Vertical slice | Jogável: `npm run dev` (web:5173 + api:3000) |
 
 Comece por [`docs/README.md`](docs/README.md).
 
