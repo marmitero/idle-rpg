@@ -20,6 +20,7 @@ export function App() {
   const tab = useGame((s) => s.tab);
   const gold = useGame((s) => s.gold);
   const letters = useGame((s) => s.letters);
+  const email = useGame((s) => s.email);
   const fighting = useGame((s) => s.fighting);
   const ready = useGame((s) => s.ready);
   const error = useGame((s) => s.error);

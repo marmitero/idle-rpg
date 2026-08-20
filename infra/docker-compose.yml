@@ -1,7 +1,9 @@
-# Postgres de produção / staging. O slice local usa SQLite (mesmo schema).
+# dev: não precisa disto (SQLite).
+# staging: docker compose -f infra/docker-compose.yml --profile staging up
 services:
   postgres:
     image: postgres:16-alpine
+    profiles: ["staging", "prod"]
     environment:
       POSTGRES_USER: relicwake
       POSTGRES_PASSWORD: relicwake
@@ -11,5 +13,28 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relicwake"]
+      interval: 5s
+      retries: 10
+
+  api:
+    image: node:22-alpine
+    profiles: ["staging"]
+    working_dir: /app
+    command: sh -c "npm ci && npm run start -w @relicwake/api"
+    env_file:
+      - ./env/staging.example
+    environment:
+      API_PORT: 3000
+      DATABASE_URL: postgres://relicwake:relicwake@postgres:5432/relicwake
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   pgdata:

@@ -6,6 +6,8 @@ import { bumpDaily, credit, getByEmail, getById, getOrCreate, publicState, save,
 import { hashPassword, signJwt, validEmail, verifyJwt, verifyPassword } from "./auth.ts";
 
 const PORT = Number(process.env.API_PORT ?? 3000);
+const CORS = process.env.CORS_ORIGIN ?? "*";
+const RW_ENV = process.env.RW_ENV ?? "dev";
 const STAMINA_CAP = 120;
 const STAMINA_PER_H = 10;
 
@@ -13,7 +15,7 @@ function json(res: ServerResponse, code: number, body: unknown) {
   const data = JSON.stringify(body);
   res.writeHead(code, {
     "content-type": "application/json; charset=utf-8",
-    "access-control-allow-origin": "*",
+    "access-control-allow-origin": CORS,
     "access-control-allow-headers": "content-type, x-device-id, authorization, idempotency-key",
     "access-control-allow-methods": "GET,POST,OPTIONS",
   });
@@ -95,7 +97,7 @@ function loadoutFromTeam(a: Account): LoadoutUnit[] {
 const server = createServer(async (req, res) => {
   if (req.method === "OPTIONS") {
     res.writeHead(204, {
-      "access-control-allow-origin": "*",
+      "access-control-allow-origin": CORS,
       "access-control-allow-headers": "content-type, x-device-id, authorization, idempotency-key",
       "access-control-allow-methods": "GET,POST,OPTIONS",
     });
@@ -105,7 +107,7 @@ const server = createServer(async (req, res) => {
   const url = req.url?.split("?")[0] ?? "";
   try {
     if (req.method === "GET" && url === "/api/health") {
-      json(res, 200, { ok: true, service: "relicwake-api" });
+      json(res, 200, { ok: true, service: "relicwake-api", env: RW_ENV });
       return;
     }
     if (req.method === "POST" && url === "/api/session") {
@@ -313,5 +315,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`relicwake-api on 0.0.0.0:${PORT}`);
+  console.log(`relicwake-api env=${RW_ENV} on 0.0.0.0:${PORT}`);
 });
