@@ -87,7 +87,7 @@ Ultimates + comandos + passivas dos 6. VFX: hit slash, heal.
 ## Buracos do 1.0 (não inventar no código)
 
 - plates: hub, Font, hall, 6 biomas (incl. Ash + Crown), 3 hunts
-- sprites idle+atk+hit: 6/6 heróis; bosses idle+atk 3/3; die ainda falta
+- sprites heróis idle+atk+hit+die 6/6; bosses idle+atk+hit 3/3; die bosses 1/3 (falta wyrm e hidra)
 - 0 áudio
 - logo: `marketing/rw_brand_logo.png` (lote-02)
 - 0 fontes licenciadas

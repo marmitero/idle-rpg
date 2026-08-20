@@ -107,6 +107,21 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `enemies/rw_enemy_boss_pale_hydra_hit.png` | boss hit |
 | 10 | `enemies/rw_enemy_boss_goblin_king_die.png` | boss die |
 
-## lote-10 (fila)
+## lote-10 (feito, 9/10) — fundo `#FF00FF`
 
-Die do Ash Wyrm e da Hidra; ult poses dos 6 (opcional); VFX de facção.
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `enemies/rw_enemy_boss_ash_wyrm_die.png` | boss die |
+| 2 | `enemies/rw_enemy_boss_pale_hydra_die.png` | boss die |
+| 3 | `characters/battle/rw_hero_warrior_ult.png` | **falhou** → lote-11 |
+| 4 | `characters/battle/rw_hero_guardian_ult.png` | ult pose |
+| 5 | `characters/battle/rw_hero_mage_ult.png` | ult pose |
+| 6 | `characters/battle/rw_hero_archer_ult.png` | ult pose |
+| 7 | `characters/battle/rw_hero_rogue_ult.png` | ult pose |
+| 8 | `characters/battle/rw_hero_cleric_ult.png` | ult pose |
+| 9 | `vfx/rw_vfx_ember.png` | VFX facção |
+| 10 | `vfx/rw_vfx_tide.png` | VFX facção |
+
+## lote-11 (fila)
+
+Ult pose do guerreiro; VFX Thorn, Ashen, Solstice, Nadir.
