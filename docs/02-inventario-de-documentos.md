@@ -101,7 +101,7 @@ Templates em `docs/templates/` (criados no kickoff de design).
 | # | Documento |
 | --- | --- |
 | A-01 ★ | [Art Bible](05-art-bible.md) |
-| A-02 ★ | [Pipeline de assets](10-pipeline-assets.md) |
+| A-02 ★ | [Pipeline de assets](10-pipeline-assets.md) + [regras de geração](13-regras-de-geracao.md) |
 | A-03 ★ | [Responsividade / shell](12-responsividade.md) + UI tokens |
 | A-04 | Iconography sheet |
 | A-05 | VFX language sheet |

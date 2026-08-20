@@ -3,7 +3,8 @@
 **Status:** v1.1 **travada no pacote real** (82 PNGs em `origin/main`, 2026-08-20)  
 **Dono:** Direção de arte  
 **Override cumprido:** o pacote venceu a hipótese v1 (vitral/AFK). Escola oficial = **HD pixel ilustrado + UI ouro/navy**.  
-**Catálogo:** [`assets/CATALOG.md`](../assets/CATALOG.md) · **Tela:** [`docs/12-responsividade.md`](12-responsividade.md)
+**Catálogo:** [`assets/CATALOG.md`](../assets/CATALOG.md) · **Tela:** [`docs/12-responsividade.md`](12-responsividade.md)  
+**Geração:** [`docs/13-regras-de-geracao.md`](13-regras-de-geracao.md) — fundo `#FF00FF`, 10 por lote. Magenta é cor proibida no sujeito.
 
 ---
 

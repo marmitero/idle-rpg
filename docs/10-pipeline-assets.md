@@ -1,8 +1,9 @@
 # Pipeline de assets
 
-**Status:** v1  
+**Status:** v1.1  
 **Dono:** Arte + client  
-**Pastas canônicas:** `/assets`
+**Pastas canônicas:** `/assets`  
+**Geração:** [regras](13-regras-de-geracao.md) — magenta `#FF00FF`, lotes de 10.
 
 ---
 

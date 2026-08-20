@@ -14,8 +14,8 @@ Runtime usa o prefixo `rw_`.
 | `portrait_rogue` | `rw_hero_rogue_*` | Ashen Choir | Striker |
 | `portrait_cleric` | `rw_hero_cleric_*` | Solstice | Seer |
 
-Peças: `bust_512` (pack) · `icon_256` (downscale do bust).  
-Faltam: splash 2048, battle sheet, cut-in, 22 heróis restantes do 1.0.
+Peças: `bust_512` (pack) · `icon_256` (downscale) · `battle/*_idle` (lote-02, 4/6 — faltam rogue e cleric).  
+Faltam: splash, cut-in, sheets de atk/ult/hit, 22 heróis do 1.0.
 
 ## Chefes
 
@@ -33,7 +33,7 @@ Faltam: splash 2048, battle sheet, cut-in, 22 heróis restantes do 1.0.
 | `frame_raro` | `rw_ui_frame_rare_256` | Rare |
 | `frame_epico` | `rw_ui_frame_elite_256` | Elite |
 | `frame_lendario` | `rw_ui_frame_relic_256` | Relic |
-| — | myth/apex | *falta* |
+| — | `rw_ui_frame_mythic_256` | Myth *(lote-02, chroma)* |
 
 ## Chrome UI
 
@@ -59,14 +59,13 @@ Mapeamento de nav 1.0:
 | Hub | `rw_hud_home` | ok (bigorna — trocar se o hub não for forja) |
 | Roster | `rw_hud_hero` | ok |
 | Battle / Spire | `rw_hud_area` / `raid` | decidir no UI kit |
-| Guild | — | **falta** |
+| Guild | `rw_hud_guild` | lote-02 |
 | Menu | `rw_hud_settings` | ok |
-| Font | — | **falta** (usar `fuse` temporário) |
+| Font | `rw_hud_font` | lote-02 |
 
 ## Facções
 
-Core geradas: Embercourt, Tidebound, Thornveil, Ashen.  
-Raras: Solstice, Nadir — **faltam**.
+Seis brasões: Embercourt, Tidebound, Thornveil, Ashen (lote-01) · Solstice, Nadir (lote-02, magenta).
 
 ## Stats
 
@@ -75,10 +74,10 @@ Complemento: atk, spd.
 
 ## Buracos do 1.0 (não inventar no código)
 
-- 0 ambientes (hub, 6 biomas, 4 hunts, hall)
-- 0 sprites de batalha / VFX
+- 0 ambientes / plates (lote-04)
+- sprites de batalha: 4/6 idle; faltam rogue, cleric, bosses, clips atk/ult
 - 0 áudio
-- 0 logo / key art
+- logo: `marketing/rw_brand_logo.png` (lote-02)
 - 0 fontes licenciadas
 - 22 heróis
 - 9-slice JSON calibrado visualmente

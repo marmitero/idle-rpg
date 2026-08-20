@@ -1,6 +1,6 @@
 # Relicwake — Documentação de estúdio
 
-Índice vivo. Cada documento tem dono, audiência e critério de “pronto”. Versão atual: **pré-produção v1** (2026-08-20).
+Índice vivo. Cada documento tem dono, audiência e critério de “pronto”. Versão atual: **pré-produção v1.1** (pacote de arte absorvido, shell responsivo).
 
 ## Como ler
 
@@ -29,6 +29,7 @@ docs/
 ├── 10-pipeline-assets.md           pastas, naming, import
 ├── 11-pitch-one-pager.md           uma página
 ├── 12-responsividade.md            PC, tablet, telefone
+├── 13-regras-de-geracao.md         magenta + lotes de 10
 └── adr/                            decisões técnicas datadas
 ```
 
