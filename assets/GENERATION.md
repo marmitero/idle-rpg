@@ -97,6 +97,16 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `enemies/rw_enemy_boss_ash_wyrm_atk.png` | boss atk |
 | 10 | `enemies/rw_enemy_boss_pale_hydra_atk.png` | boss atk |
 
-## lote-09 (fila)
+## lote-09 (feito) — fundo `#FF00FF`
 
-Die dos 6 heróis; hit/die dos 3 bosses.
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1–6 | `characters/battle/rw_hero_*_die.png` | die dos 6 |
+| 7 | `enemies/rw_enemy_boss_goblin_king_hit.png` | boss hit |
+| 8 | `enemies/rw_enemy_boss_ash_wyrm_hit.png` | boss hit |
+| 9 | `enemies/rw_enemy_boss_pale_hydra_hit.png` | boss hit |
+| 10 | `enemies/rw_enemy_boss_goblin_king_die.png` | boss die |
+
+## lote-10 (fila)
+
+Die do Ash Wyrm e da Hidra; ult poses dos 6 (opcional); VFX de facção.
