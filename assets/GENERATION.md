@@ -22,17 +22,28 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 9 | `characters/battle/rw_hero_archer_idle.png` | sprite |
 | 10 | `characters/battle/rw_hero_guardian_idle.png` | sprite |
 
-## lote-03 (fila)
+## lote-03 (feito, 9/10) — fundo `#FF00FF`
 
-1. `rw_hero_rogue_idle`  
-2. `rw_hero_cleric_idle`  
-3. `rw_enemy_boss_goblin_king_idle`  
-4. `rw_enemy_boss_ash_wyrm_idle`  
-5. `rw_enemy_boss_pale_hydra_idle`  
-6. `rw_hud_spire`  
-7. 3 diretivas (Foco, Guarda, Execute)  
-8. — (completa 10 no kickoff)
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `characters/battle/rw_hero_rogue_idle.png` | sprite |
+| 2 | `characters/battle/rw_hero_cleric_idle.png` | sprite |
+| 3 | `enemies/rw_enemy_boss_goblin_king_idle.png` | sprite |
+| 4 | `enemies/rw_enemy_boss_ash_wyrm_idle.png` | sprite |
+| 5 | hidra idle | **falhou** (limite da sessão) → lote-04 |
+| 6 | `ui/icons/hud/rw_hud_spire.png` | nav |
+| 7 | `ui/icons/directives/rw_directive_foco.png` | diretiva |
+| 8 | `ui/icons/directives/rw_directive_guarda.png` | diretiva |
+| 9 | `ui/icons/directives/rw_directive_execute.png` | diretiva |
+| 10 | `ui/icons/directives/rw_directive_mare.png` | diretiva |
 
-## lote-04 (plates, sem magenta)
+## lote-04 (fila, cutouts)
+
+1. `rw_enemy_boss_pale_hydra_idle`  
+2. `rw_directive_pacto`  
+3. `rw_directive_cisma`  
+4–10. a completar no kickoff (skills dos 6, etc.)
+
+## lote-05 (plates, sem magenta)
 
 Hub, batalha cap. 1, hall da guilda. Lote marcado `plate`.
