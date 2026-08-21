@@ -3,7 +3,6 @@ import { DIRECTIVES, type DirectiveId } from "@relicwake/shared";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "../state";
 import { BattleView } from "./BattleView";
-import { ChromaImg } from "./ChromaImg";
 
 const LABELS: Record<DirectiveId, string> = {
   foco: "Foco",
@@ -145,7 +144,7 @@ export function Battle() {
         <div className="dir-row">
           {DIRECTIVES.map((d) => (
             <button key={d} className={`dir ${directives.includes(d) ? "on" : ""}`} onClick={() => toggle(d)}>
-              <ChromaImg src={UI.directives[d]!} alt="" />
+              <img src={UI.directives[d]!} alt="" />
               <span>{LABELS[d]}</span>
             </button>
           ))}

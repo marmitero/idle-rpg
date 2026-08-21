@@ -34,7 +34,8 @@ Comece por [`docs/README.md`](docs/README.md).
 apps/          clientes (web PWA, admin live-ops)
 packages/      simulação determinística, protocolo, conteúdo, UI kit
 services/      API autoritativa, workers de idle/settlement
-assets/        arte organizada por disciplina
+assets/        finais prontos que o jogo carrega (fundo removido, bordas limpas)
+referencias/   masters de geração com fundo magenta, mesma taxonomia de assets/
 docs/          documentos de estúdio
 infra/         deploy, observabilidade
 tools/         pipelines de conteúdo e assets

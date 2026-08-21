@@ -16,3 +16,7 @@ Estilo oficial: HD pixel ilustrado, UI ouro/navy. Pacote absorvido em 2026-08-20
 | `audio/` | Música, SFX, VO |
 | `marketing/` | Key art, store, trailer stills |
 | `generated/` | Atlases (CI) |
+
+`assets/` guarda **finais prontos** (fundo removido). Masters de geração com
+fundo magenta `#FF00FF` vivem em [`referencias/`](../referencias/README.md),
+na mesma taxonomia. Fluxo: `npm run assets:finalize` + `npm run assets:check`.

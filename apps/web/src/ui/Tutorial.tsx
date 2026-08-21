@@ -2,7 +2,6 @@ import { HERO_BY_ID, STARTERS, TUTORIAL_DONE, TUTORIAL_STAGES, UI } from "@relic
 import { useEffect, useState } from "react";
 import { playSfx, unlockAudio } from "../audio";
 import { useGame } from "../state";
-import { ChromaImg } from "./ChromaImg";
 
 export function Tutorial() {
   const step = useGame((s) => s.tutorialStep);
@@ -112,7 +111,7 @@ export function Tutorial() {
             <p>O time luta sozinho. Você escolhe a intenção. Foco: priorize o inimigo de maior ATK.</p>
             <div style={{ display: "flex", justifyContent: "center", margin: "12px 0" }}>
               <div className="dir on">
-                <ChromaImg src={UI.directives.foco!} alt="" />
+                <img src={UI.directives.foco!} alt="" />
                 <span>Foco</span>
               </div>
             </div>
@@ -193,7 +192,7 @@ export function Tutorial() {
               }}
             >
               <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-                <ChromaImg src={UI.chest} alt="" width={28} height={28} />
+                <img src={UI.chest} alt="" width={28} height={28} />
                 Coletar Wake
               </span>
             </button>

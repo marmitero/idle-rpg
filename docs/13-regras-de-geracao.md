@@ -27,10 +27,18 @@ Obrigatório no prompt e no pós-processo:
 
 **Exceção:** placas full-bleed de cenário (hub, bioma, hunt) *são* o fundo. Não levam magenta. Entram num lote próprio, rotulado `plate`. Este lote 02 **não** tem plates.
 
-Pós-processo obrigatório: `tools/asset-pipeline/chroma_magenta.py`  
-(flood a partir das bordas + alfa baixo → `#FF00FF`, saída RGB sem alfa).
+Pós-processo obrigatório: `tools/asset-pipeline/remove_bg.py` (`npm run assets:finalize`)  \n(flood do magenta a partir das bordas → PNG RGBA transparente; sujeito nunca é removido por cor).
 
-Runtime: o import troca `#FF00FF` por alfa 0 antes do atlas.
+Runtime: o jogo **não processa nada**. Carrega direto o final transparente de `assets/`.
+
+## Pastas — masters × finais
+
+| Pasta | Conteúdo |
+| --- | --- |
+| `referencias/` | **Master** magenta `#FF00FF` recém-gerado, mesma taxonomia de `assets/` |
+| `assets/` | **Final** RGBA com fundo removido e bordas limpas — única fonte do jogo |
+
+Fluxo: gerar → salvar em `referencias/<taxonomia>` → `npm run assets:finalize` → validar com `npm run assets:check`. Nunca commitar final sem passar pelo pipeline, e nunca referenciar `referencias/` no código do jogo.
 
 ---
 

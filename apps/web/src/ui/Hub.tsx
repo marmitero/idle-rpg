@@ -3,7 +3,6 @@ import { t } from "../i18n";
 import { useState } from "react";
 import { playSfx, unlockAudio } from "../audio";
 import { useGame } from "../state";
-import { ChromaImg } from "./ChromaImg";
 import { ArenaPanel, HonorPanel, LivePanel, TowerPanel } from "./Modes";
 
 export function Hub() {
@@ -82,7 +81,7 @@ export function Hub() {
           }}
         >
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-            <ChromaImg src={UI.chest} alt="" width={28} height={28} />
+            <img src={UI.chest} alt="" width={28} height={28} />
             {t("collect_wake", locale)}
           </span>
         </button>

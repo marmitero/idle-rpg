@@ -2,6 +2,8 @@
 
 Regra: **10 por lote**. Fundo: **`#FF00FF`**. Spec: [`docs/13-regras-de-geracao.md`](../docs/13-regras-de-geracao.md).
 
+**Saída do gerador:** master em `referencias/<taxonomia>` → `npm run assets:finalize` escreve o final transparente em `assets/<taxonomia>`. O jogo nunca processa imagem em runtime (chroma removido em 2026-08-21).
+
 ## lote-01 (passado)
 
 Complementos sem a regra do magenta (armor t2, frame common, 4 moedas, 4 facções core).  
@@ -202,9 +204,12 @@ Wiring: `ownIdle()` para os 8 Ember/Tide; `ownBust` Helion (atrasado do lote-13)
 | 9 | `characters/battle/rw_hero_ashen_dust_idle.png` | idle Dust |
 | 10 | `characters/battle/rw_hero_ashen_hymn_idle.png` | idle Hymn |
 
-Wiring: `ownBust("nadir_rift", KIT.guardian)` (Rift sai do kit caído — ver nota) e `ownIdle()` para os 9. Ícone do Rift = cópia do busto (convenção lotes 12–13). Busto do Rift precisou de padding magenta 112px (geração sangrou até a borda) — chroma + cantos `#FF00FF` verificados.
+Wiring: `ownBust("nadir_rift", KIT.guardian)` (Rift sai do kit caído — ver nota) e `ownIdle()` para os 9. Ícone do Rift = cópia do busto (convenção lotes 12–13).
 
-Nota: o `undefined` do Rift **não era bug** — `h()` faz fallback `kitOf(klass, faction)`; todos os heróis nasceram assim em "Content complete" e ganharam arte própria conforme a fila. Com o lote-15, **nenhum herói depende mais do fallback de busto**.
+Nota (2026-08-21, reorganização): o busto do Rift foi **regenerado** — o primeiro
+master tinha sido perfurado pelo chroma global do pipeline antigo (6.195 recortes
+internos). Novo pipeline `remove_bg.py` (flood de borda, sem kill por cor) substitui
+`chroma_magenta.py`; masters vivem em `referencias/`, finais transparentes em `assets/`.
 
-**Próximo lote-16:** 5 idle restantes (Cinder, Veil, Helion, Umbral, Rift) + 5 atk dos novos (Sem, Bramble, Tess, Quin, Ashleaf) ou mix idle/atk conforme prioridade.
+**Próximo lote-16:** 5 idle restantes (Cinder, Veil, Helion, Umbral, Rift) + 5 atk dos novos (Sem, Bramble, Tess, Quin, Ashleaf).
 

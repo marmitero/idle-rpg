@@ -3,7 +3,6 @@ import type { BattleInput, BattleResult } from "@relicwake/sim";
 import { Application, Container, Sprite, Texture } from "pixi.js";
 import { useEffect, useRef } from "react";
 import { playSfx, setBed } from "../audio";
-import { chromaUrl } from "../chroma";
 
 /** Pixi playback of a server-judged BattleResult. Never calls simulate(). */
 type Props = {
@@ -32,8 +31,8 @@ function slotPos(team: "ally" | "enemy", slot: number, w: number, h: number) {
 }
 
 async function tex(url: string): Promise<Texture> {
-  const data = await chromaUrl(url);
-  return Texture.from(data);
+  // Assets já vêm com fundo removido de `assets/` (pipeline remove_bg.py).
+  return Texture.from(url);
 }
 
 export function BattleView({ bg, input, result, speed, onDone }: Props) {

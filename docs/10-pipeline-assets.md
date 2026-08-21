@@ -29,7 +29,8 @@ Até lá, estas pastas existem e estão vazias de propósito.
 ## 2. Árvore
 
 ```
-assets/
+referencias/               masters magenta #FF00FF recém-gerados (mesma taxonomia)
+assets/                    finais que o jogo carrega (fundo removido, bordas limpas)
 ├── _inbox/                 pacote cru, ainda sem naming
 ├── raw/                    fontes (psd, clip, ase, blend) — git-lfs se >10MB
 ├── characters/
@@ -57,6 +58,11 @@ assets/
 ├── marketing/
 └── generated/              atlases e hashes (CI, não editar à mão)
 ```
+
+Fluxo do corte de fundo: gerador salva o master em `referencias/` →
+`npm run assets:finalize` (remove_bg.py) escreve o RGBA transparente em
+`assets/` → `npm run assets:check` valida. O cliente não processa imagem
+em runtime (chroma removido em 2026-08-21).
 
 ---
 
@@ -94,14 +100,14 @@ sRGB. Sem perfil Adobe RGB no runtime.
 
 ## 5. Import
 
-`tools/asset-pipeline` (a escrever no kickoff):
+`tools/asset-pipeline` (remove_bg.py hoje; atlas no futuro):
 
 1. valida naming + dimensões da bible;
-2. gera atlas por disciplina;
-3. escreve manifesto `generated/manifest.json` (hash, pixel size, content id);
-4. CI quebra se herói em content não tem bust+icon+battle.
+2. remove o fundo magenta dos masters (`referencias/` → `assets/`);
+3. gera atlas por disciplina + manifesto `generated/manifest.json` (hash, pixel size, content id);
+4. CI quebra se herói em content não tem bust+icon+battle final.
 
-Cliente só conhece o manifesto.
+Cliente carrega os finais de `assets/` direto, sem processamento em runtime.
 
 ---
 

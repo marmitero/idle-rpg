@@ -8,7 +8,6 @@ import { Battle } from "./Battle";
 import { Guild } from "./Guild";
 import { Menu } from "./Menu";
 import { Tutorial } from "./Tutorial";
-import { ChromaImg } from "./ChromaImg";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "hub", label: "Hub", icon: UI.nav.hub },
@@ -56,11 +55,11 @@ export function App() {
       <div className="stage">
         <header className="topbar">
           <div className="chip">
-            <ChromaImg src={UI.gold} alt="" />
+            <img src={UI.gold} alt="" />
             {gold}
           </div>
           <div className="chip">
-            <ChromaImg src={UI.letters} alt="" />
+            <img src={UI.letters} alt="" />
             {letters}
           </div>
           <div className="chip">poeira {dust}</div>
@@ -81,7 +80,7 @@ export function App() {
           <nav className="nav">
             {TABS.map((t) => (
               <button key={t.id} className={tab === t.id ? "on" : ""} onClick={() => setTab(t.id)}>
-                <ChromaImg src={t.icon} alt="" />
+                <img src={t.icon} alt="" />
                 {t.label}
               </button>
             ))}
