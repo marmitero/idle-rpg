@@ -18,6 +18,7 @@ export function Menu() {
   const [authMsg, setAuthMsg] = useState("");
   const [mute, setMute] = useState(isMuted);
   const [vol, setVol] = useState(getVolume);
+  const [admin, setAdmin] = useState("");
 
   return (
     <div className="hero-bg" style={{ backgroundImage: `url(${UI.font})` }}>
@@ -134,6 +135,25 @@ export function Menu() {
           }}
           style={{ width: "100%", marginTop: 10 }}
         />
+      </div>
+      <div className="panel">
+        <h2>Admin live-ops</h2>
+        <p className="muted">Chave local (ADMIN_KEY). Flags, mail, analytics.</p>
+        <input value={admin} onChange={(e) => setAdmin(e.target.value)} placeholder="admin key" style={inputStyle} />
+        <button
+          className="cta"
+          onClick={async () => {
+            try {
+              const { api } = await import("../api");
+              const r = await api<{ flags: Record<string, string> }>("/api/admin/flags", undefined, { "x-admin-key": admin || "dev-admin" });
+              setLog(JSON.stringify(r.flags));
+            } catch (e) {
+              setLog(e instanceof Error ? e.message : "admin");
+            }
+          }}
+        >
+          Ver flags
+        </button>
       </div>
     </div>
   );

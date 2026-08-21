@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { CHAPTERS, HUNT_UNLOCK_STAGE, STAGES, TUTORIAL_STAGES, isStageOpen } from "./index.ts";
+import {
+  CHAPTERS,
+  HONOR_POOL,
+  HUNTS,
+  HUNT_UNLOCK_STAGE,
+  STAGES,
+  TOWER_FLOORS,
+  TUTORIAL_STAGES,
+  isStageOpen,
+  poweredStats,
+  starterGear,
+} from "./index.ts";
 
 test("slice campaign is 40 stages across 2 chapters", () => {
   assert.equal(STAGES.length, 40);
@@ -25,4 +36,20 @@ test("tutorial and hunt gates exist", () => {
   assert.equal(isStageOpen([], "1-1"), true);
   assert.equal(isStageOpen([], "1-2"), false);
   assert.equal(isStageOpen(["1-1"], "1-2"), true);
+});
+
+test("systems complete content exists", () => {
+  assert.equal(HUNTS.length, 4);
+  assert.equal(HONOR_POOL.length, 16);
+  assert.equal(TOWER_FLOORS, 100);
+  assert.equal(starterGear().length, 4);
+  const h = {
+    id: "hero.warrior",
+    name: "Kael",
+    faction: "embercourt" as const,
+    stats: { hp: 100, atk: 10, def: 10, spd: 10, crit: 5 },
+  };
+  const p = { level: 10, stars: 2, imprint: 2, pas: 1, cmd: 1, ult: 1 };
+  const s = poweredStats(h, p, starterGear(), [h, h, h], false, 10);
+  assert.ok(s.atk > 10);
 });

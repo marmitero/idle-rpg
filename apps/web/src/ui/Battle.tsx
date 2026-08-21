@@ -1,4 +1,4 @@
-import { CHAPTERS, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE, UI, isStageOpen } from "@relicwake/content";
+import { BG, CHAPTERS, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE, UI, isStageOpen } from "@relicwake/content";
 import { DIRECTIVES, type DirectiveId } from "@relicwake/shared";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "../state";
@@ -16,6 +16,15 @@ const LABELS: Record<DirectiveId, string> = {
 
 function contentName(id: string): string {
   return STAGES.find((s) => s.id === id)?.name ?? HUNTS.find((h) => h.id === id)?.name ?? id;
+}
+
+function fightBg(id: string, stageBg?: string, huntBg?: string): string {
+  if (stageBg) return stageBg;
+  if (huntBg) return huntBg;
+  if (id.startsWith("tower")) return BG.crown;
+  if (id.startsWith("ftower")) return BG.ember;
+  if (id === "gwar") return UI.guild;
+  return BG.spire;
 }
 
 export function Battle() {
@@ -54,7 +63,7 @@ export function Battle() {
     return (
       <div>
         <BattleView
-          bg={stage?.bg ?? hunt?.bg ?? ""}
+          bg={fightBg(fighting.id, stage?.bg, hunt?.bg)}
           input={fighting.input}
           result={fighting.result}
           speed={speed}

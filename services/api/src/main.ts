@@ -5,6 +5,7 @@ import { bumpDaily, credit, getByEmail, getById, getOrCreate, publicState, save,
 import { hashPassword, signJwt, validEmail, verifyJwt, verifyPassword } from "./auth.ts";
 import { readBattle, readBattles, resolveBattle } from "./combat.ts";
 import { applyTutorial } from "./tutorial.ts";
+import { handleSystems, track, upsertArena } from "./systems.ts";
 import { dialect } from "./db.ts";
 
 const PORT = Number(process.env.API_PORT ?? 3000);
@@ -18,7 +19,7 @@ function json(res: ServerResponse, code: number, body: unknown) {
   res.writeHead(code, {
     "content-type": "application/json; charset=utf-8",
     "access-control-allow-origin": CORS,
-    "access-control-allow-headers": "content-type, x-device-id, authorization, idempotency-key",
+    "access-control-allow-headers": "content-type, x-device-id, authorization, idempotency-key, x-admin-key",
     "access-control-allow-methods": "GET,POST,OPTIONS",
   });
   res.end(data);
@@ -62,13 +63,22 @@ async function account(req: IncomingMessage, res: ServerResponse): Promise<Accou
       json(res, 401, { error: "invalid_token" });
       return null;
     }
+    if (a.banned) {
+      json(res, 403, { error: "banned" });
+      return null;
+    }
     return a;
   }
   if (!dev) {
     json(res, 401, { error: "missing_device" });
     return null;
   }
-  return getOrCreate(dev);
+  const created = await getOrCreate(dev);
+  if (created.banned) {
+    json(res, 403, { error: "banned" });
+    return null;
+  }
+  return created;
 }
 
 function regen(a: Account) {
@@ -104,6 +114,8 @@ const server = createServer(async (req, res) => {
     if (req.method === "POST" && url === "/api/session") {
       const a = await account(req, res);
       if (!a) return;
+      await upsertArena(a);
+      void track(a.id, "session.start", { env: RW_ENV });
       json(res, 200, { state: publicState(a) });
       return;
     }
@@ -160,6 +172,7 @@ const server = createServer(async (req, res) => {
       a.lastCollectAt = now;
       bumpDaily(a, "wake");
       await save(a);
+      void track(a.id, "wake.collect", { gold, hours });
       json(res, 200, { gold, hours, state: publicState(a) });
       return;
     }
@@ -262,13 +275,35 @@ const server = createServer(async (req, res) => {
       const body = await readBody(req);
       const id = String(body.id ?? "");
       const key = header(req, "idempotency-key");
-      const out = await resolveBattle(a, id, key);
+      const out = await resolveBattle(a, id, key, { opponentId: body.opponentId ? String(body.opponentId) : undefined });
       if (!out.ok) {
-        const code = out.error === "unknown_content" || out.error === "no_breath" ? 400 : 409;
+        const code =
+          out.error === "unknown_content" ||
+          out.error === "no_breath" ||
+          out.error === "tutorial_lock" ||
+          out.error === "hunt_locked" ||
+          out.error === "no_opponent" ||
+          out.error === "no_attacks" ||
+          out.error === "no_draft" ||
+          out.error === "no_guild" ||
+          out.error === "no_war"
+            ? 400
+            : 409;
         return json(res, code, { error: out.error });
       }
+      void track(a.id, "battle.end", { id, win: out.payload.rewards.win });
       json(res, 200, out.payload);
       return;
+    }
+    {
+      const a = await account(req, res);
+      if (!a) return;
+      const body = req.method === "GET" || req.method === "OPTIONS" ? {} : await readBody(req);
+      const sys = await handleSystems(url, req.method ?? "GET", a, body, header(req, "x-admin-key"));
+      if (sys) {
+        json(res, sys.code, sys.body);
+        return;
+      }
     }
     json(res, 404, { error: "not_found" });
   } catch (err) {

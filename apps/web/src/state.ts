@@ -4,6 +4,7 @@ import type { BattleInput, BattleRecord, BattleResult } from "@relicwake/sim";
 import { api, setToken } from "./api";
 
 export type Tab = "hub" | "roster" | "battle" | "guild" | "menu";
+export type HubPanel = "home" | "tower" | "arena" | "honor" | "live";
 
 export type Remote = {
   gold: number;
@@ -28,6 +29,27 @@ export type Remote = {
   starterId: string | null;
   tutorialStep: number;
   tutorialPull: boolean;
+  dust: number;
+  crests: number;
+  ember: number;
+  heroProg: Record<string, { level: number; stars: number; imprint: number; pas: number; cmd: number; ult: number }>;
+  gear: { id: string; slot: string; set: string; plus: number }[];
+  equipped: Record<string, string>;
+  towerFloor: number;
+  factionTower: Record<string, number>;
+  arenaRating: number;
+  arenaAttacks: number;
+  guildId: string | null;
+  guildRole: string | null;
+  warAttacks: number;
+  mail: { id: string; title: string; body: string; gold: number; letters: number; dust: number; claimed: boolean; at: number }[];
+  passXp: number;
+  passPremium: boolean;
+  passClaimed: string[];
+  eventDay: number;
+  eventClaimed: number[];
+  honorDraft: string[];
+  banned: boolean;
 };
 
 export type FightPayload = {
@@ -55,7 +77,11 @@ type Store = Remote & {
   error: string;
   fighting: FightPayload | null;
   replays: BattleSummary[];
+  hubPanel: HubPanel;
   setTab: (t: Tab) => void;
+  setHubPanel: (p: HubPanel) => void;
+  cmd: (path: string, body?: unknown) => Promise<unknown>;
+  startFight: (id: string, extra?: { opponentId?: string }) => Promise<void>;
   hydrate: () => Promise<void>;
   apply: (state: Remote) => void;
   loadReplays: () => Promise<void>;
@@ -97,6 +123,27 @@ const empty: Remote = {
   starterId: null,
   tutorialStep: 0,
   tutorialPull: false,
+  dust: 0,
+  crests: 0,
+  ember: 0,
+  heroProg: {},
+  gear: [],
+  equipped: {},
+  towerFloor: 1,
+  factionTower: {},
+  arenaRating: 1000,
+  arenaAttacks: 5,
+  guildId: null,
+  guildRole: null,
+  warAttacks: 3,
+  mail: [],
+  passXp: 0,
+  passPremium: false,
+  passClaimed: [],
+  eventDay: 1,
+  eventClaimed: [],
+  honorDraft: [],
+  banned: false,
 };
 
 export const useGame = create<Store>((set, get) => ({
@@ -106,7 +153,14 @@ export const useGame = create<Store>((set, get) => ({
   error: "",
   fighting: null,
   replays: [],
+  hubPanel: "home",
   setTab: (tab) => set({ tab }),
+  setHubPanel: (hubPanel) => set({ hubPanel }),
+  cmd: async (path, body) => {
+    const r = await api<{ state?: Remote }>(path, body);
+    if (r.state) get().apply(r.state);
+    return r;
+  },
   apply: (state) => set({ ...state, ready: true, error: "" }),
   hydrate: async () => {
     try {
@@ -159,7 +213,7 @@ export const useGame = create<Store>((set, get) => ({
     const r = await api<{ state: Remote }>("/api/directives", { directives });
     get().apply(r.state);
   },
-  startFight: async (id) => {
+  startFight: async (id, extra) => {
     const r = await api<{
       battleId: string;
       seed: number;
@@ -168,7 +222,7 @@ export const useGame = create<Store>((set, get) => ({
       hash: string;
       rewards: FightPayload["rewards"];
       state: Remote;
-    }>("/api/battle", { id }, { "idempotency-key": crypto.randomUUID() });
+    }>("/api/battle", { id, opponentId: extra?.opponentId }, { "idempotency-key": crypto.randomUUID() });
     get().apply(r.state);
     set({
       fighting: {

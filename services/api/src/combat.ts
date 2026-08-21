@@ -1,15 +1,24 @@
 import { randomInt, randomUUID } from "node:crypto";
 import {
   ENEMIES,
+  FACTION_TOWER_FLOORS,
   HERO_BY_ID,
   HEROES,
+  HONOR_POOL,
   HUNT_UNLOCK_STAGE,
   HUNTS,
   LOAN_HEROES,
   STAGES,
+  TOWER_FLOORS,
   TUTORIAL_DONE,
   TUTORIAL_STAGES,
+  poweredStats,
+  resonanceFloor,
+  towerGold,
+  towerScale,
+  type HeroProg,
 } from "@relicwake/content";
+import { equippedPieces } from "./systems.ts";
 import { battleHash, simulate, type BattleInput, type BattleRecord, type LoadoutUnit } from "@relicwake/sim";
 import { signReplay, verifyReplayMac } from "./auth.ts";
 import {
@@ -50,15 +59,29 @@ function scaled(stats: LoadoutUnit["stats"], s: number): LoadoutUnit["stats"] {
   };
 }
 
-export function loadoutFromTeam(a: Account): LoadoutUnit[] {
-  const ids = [...a.team];
+export function loadoutFromTeam(a: Account, honor = false, draftIds?: string[]): LoadoutUnit[] {
+  let ids = draftIds?.length
+    ? draftIds.map((d) => HONOR_POOL.find((p) => p.id === d)?.heroId ?? d)
+    : [...a.team];
   for (const id of LOAN_HEROES) {
     if (ids.length >= 5) break;
     if (!ids.includes(id)) ids.push(id);
   }
-  return ids.slice(0, 5).map((id, slot) => {
+  ids = ids.slice(0, 5);
+  const teamHeroes = ids.map((id) => HERO_BY_ID[id] ?? HEROES[0]!);
+  const res = resonanceFloor(Object.values(a.heroProg ?? {}));
+  const gear = honor ? [] : equippedPieces(a);
+  return ids.map((id, slot) => {
     const h = HERO_BY_ID[id] ?? HEROES[0]!;
-    return { id: `a${slot}`, heroId: h.id, name: h.name, faction: h.faction, stats: h.stats, slot };
+    const prog: HeroProg = a.heroProg?.[id] ?? { level: 1, stars: 1, imprint: 0, pas: 1, cmd: 1, ult: 1 };
+    return {
+      id: `a${slot}`,
+      heroId: h.id,
+      name: h.name,
+      faction: h.faction,
+      stats: poweredStats(h, prog, gear, teamHeroes, honor, res),
+      slot,
+    };
   });
 }
 
@@ -87,6 +110,45 @@ export function enemiesFor(id: string): LoadoutUnit[] | null {
       faction: def.faction,
       stats: scaled(def.stats, i === 0 ? 1 : 0.72),
       slot,
+    }));
+  }
+  const tw = id.match(/^tower\.(\d+)$/);
+  if (tw) {
+    const n = Number(tw[1]);
+    const def = ENEMIES[n % ENEMIES.length]!;
+    const sc = towerScale(n);
+    return [0, 1, 2].map((slot, i) => ({
+      id: `e${i}`,
+      heroId: def.id,
+      name: def.name,
+      faction: def.faction,
+      stats: scaled(def.stats, sc - i * 0.04),
+      slot,
+    }));
+  }
+  const ft = id.match(/^ftower\.([a-z]+)\.(\d+)$/);
+  if (ft) {
+    const n = Number(ft[2]);
+    const def = ENEMIES[n % ENEMIES.length]!;
+    const sc = towerScale(n + 10);
+    return [0, 2].map((slot, i) => ({
+      id: `e${i}`,
+      heroId: def.id,
+      name: def.name,
+      faction: def.faction,
+      stats: scaled(def.stats, sc - i * 0.05),
+      slot,
+    }));
+  }
+  if (id === "gwar" || id.startsWith("honor")) {
+    const pack = id === "gwar" ? [ENEMIES[2]!, ENEMIES[1]!] : [HEROES[1]!, HEROES[2]!, HEROES[3]!];
+    return pack.map((def, i) => ({
+      id: `e${i}`,
+      heroId: def.id,
+      name: def.name,
+      faction: def.faction,
+      stats: scaled(def.stats, id === "gwar" ? 1.15 - i * 0.08 : 0.88),
+      slot: i,
     }));
   }
   return null;
@@ -130,6 +192,7 @@ export async function resolveBattle(
   a: Account,
   contentId: string,
   idempotencyKey: string | null,
+  extra?: { opponentId?: string },
 ): Promise<{ ok: true; payload: BattlePayload } | { ok: false; error: string }> {
   if (idempotencyKey) {
     const prior = await getBattleByIdempotency(a.id, idempotencyKey);
@@ -148,25 +211,48 @@ export async function resolveBattle(
 
   const stage = STAGES.find((s) => s.id === contentId);
   const hunt = HUNTS.find((h) => h.id === contentId);
-  if (!stage && !hunt) return { ok: false, error: "unknown_content" };
+  const towerM = contentId.match(/^tower\.(\d+)$/);
+  const ftM = contentId.match(/^ftower\.([a-z]+)\.(\d+)$/);
+  const isHonor = contentId.startsWith("honor");
+  const isArena = contentId === "arena";
+  const isWar = contentId === "gwar";
 
   if ((a.tutorialStep ?? TUTORIAL_DONE) < TUTORIAL_DONE) {
-    if (hunt) return { ok: false, error: "tutorial_lock" };
-    if (stage && !(TUTORIAL_STAGES as readonly string[]).includes(stage.id)) {
+    if (!stage || !(TUTORIAL_STAGES as readonly string[]).includes(stage.id)) {
       return { ok: false, error: "tutorial_lock" };
     }
   }
   if (hunt && !a.cleared.includes(HUNT_UNLOCK_STAGE)) return { ok: false, error: "hunt_locked" };
 
-  const enemies = enemiesFor(contentId);
+  let enemies = enemiesFor(contentId);
+  if (isArena) {
+    const { db } = await import("./db.ts");
+    const opp = extra?.opponentId
+      ? await db.get<{ snapshot: string }>("SELECT snapshot FROM arena_board WHERE account_id = ?", [extra.opponentId])
+      : undefined;
+    if (!opp) return { ok: false, error: "no_opponent" };
+    if (a.arenaAttacks < 1) return { ok: false, error: "no_attacks" };
+    a.arenaAttacks -= 1;
+    const snap = JSON.parse(opp.snapshot) as { team: string[] };
+    enemies = (snap.team ?? []).slice(0, 5).map((hid, slot) => {
+      const h = HERO_BY_ID[hid] ?? HEROES[0]!;
+      return { id: `e${slot}`, heroId: h.id, name: h.name, faction: h.faction, stats: scaled(h.stats, 1), slot };
+    });
+  }
   if (!enemies) return { ok: false, error: "unknown_content" };
 
   if (hunt) {
     if (a.stamina < hunt.stamina) return { ok: false, error: "no_breath" };
     await credit(a, "stamina", -hunt.stamina, "hunt.enter", hunt.id);
   }
+  if (isWar) {
+    if (!a.guildId) return { ok: false, error: "no_guild" };
+    if (a.warAttacks < 1) return { ok: false, error: "no_war" };
+    a.warAttacks -= 1;
+  }
+  if (isHonor && a.honorDraft.length !== 5) return { ok: false, error: "no_draft" };
 
-  const allies = loadoutFromTeam(a);
+  const allies = loadoutFromTeam(a, isHonor, isHonor ? a.honorDraft : undefined);
   const seed = randomInt(1, 2_147_000_000);
   const input: BattleInput = { seed, allies, enemies, directives: a.directives };
   const result = simulate(input);
@@ -208,6 +294,41 @@ export async function resolveBattle(
       await credit(a, "letters", letters, "hunt.win", battleId);
       bumpDaily(a, "hunt");
     }
+    if (towerM) {
+      const n = Number(towerM[1]);
+      gold = towerGold(n);
+      await credit(a, "gold", gold, "tower.win", battleId);
+      await credit(a, "dust", 2, "tower.win", battleId);
+      if (n === a.towerFloor && a.towerFloor < TOWER_FLOORS) a.towerFloor += 1;
+      a.passXp += 10;
+    }
+    if (ftM) {
+      const fac = ftM[1]!;
+      const n = Number(ftM[2]);
+      gold = towerGold(n);
+      await credit(a, "gold", gold, "ftower.win", battleId);
+      if (n === (a.factionTower[fac] ?? 1) && (a.factionTower[fac] ?? 1) < FACTION_TOWER_FLOORS) {
+        a.factionTower[fac] = n + 1;
+      }
+    }
+    if (isArena && extra?.opponentId) {
+      gold = 25;
+      await credit(a, "gold", gold, "arena.win", battleId);
+      await credit(a, "crests", 8, "arena.win", battleId);
+      a.arenaRating += 18;
+      a.passXp += 6;
+    }
+    if (isHonor) {
+      gold = 15;
+      await credit(a, "gold", gold, "honor.win", battleId);
+    }
+    if (isWar) {
+      gold = 40;
+      await credit(a, "gold", gold, "gwar.win", battleId);
+      await credit(a, "ember", 6, "gwar.win", battleId);
+    }
+  } else if (isArena) {
+    a.arenaRating = Math.max(0, a.arenaRating - 12);
   }
 
   await save(a);

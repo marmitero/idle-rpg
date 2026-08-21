@@ -152,6 +152,7 @@ img { max-width: 100%; display: block; }
 .card img.bust { width: 100%; aspect-ratio: 1; object-fit: contain; }
 .card .nm { font-size: 13px; color: #fff; margin-top: 4px; }
 .card .ep { font-size: 11px; opacity: 0.7; }
+.card.on { outline: 1px solid var(--gold); }
 
 .dir-row {
   display: flex;

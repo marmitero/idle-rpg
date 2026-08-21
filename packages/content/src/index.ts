@@ -130,7 +130,9 @@ export const ENEMIES: EnemyDef[] = [
 
 export type { StageDef } from "./stages.ts";
 export { BG, CHAPTERS, STAGES, isStageOpen } from "./stages.ts";
+export * from "./systems.ts";
 import { BG } from "./stages.ts";
+import { HUNT_ROOT } from "./systems.ts";
 
 export const TUTORIAL_DONE = 8;
 export const TUTORIAL_STAGES = ["1-1", "1-2", "1-3", "1-4"] as const;
@@ -180,6 +182,21 @@ export const HUNTS: HuntDef[] = [
     gold: 120,
     letters: 2,
   },
+  {
+    id: HUNT_ROOT.id,
+    name: HUNT_ROOT.name,
+    bg: HUNT_ROOT.bg,
+    enemyId: HUNT_ROOT.enemyId,
+    stamina: HUNT_ROOT.stamina,
+    gold: HUNT_ROOT.gold,
+    letters: HUNT_ROOT.letters,
+  },
+];
+
+export const HONOR_POOL: { id: string; heroId: string; name: string }[] = [
+  ...HEROES.map((h) => ({ id: `honor.${h.id}`, heroId: h.id, name: h.name })),
+  ...HEROES.map((h, i) => ({ id: `honor.echo.${i}`, heroId: h.id, name: `${h.name} · eco` })),
+  ...HEROES.slice(0, 4).map((h, i) => ({ id: `honor.shade.${i}`, heroId: h.id, name: `${h.name} · sombra` })),
 ];
 
 export const DAILIES = [

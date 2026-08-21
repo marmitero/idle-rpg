@@ -20,6 +20,7 @@ Este repositório é o estúdio: planejamento, conteúdo, cliente, simulação, 
 | Campanha do slice | 40 stages (caps. 1–2) |
 | Áudio | Camas + SFX procedurais; mute no Menu |
 | Tutorial (ofício) | 8 min até o primeiro Wake — `docs/14-slice-onboarding.md` |
+| Systems complete | Gear, torre, arena, guilda, passe, honor, admin — `docs/15-systems-complete.md` |
 | Replay de batalha | Persistido (`battles`) — cliente só faz playback |
 | CI + ambientes | GitHub Actions + `infra/environments.md` |
 

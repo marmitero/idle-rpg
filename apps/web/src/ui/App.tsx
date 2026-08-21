@@ -22,6 +22,7 @@ export function App() {
   const tab = useGame((s) => s.tab);
   const gold = useGame((s) => s.gold);
   const letters = useGame((s) => s.letters);
+  const dust = useGame((s) => s.dust);
   const email = useGame((s) => s.email);
   const wakerName = useGame((s) => s.wakerName);
   const fighting = useGame((s) => s.fighting);
@@ -62,6 +63,7 @@ export function App() {
             <ChromaImg src={UI.letters} alt="" />
             {letters}
           </div>
+          <div className="chip">poeira {dust}</div>
           <div className="chip grow" style={{ border: "none", background: "transparent" }}>
             {wakerName ?? email ?? "Relicwake"}
           </div>

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { HEROES } from "@relicwake/content";
+import { HEROES, defaultProg, starterGear, type GearPiece, type HeroProg } from "@relicwake/content";
 import type { DirectiveId } from "@relicwake/shared";
 import type { BattleInput, BattleRecord, BattleResult } from "@relicwake/sim";
 import { db } from "./db.ts";
@@ -7,7 +7,7 @@ import { db } from "./db.ts";
 export type LedgerEntry = {
   id: string;
   accountId: string;
-  currency: "gold" | "letters" | "fate" | "sweep" | "stamina";
+  currency: "gold" | "letters" | "fate" | "sweep" | "stamina" | "dust" | "crests" | "ember";
   delta: number;
   reason: string;
   ref: string;
@@ -40,6 +40,38 @@ export type Account = {
   starterId: string | null;
   tutorialStep: number;
   tutorialPull: boolean;
+  dust: number;
+  crests: number;
+  ember: number;
+  heroProg: Record<string, HeroProg>;
+  gear: GearPiece[];
+  equipped: Record<string, string>;
+  towerFloor: number;
+  factionTower: Record<string, number>;
+  arenaRating: number;
+  arenaAttacks: number;
+  guildId: string | null;
+  guildRole: "sovereign" | "flame" | "member" | null;
+  warAttacks: number;
+  mail: Mail[];
+  passXp: number;
+  passPremium: boolean;
+  passClaimed: string[];
+  eventDay: number;
+  eventClaimed: number[];
+  honorDraft: string[];
+  banned: boolean;
+};
+
+export type Mail = {
+  id: string;
+  title: string;
+  body: string;
+  gold: number;
+  letters: number;
+  dust: number;
+  claimed: boolean;
+  at: number;
 };
 
 function today() {
@@ -73,6 +105,38 @@ function genesis(id: string, deviceId: string): Account {
     dailyProg: { login: 1 },
     dailyClaimed: [],
     ledger: [],
+    dust: 40,
+    crests: 0,
+    ember: 0,
+    heroProg: defaultProg(HEROES.map((h) => h.id)),
+    gear: starterGear(),
+    equipped: Object.fromEntries(starterGear().map((g) => [g.slot, g.id])),
+    towerFloor: 1,
+    factionTower: { embercourt: 1, tidebound: 1, thornveil: 1, ashen: 1 },
+    arenaRating: 1000,
+    arenaAttacks: 5,
+    guildId: null,
+    guildRole: null,
+    warAttacks: 3,
+    mail: [
+      {
+        id: randomUUID(),
+        title: "O Spire ouviu",
+        body: "Moth arquivou seu nome. O ofício começa.",
+        gold: 50,
+        letters: 1,
+        dust: 10,
+        claimed: false,
+        at: Date.now(),
+      },
+    ],
+    passXp: 0,
+    passPremium: false,
+    passClaimed: [],
+    eventDay: 1,
+    eventClaimed: [],
+    honorDraft: [],
+    banned: false,
   };
 }
 
@@ -87,13 +151,44 @@ async function loadSnapshot(accountId: string, deviceId: string, email: string |
     a.dailyDay = today();
     a.dailyProg = { login: 1 };
     a.dailyClaimed = [];
+    a.arenaAttacks = 5;
+    a.warAttacks = 3;
+    a.eventDay = Math.min(7, (a.eventDay ?? 1) + 1);
   }
   if (a.tutorialStep == null) a.tutorialStep = a.cleared.length ? 8 : 0;
   if (a.wakerName === undefined) a.wakerName = null;
   if (a.starterId === undefined) a.starterId = null;
   if (a.tutorialPull == null) a.tutorialPull = a.tutorialStep >= 8;
   if (!a.directives) a.directives = ["foco", "guarda", "execute"];
+  ensureSystems(a);
   return a;
+}
+
+export function ensureSystems(a: Account) {
+  if (a.dust == null) a.dust = 40;
+  if (a.crests == null) a.crests = 0;
+  if (a.ember == null) a.ember = 0;
+  if (!a.heroProg) a.heroProg = defaultProg(a.owned.length ? a.owned : HEROES.map((h) => h.id));
+  for (const id of a.owned) {
+    if (!a.heroProg[id]) a.heroProg[id] = { level: 1, stars: 1, imprint: 0, pas: 1, cmd: 1, ult: 1 };
+  }
+  if (!a.gear) a.gear = starterGear();
+  if (!a.equipped) a.equipped = Object.fromEntries(a.gear.map((g) => [g.slot, g.id]));
+  if (!a.towerFloor) a.towerFloor = 1;
+  if (!a.factionTower) a.factionTower = { embercourt: 1, tidebound: 1, thornveil: 1, ashen: 1 };
+  if (a.arenaRating == null) a.arenaRating = 1000;
+  if (a.arenaAttacks == null) a.arenaAttacks = 5;
+  if (a.guildId === undefined) a.guildId = null;
+  if (a.guildRole === undefined) a.guildRole = null;
+  if (a.warAttacks == null) a.warAttacks = 3;
+  if (!a.mail) a.mail = [];
+  if (a.passXp == null) a.passXp = 0;
+  if (a.passPremium == null) a.passPremium = false;
+  if (!a.passClaimed) a.passClaimed = [];
+  if (!a.eventDay) a.eventDay = 1;
+  if (!a.eventClaimed) a.eventClaimed = [];
+  if (!a.honorDraft) a.honorDraft = [];
+  if (a.banned == null) a.banned = false;
 }
 
 export function publicState(a: Account) {
