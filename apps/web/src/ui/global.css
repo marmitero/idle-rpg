@@ -528,7 +528,7 @@ h2 { font-size: 16px; margin: 0 0 8px; color: #f3e2a1; }
   position: absolute;
   left: 10%;
   right: 10%;
-  top: 15.5%;
+  top: 20.5%;
   height: 20%;
   display: flex;
   align-items: center;
@@ -542,9 +542,9 @@ h2 { font-size: 16px; margin: 0 0 8px; color: #f3e2a1; }
 }
 .notice-board-body {
   position: absolute;
-  left: 10%;
-  right: 10%;
-  top: 45%;
+  left: 12.5%;
+  right: 12.5%;
+  top: 40%;
   bottom: 8%;
   display: flex;
   flex-direction: column;
