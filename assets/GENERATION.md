@@ -169,3 +169,22 @@ Primeiros 10 heróis placeholder (bust 512; ícone = cópia). Battle clips ainda
 | 10 | `characters/bust/rw_hero_solstice_helion_bust_512.png` | Helion |
 
 **Próximo lote-14:** bustos Umbral + Rift (Nadir) e 8 idle/atk dos novos (ou 8 bustos já feitos não). Só restam 2 bustos; completar Nadir e começar sprites idle.
+
+## lote-14 (feito, 9/10) — fundo `#FF00FF` — fecha Nadir (parcial) + 8 idle
+
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `characters/bust/rw_hero_nadir_umbral_bust_512.png` | Umbral |
+| 2 | `characters/bust/rw_hero_nadir_rift_bust_512.png` | **falhou** (erro de geração + teto 10) → lote-15 |
+| 3 | `characters/battle/rw_hero_ember_bril_idle.png` | idle Bril |
+| 4 | `characters/battle/rw_hero_ember_sora_idle.png` | idle Sora |
+| 5 | `characters/battle/rw_hero_ember_durn_idle.png` | idle Durn |
+| 6 | `characters/battle/rw_hero_ember_hest_idle.png` | idle Hest |
+| 7 | `characters/battle/rw_hero_tide_nera_idle.png` | idle Nera |
+| 8 | `characters/battle/rw_hero_tide_luth_idle.png` | idle Luth |
+| 9 | `characters/battle/rw_hero_tide_cale_idle.png` | idle Cale |
+| 10 | `characters/battle/rw_hero_tide_ivo_idle.png` | idle Ivo |
+
+Wiring: `ownIdle()` para os 8 Ember/Tide; `ownBust` Helion (atrasado do lote-13) + Umbral. Rift ainda kit da classe.
+
+**Próximo lote-15:** busto Rift (retomado) + 9 idle (Sem, Bramble, Tess, Quin, Ashleaf, Yew, Choir, Dust, Hymn) ou mix idle/atk.
