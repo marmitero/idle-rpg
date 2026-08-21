@@ -25,6 +25,8 @@ export type Account = {
   capHours: number;
   afkStage: string;
   cleared: string[];
+  /** Melhores estrelas por estágio de campanha (docs/campaign/03). */
+  campaignStars: Record<string, number>;
   team: string[];
   /** Formação na grade 3x3 (9 slots, da esquerda p/ direita, frente p/ topo).
    *  Fonte de verdade do posicionamento; `team` é derivado (ordem dos slots). */
@@ -93,6 +95,7 @@ function genesis(id: string, deviceId: string): Account {
     capHours: 8,
     afkStage: "1-1",
     cleared: [],
+    campaignStars: {},
     team: ["hero.warrior", "hero.guardian", "hero.mage", "hero.archer", "hero.rogue"],
     formation: ["hero.warrior", "hero.guardian", "hero.mage", "hero.archer", "hero.rogue", null, null, null, null],
     owned: [...SLICE_OWNED],
@@ -179,6 +182,7 @@ export function ensureSystems(a: Account) {
   if (a.dust == null) a.dust = 40;
   if (a.crests == null) a.crests = 0;
   if (a.ember == null) a.ember = 0;
+  if (!a.campaignStars || typeof a.campaignStars !== "object") a.campaignStars = {};
   if (!a.heroProg) a.heroProg = defaultProg(a.owned.length ? a.owned : HEROES.map((h) => h.id));
   for (const id of a.owned) {
     if (!a.heroProg[id]) a.heroProg[id] = { level: 1, stars: 1, imprint: 0, pas: 1, cmd: 1, ult: 1 };

@@ -19,6 +19,8 @@ export type Remote = {
   team: string[];
   /** Formação 3x3: 9 slots (0-2 frente, 3-5 meio, 6-8 topo; col = slot % 3). */
   formation: (string | null)[];
+  /** Melhores estrelas por estágio de campanha (espelho do servidor). */
+  campaignStars: Record<string, number>;
   owned: string[];
   pity: number;
   directives: DirectiveId[];
@@ -62,7 +64,7 @@ export type FightPayload = {
   hash: string;
   input: BattleInput;
   result: BattleResult;
-  rewards: { gold: number; letters: number; win: boolean };
+  rewards: { gold: number; letters: number; win: boolean; stars: number };
   mode: "live" | "replay";
 };
 
@@ -116,6 +118,7 @@ const empty: Remote = {
   cleared: [],
   team: [],
   formation: Array(9).fill(null),
+  campaignStars: {},
   owned: [],
   pity: 0,
   directives: ["foco", "guarda", "execute"],
@@ -201,7 +204,7 @@ export const useGame = create<Store>((set, get) => ({
         hash: rec.hash,
         input: rec.input,
         result: rec.result,
-        rewards: { gold: 0, letters: 0, win: rec.winner === "ally" },
+        rewards: { gold: 0, letters: 0, win: rec.winner === "ally", stars: 0 },
         mode: "replay",
       },
       tab: "battle",

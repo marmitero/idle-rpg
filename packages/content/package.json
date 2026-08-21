@@ -9,7 +9,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "tsx --test src/content.test.ts"
+    "test": "tsx --test src/content.test.ts src/campaign.test.ts"
   },
   "dependencies": {
     "@relicwake/shared": "0.1.0"

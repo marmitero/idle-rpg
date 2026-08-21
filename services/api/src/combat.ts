@@ -19,6 +19,7 @@ import {
   type HeroProg,
 } from "@relicwake/content";
 import { equippedPieces } from "./systems.ts";
+import { mergeStars, starsFromBattle } from "@relicwake/content";
 import { battleHash, simulate, type BattleInput, type BattleRecord, type LoadoutUnit } from "@relicwake/sim";
 import { signReplay, verifyReplayMac } from "./auth.ts";
 import {
@@ -45,7 +46,7 @@ export type BattlePayload = {
   hash: string;
   contentId: string;
   contentSemver: string;
-  rewards: { gold: number; letters: number; win: boolean };
+  rewards: { gold: number; letters: number; win: boolean; stars: number };
   state: ReturnType<typeof publicState>;
 };
 
@@ -293,6 +294,7 @@ export async function resolveBattle(
 
   let gold = 0;
   let letters = 0;
+  let stars = 0;
   if (result.winner === "ally") {
     if (stage) {
       gold = stage.gold;
@@ -301,6 +303,11 @@ export async function resolveBattle(
       const idx = STAGES.findIndex((s) => s.id === stage.id);
       const afk = STAGES.findIndex((s) => s.id === a.afkStage);
       if (idx >= afk) a.afkStage = stage.id;
+      // Estrelas da campanha (docs/campaign/03): máx. entre replays.
+      const allyTotal = Math.max(1, input.allies.length);
+      const allyAlive = input.allies.filter((u) => (result.remaining[u.id] ?? 0) > 0).length;
+      stars = starsFromBattle(true, allyAlive / allyTotal);
+      a.campaignStars = mergeStars(a.campaignStars, stage.id, stars);
       bumpDaily(a, "fight");
     }
     if (hunt) {
@@ -348,7 +355,7 @@ export async function resolveBattle(
   }
 
   await save(a);
-  return { ok: true, payload: toPayload(a, rec, { gold, letters, win: result.winner === "ally" }) };
+  return { ok: true, payload: toPayload(a, rec, { gold, letters, win: result.winner === "ally", stars }) };
 }
 
 export async function readBattle(

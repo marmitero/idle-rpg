@@ -30,6 +30,21 @@ docs/
 ├── 11-pitch-one-pager.md           uma página
 ├── 12-responsividade.md            PC, tablet, telefone
 ├── 13-regras-de-geracao.md         magenta + lotes de 10
+├── 14-slice-onboarding.md          ofício de 8 minutos
+├── 15-systems-complete.md          systems 1.0
+├── 16-batalha-apresentacao.md      composição, perf e áudio da batalha
+├── 17-formacao.md                  formação 3x3 (posicionamento estratégico)
+├── campaign/                       Campaign Map (sistema de progressão)
+│   ├── 01-campaign-map-system.md   objetivo, arquitetura, fluxos, integração
+│   ├── 02-campaign-data-schema.md  campanha/capítulo/estágio/conexão/requisito
+│   ├── 03-campaign-progress-schema.md progresso, estrelas, persistência
+│   ├── 04-campaign-map-ui-spec.md  componentes e estados visuais
+│   ├── 05-campaign-state-machine.md estados e transições dos nós
+│   ├── 06-campaign-unlock-rules.md motor genérico de desbloqueio
+│   ├── 07-campaign-asset-spec.md   background × sistema, inventário de assets
+│   ├── 08-campaign-responsive-layout.md coords normalizadas, câmera, safe area
+│   ├── 09-campaign-save-integration.md snapshot, migração, versionamento
+│   └── 10-campaign-test-plan.md    matriz de testes (auto + manuais)
 └── adr/                            decisões técnicas datadas
 ```
 

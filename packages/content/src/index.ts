@@ -3,6 +3,10 @@ export type { HeroDef } from "./heroes.ts";
 export { HEROES, HERO_BY_ID, SLICE_OWNED } from "./heroes.ts";
 import { HEROES, HERO_BY_ID } from "./heroes.ts";
 
+// Campaign Map (docs/campaign/*)
+export * from "./campaign.ts";
+export * from "./campaignState.ts";
+
 export type EnemyDef = {
   id: string;
   name: string;

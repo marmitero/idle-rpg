@@ -1,8 +1,9 @@
-import { ACT_CUTSCENES, BG, CHAPTERS, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE, UI, isStageOpen } from "@relicwake/content";
+import { BG, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE, UI } from "@relicwake/content";
 import { DIRECTIVES, type DirectiveId } from "@relicwake/shared";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "../state";
 import { BattleView } from "./BattleView";
+import { CampaignMap } from "./campaign/CampaignMap";
 
 const LABELS: Record<DirectiveId, string> = {
   foco: "Foco",
@@ -41,11 +42,9 @@ export function Battle() {
   const openReplay = useGame((s) => s.openReplay);
   const tutorialStep = useGame((s) => s.tutorialStep);
   const [speed, setSpeed] = useState(1);
-  const [openCh, setOpenCh] = useState(1);
   const [done, setDone] = useState(false);
   const [huntMsg, setHuntMsg] = useState("");
   const [huntLv, setHuntLv] = useState<Record<string, number>>({});
-  const locale = useGame((s) => s.locale);
   const settled = useRef(false);
 
   useEffect(() => {
@@ -114,7 +113,17 @@ export function Battle() {
         ) : w ? (
           <p className="muted">
             +{fighting.rewards.gold} ouro
-            {fighting.rewards.letters ? ` · +${fighting.rewards.letters} Letters` : ""} · ledger no servidor
+            {fighting.rewards.letters ? ` · +${fighting.rewards.letters} Letters` : ""}
+            {fighting.rewards.stars > 0 ? (
+              <span className="stage-stars" style={{ marginLeft: 8 }}>
+                {[0, 1, 2].map((i) => (
+                  <span key={i} className={i < fighting.rewards.stars ? "on" : ""}>
+                    ★
+                  </span>
+                ))}
+              </span>
+            ) : null}{" "}
+            · ledger no servidor
           </p>
         ) : (
           <p className="muted">Mude a formação ou as diretivas.</p>
@@ -225,41 +234,8 @@ export function Battle() {
         </div>
       )}
 
-      {CHAPTERS.map((ch) => {
-        const list = STAGES.filter((s) => s.chapter === ch.chapter);
-        const done = list.filter((s) => cleared.includes(s.id)).length;
-        const expanded = openCh === ch.chapter;
-        return (
-          <div key={ch.chapter} className="panel">
-            <button className="cta" onClick={() => setOpenCh(expanded ? 0 : ch.chapter)}>
-              Cap. {ch.chapter} · {ch.name} · {done}/{list.length}
-            </button>
-            <p className="muted">{ch.blurb}</p>
-            {expanded && (
-              <p className="muted">{ACT_CUTSCENES.find((a) => a.chapter === ch.chapter)?.enter[locale]}</p>
-            )}
-            {expanded &&
-              list.map((s) => {
-                const open = isStageOpen(cleared, s.id);
-                return (
-                  <div key={s.id} className="stage-row">
-                    <div>
-                      <strong>
-                        {s.id} · {s.name}
-                      </strong>
-                      <div className="muted">
-                        +{s.gold} ouro · Wake {s.wakeRate}/h
-                      </div>
-                    </div>
-                    <button className="cta" style={{ width: 88, minHeight: 40 }} disabled={!open} onClick={() => void startFight(s.id)}>
-                      {open ? "Lutar" : "—"}
-                    </button>
-                  </div>
-                );
-              })}
-          </div>
-        );
-      })}
+      <CampaignMap />
+
       <div className="panel">
         <p className="muted">12 atos · 240 stages. Arte de inimigo ainda empresta os 3 bosses do slice.</p>
       </div>
