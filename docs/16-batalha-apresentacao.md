@@ -45,6 +45,7 @@ desempenho de carga e som. Referências externas citadas ao longo do texto.
 | Largura máxima por unidade | **15% da largura do canvas** (cabe na coluna) |
 | Âncora do sprite | (0.5, 0.9) — pés no ponto da fileira |
 | Clamp de escala | 0.05–0.32 (qualquer arte de origem) |
+| **Orientação canônica** | Arte desenhada mirando para a **ESQUERDA**. Aliados (esquerda) são espelhados para mirar à direita; inimigos (direita) mantêm a orientação → times **frente a frente**. Regra vale também para os lotes 17+ (atk/hit/die/ult). |
 
 A escala é calculada **por textura** (`targetH / tex.height`), então os assets
 de tamanhos variados (1024², 1376×768, 1152×922…) normalizam sozinhos. Sem

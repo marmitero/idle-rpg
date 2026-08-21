@@ -142,7 +142,10 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
           s = Math.min(0.32, Math.max(0.05, s));
           const depth = pos.row === 0 ? 1.04 : pos.row === 1 ? 0.98 : 0.92;
           spr.anchor.set(0.5, 0.9);
-          spr.scale.set((team === "ally" ? s : -s) * depth, s * depth);
+          // Orientação canônica da arte: sprites desenhados mirando para a
+          // ESQUERDA. No palco, aliados (esquerda) são espelhados para mirar
+          // à direita; inimigos (direita) mantêm a orientação → frente a frente.
+          spr.scale.set((team === "ally" ? -s : s) * depth, s * depth);
           spr.position.set(pos.x, pos.y);
           layer.addChild(spr);
           actors.set(u.id, {
