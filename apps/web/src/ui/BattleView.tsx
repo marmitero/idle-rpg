@@ -57,6 +57,15 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
     setBed("battle");
     const app = new Application();
     let destroyed = false;
+    let ready = false;
+
+    const safeDestroy = () => {
+      try {
+        app.destroy(true);
+      } catch (e) {
+        reportError("app.destroy", e);
+      }
+    };
 
     const run = async () => {
       try {
@@ -67,10 +76,13 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
           autoDensity: true,
           resolution: Math.min(2, window.devicePixelRatio || 1),
         });
+        // StrictMode (dev) pode ter desmontado enquanto init estava pendente;
+        // agora o init terminou, então destruir é seguro.
         if (destroyed) {
-          app.destroy();
+          safeDestroy();
           return;
         }
+        ready = true;
         el.appendChild(app.canvas);
         const w = app.renderer.width;
         const h = app.renderer.height;
@@ -168,6 +180,7 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
         app.ticker.add(ticker);
       } catch (e) {
         reportError("battle init", e);
+        if (destroyed) safeDestroy();
       }
     };
 
@@ -175,7 +188,11 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
     return () => {
       destroyed = true;
       setBed("hub");
-      app.destroy(true);
+      delete (window as unknown as { __battle?: unknown }).__battle;
+      // NUNCA destruir antes do init resolver: ResizePlugin.destroy() chama
+      // this._cancelResize() sem guarda (pixi 8.19) e a exceção derruba a
+      // árvore React inteira (tela preta). O run() destrói ao resolver.
+      if (ready) safeDestroy();
     };
   }, [bg, input, result]);
 

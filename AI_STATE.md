@@ -2,9 +2,9 @@
 
 **Atualizado:** 2026-08-21  
 **Branch:** `arena/01a02426-idle-rpg`  
-**Último passo:** investigação da tela preta em batalha — instrumentação de diag adicionada; aguardando teste do usuário.
+**Último passo:** causa raiz da tela preta encontrada e corrigida — `app.destroy()` durante `init()` pendente (StrictMode) derrubava o ResizePlugin do Pixi.
 
-**BUG ABERTO — tela preta ao iniciar batalha:** o fix `Assets.load` (commit 6410235) era necessário e está correto (`Texture.from(string)` não carrega no Pixi v8), mas o usuário reporta sintoma persistente. Causas candidatas: (a) build/cache antigo no navegador do usuário; (b) `app.init()` falhando (WebGL) no ambiente dele; (c) crash React. Instrumentação (commit e5e9eb8): banner vermelho visível + logs de progresso (init/bg/atores) e erros enviados a `POST /api/diag` (dev-only) — ler o log da API (`get_process_output`) após o usuário jogar uma batalha. `window.__battle` exposto no cliente. PRÓXIMA AÇÃO: pedir hard-refresh + uma batalha; ler `[diag]` no log; corrigir a causa real.
+**BUG FECHADO — tela preta em batalha:** o stack do usuário (`window.onerror: this._cancelResize is not a function` em `ResizePlugin.destroy` do pixi 8.19) provou que o cleanup do useEffect chamava `app.destroy(true)` **antes de o `app.init()` assíncrono terminar** (React StrictMode dev desmonta logo após montar). O `ResizePlugin.destroy()` chama `_cancelResize()` sem guarda → exceção no desmonte → React derruba a árvore inteira → só o fundo escuro do body. Correção (BattleView): flag `ready` pós-init + `safeDestroy()` com try/catch; cleanup só destrói se `ready`, senão o `run()` destrói ao resolver o init (caminho `destroyed`). O fix anterior `Assets.load` (Texture.from não carrega no v8) permanece — eram dois bugs. Instrumentação diag mantida (banner + /api/diag).
 
 Este arquivo é a **fonte de verdade para o agente**. Atualize-o ao **final de cada execução**.
 
