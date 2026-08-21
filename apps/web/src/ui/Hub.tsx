@@ -1,8 +1,9 @@
-import { DAILIES, UI } from "@relicwake/content";
-import { t } from "../i18n";
+import { DAILIES, HUB_PLAZA, HUB_WORLD, type HubWorldDef } from "@relicwake/content";
 import { useState } from "react";
 import { playSfx, unlockAudio } from "../audio";
+import { t } from "../i18n";
 import { useGame } from "../state";
+import { NoticeBoard, SparkleBurst, WakeBar, WorldObject } from "./gameUI";
 import { ArenaPanel, HonorPanel, LivePanel, TowerPanel } from "./Modes";
 
 export function Hub() {
@@ -16,119 +17,93 @@ export function Hub() {
   const setHubPanel = useGame((s) => s.setHubPanel);
   const locale = useGame((s) => s.locale);
   const [msg, setMsg] = useState("");
+  const [burst, setBurst] = useState(0);
   const hours = Math.min(cap, (Date.now() - last) / 3_600_000);
-  if (panel === "tower") {
-    return (
-      <div>
-        <button className="cta" style={{ margin: 12, width: "calc(100% - 24px)" }} onClick={() => setHubPanel("home")}>
-          ← Hub
-        </button>
-        <TowerPanel />
-      </div>
-    );
-  }
-  if (panel === "arena") {
-    return (
-      <div>
-        <button className="cta" style={{ margin: 12, width: "calc(100% - 24px)" }} onClick={() => setHubPanel("home")}>
-          ← Hub
-        </button>
-        <ArenaPanel />
-      </div>
-    );
-  }
-  if (panel === "honor") {
-    return (
-      <div>
-        <button className="cta" style={{ margin: 12, width: "calc(100% - 24px)" }} onClick={() => setHubPanel("home")}>
-          ← Hub
-        </button>
-        <HonorPanel />
-      </div>
-    );
-  }
-  if (panel === "live") {
-    return (
-      <div>
-        <button className="cta" style={{ margin: 12, width: "calc(100% - 24px)" }} onClick={() => setHubPanel("home")}>
-          ← Hub
-        </button>
-        <LivePanel />
-      </div>
-    );
-  }
 
+  const open = (def: HubWorldDef) => {
+    if (def.action === "open_tower") setHubPanel("tower");
+    else if (def.action === "open_arena") setHubPanel("arena");
+    else if (def.action === "open_honor") setHubPanel("honor");
+    else if (def.action === "open_live" || def.action === "open_mail") setHubPanel("live");
+  };
+
+  const collectWake = async () => {
+    try {
+      unlockAudio();
+      const r = await collect();
+      playSfx("collect");
+      setBurst((b) => b + 1);
+      setMsg(r.gold > 0 ? `+${r.gold} ouro em ${r.hours.toFixed(1)} h de sono.` : "O Spire ainda não rendeu.");
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "servidor");
+    }
+  };
+
+  if (panel !== "home") {
+    return (
+      <div>
+        <button className="cta back-cta" onClick={() => setHubPanel("home")}>
+          ← Hub
+        </button>
+        {panel === "tower" && <TowerPanel />}
+        {panel === "arena" && <ArenaPanel />}
+        {panel === "honor" && <HonorPanel />}
+        {panel === "live" && <LivePanel />}
+      </div>
+    );
+  }
 
   return (
-    <div className="hero-bg" style={{ backgroundImage: `url(${UI.hub})`, minHeight: "100%" }}>
-      <div style={{ height: 220 }} />
-      <div className="panel">
-        <h1>{t("spire_sleeps", locale)}</h1>
-        <p className="muted">
-          Wake acumulado: {hours.toFixed(1)} h / {cap} h.
-        </p>
-        <button
-          className="cta"
-          onClick={async () => {
-            try {
-              unlockAudio();
-              const r = await collect();
-              playSfx("collect");
-              setMsg(r.gold > 0 ? `+${r.gold} ouro em ${r.hours.toFixed(1)} h de sono.` : "O Spire ainda não rendeu.");
-            } catch (e) {
-              setMsg(e instanceof Error ? e.message : "servidor");
-            }
-          }}
-        >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-            <img src={UI.chest} alt="" width={28} height={28} />
-            {t("collect_wake", locale)}
-          </span>
-        </button>
-        {msg && <p className="muted">{msg}</p>}
+    <div className="hub-scene">
+      <div className="hub-bg" style={{ backgroundImage: `url(${HUB_PLAZA})` }} />
+      <div className="hub-shade" />
+
+      <div className="hub-title">{t("spire_sleeps", locale)}</div>
+
+      <div className="hub-world">
+        {HUB_WORLD.map((def) => (
+          <WorldObject
+            key={def.id}
+            def={def}
+            locale={locale}
+            onActivate={(d) => {
+              if (d.action === "collect") void collectWake();
+              else open(d);
+            }}
+          >
+            {def.id === "font" ? <WakeBar hours={hours} cap={cap} /> : null}
+          </WorldObject>
+        ))}
+        {burst > 0 && <SparkleBurst key={burst} />}
       </div>
-      <div className="panel">
-        <h2>{t("destinations", locale)}</h2>
-        <div className="grid3">
-          {(
-            [
-              ["tower", "tower"],
-              ["arena", "arena"],
-              ["honor", "honor"],
-              ["live", "live"],
-            ] as const
-          ).map(([id, key]) => (
-            <button key={id} className="cta" onClick={() => setHubPanel(id)}>
-              {t(key, locale)}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="panel">
-        <h2>Ofício do dia</h2>
-        {DAILIES.map((d) => {
-          const p = prog[d.id] ?? 0;
-          const done = p >= d.target;
-          const took = claimed.includes(d.id);
-          return (
-            <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, margin: "8px 0" }}>
-              <div style={{ flex: 1 }}>
-                <div>{d.label}</div>
-                <div className="muted">
-                  {Math.min(p, d.target)}/{d.target}
+
+      {msg && <div className="hub-msg">{msg}</div>}
+
+      <div className="hub-board">
+        <NoticeBoard title={t("daily", locale)}>
+          {DAILIES.map((d) => {
+            const p = prog[d.id] ?? 0;
+            const done = p >= d.target;
+            const took = claimed.includes(d.id);
+            return (
+              <div key={d.id} className="daily-row">
+                <div className="daily-info">
+                  <div>{d.label}</div>
+                  <div className="muted">
+                    {Math.min(p, d.target)}/{d.target}
+                  </div>
                 </div>
+                <button
+                  className="cta daily-btn"
+                  disabled={!done || took}
+                  onClick={() => claimDaily(d.id)}
+                >
+                  {took ? "Ok" : done ? "Coletar" : "…"}
+                </button>
               </div>
-              <button
-                className="cta"
-                style={{ width: 96, minHeight: 40 }}
-                disabled={!done || took}
-                onClick={() => claimDaily(d.id)}
-              >
-                {took ? "Ok" : done ? "Coletar" : "…"}
-              </button>
-            </div>
-          );
-        })}
+            );
+          })}
+        </NoticeBoard>
       </div>
     </div>
   );

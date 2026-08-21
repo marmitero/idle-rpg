@@ -7,6 +7,9 @@ import { HEROES, HERO_BY_ID } from "./heroes.ts";
 export * from "./campaign.ts";
 export * from "./campaignState.ts";
 
+// Game UI registry (docs/ui-redesign/*)
+export * from "./uiRegistry.ts";
+
 export type EnemyDef = {
   id: string;
   name: string;

@@ -51,28 +51,51 @@ img { max-width: 100%; display: block; }
 
 .topbar {
   height: var(--top-h);
-  padding: env(safe-area-inset-top, 0) 12px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(#1b1420ee, #1b142000);
-  z-index: 4;
-}
-
-.chip {
+  padding: env(safe-area-inset-top, 0) 10px 0;
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #0006;
-  border: 1px solid #e8b15a55;
-  border-radius: 999px;
-  padding: 4px 10px 4px 4px;
+  background: linear-gradient(#120d1acc, #120d1a00);
+  z-index: 6;
+}
+.topbar-grow { margin-left: auto; }
+
+/* Recurso: ícone + contador sobre placa asset (nada de pill CSS) */
+.res-counter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 12px 2px 6px;
+  min-height: 34px;
+  background: url("/assets/ui/kit/rw_ui_plate_counter.png") center / 100% 100% no-repeat;
+}
+.res-counter img { width: 24px; height: 24px; object-fit: contain; }
+.res-num {
+  font-weight: 700;
   font-size: 13px;
   color: var(--gold);
-  min-height: 32px;
+  text-shadow: 0 1px 2px #000c;
+  font-variant-numeric: tabular-nums;
 }
-.chip img { width: 22px; height: 22px; object-fit: contain; }
-.chip.grow { margin-left: auto; }
+.res-counter.flash-gain .res-num { animation: res-gain 0.5s ease-out; }
+.res-counter.flash-spend .res-num { animation: res-spend 0.5s ease-out; }
+@keyframes res-gain { 0% { color: #fff2c8; transform: scale(1.25); } 100% { color: var(--gold); transform: scale(1); } }
+@keyframes res-spend { 0% { color: var(--rose); transform: scale(0.9); } 100% { color: var(--gold); transform: scale(1); } }
+
+.topbar-name {
+  max-width: 46%;
+  padding: 6px 16px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: #f0d9a8;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat;
+}
 
 .content {
   flex: 1;
@@ -86,10 +109,9 @@ img { max-width: 100%; display: block; }
   height: var(--nav-h);
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  background: #120e18f0;
-  border-top: 1px solid #e8b15a33;
+  background: linear-gradient(#120d1a00, #120d1ad9 35%);
   padding-bottom: env(safe-area-inset-bottom, 0);
-  z-index: 5;
+  z-index: 6;
 }
 .nav button {
   background: none;
@@ -98,13 +120,20 @@ img { max-width: 100%; display: block; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   font-size: 11px;
   color: var(--ash);
   min-height: 44px;
-  opacity: 0.7;
+  opacity: 0.72;
+  transition: transform 120ms ease, opacity 120ms ease;
 }
-.nav button.on { color: var(--gold); opacity: 1; }
+.nav button:active { transform: scale(0.92); }
+.nav button.on {
+  color: var(--gold);
+  opacity: 1;
+  transform: translateY(-2px);
+}
+.nav button.on img { filter: drop-shadow(0 0 6px #e8b15ab0); }
 .nav img { width: 28px; height: 28px; object-fit: contain; }
 
 .hero-bg {
@@ -114,13 +143,30 @@ img { max-width: 100%; display: block; }
   background-position: center top;
 }
 
+/* Painel asset-driven: moldura ornamentada do kit (não é caixa CSS) */
 .panel {
   margin: 12px;
   padding: 14px;
-  background: #1b1f3acc;
-  border: 1px solid #e8b15a66;
-  border-radius: 12px;
+  background: #16101dcc;
+  border: 22px solid transparent;
+  border-image: url("/assets/ui/kit/rw_ui_panel_ornate_256.png") 72 / 22px / 0 stretch;
 }
+
+/* Botão asset-driven: sprite do kit (normal/press são assets) */
+.cta {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  background: url("/assets/ui/kit/rw_ui_button_256.png") center / 100% 100% no-repeat;
+  color: #ffe2b0;
+  text-shadow: 0 1px 2px #000c;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+.cta:active { background-image: url("/assets/ui/kit/rw_ui_button_press_256.png"); }
+.cta:disabled { filter: saturate(0.4) brightness(0.65); cursor: default; }
+.back-cta { width: calc(100% - 24px); margin: 12px; min-height: 44px; }
 
 .cta {
   width: 100%;
@@ -292,3 +338,208 @@ h2 { font-size: 16px; margin: 0 0 8px; color: #f3e2a1; }
 .stage-stars { color: #6b5b73; font-size: 13px; margin: 2px 0; }
 .stage-stars .on { color: #e8b15a; }
 .stage-stars.dim { color: #4c4058; }
+
+/* ── Hub: cena do mundo (docs/ui-redesign/04) ─────────────────────── */
+.hub-scene {
+  position: relative;
+  min-height: 100%;
+  padding-bottom: 8px;
+}
+.hub-bg {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--stage);
+  top: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center top;
+  z-index: 0;
+}
+.hub-shade {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--stage);
+  top: 0;
+  bottom: 0;
+  background:
+    linear-gradient(#0c0910cc, #0c091000 30%, #0c0910d9 88%);
+  z-index: 1;
+  pointer-events: none;
+}
+.hub-title {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  padding: 10px 12px 0;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  color: #f0d9a8;
+  text-shadow: 0 2px 6px #000;
+  text-transform: uppercase;
+}
+.hub-world {
+  position: relative;
+  z-index: 2;
+  height: min(58dvh, 520px);
+  min-height: 320px;
+}
+.hub-msg {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  font-size: 13px;
+  color: var(--gold);
+  text-shadow: 0 1px 3px #000;
+  margin: 2px 16px;
+}
+.hub-board {
+  position: relative;
+  z-index: 3;
+  margin: 10px 12px 0;
+}
+
+/* Objeto do mundo: sprite + rótulo em placa; estados por interação */
+.wobj {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: none;
+  border: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.wobj-sprite {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px #000b);
+  transition: transform 150ms ease, filter 150ms ease;
+  animation: wobj-float 2.8s ease-in-out infinite;
+}
+.wobj:nth-child(2n) .wobj-sprite { animation-delay: 0.7s; }
+.wobj:nth-child(3n) .wobj-sprite { animation-delay: 1.3s; }
+.wobj-label {
+  margin-top: 2px;
+  padding: 3px 10px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffe2b0;
+  background: #120d1ab8;
+  border: 1px solid #e8b15a44;
+  border-radius: 999px;
+  text-shadow: 0 1px 2px #000;
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .wobj:hover .wobj-sprite {
+    transform: scale(1.05);
+    filter: drop-shadow(0 8px 16px #000c) drop-shadow(0 0 10px #e8b15a66);
+  }
+}
+.wobj:active .wobj-sprite { transform: scale(0.95); }
+@keyframes wobj-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -5px; }
+}
+
+/* Fonte: WakeBar abaixo do objeto */
+.wobj-font .wake-bar { margin-top: 4px; width: 120px; }
+.wake-bar {
+  position: relative;
+  height: 20px;
+  pointer-events: none;
+}
+.wake-bar-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+.wake-bar-fillwrap {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  overflow: hidden;
+}
+.wake-bar-fill {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+.wake-bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff2c8;
+  text-shadow: 0 1px 2px #000;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sparkles de coleta (feedback temporário) */
+.sparkle-layer {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  width: 0;
+  height: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.sparkle {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  animation: sparkle-fly 0.7s ease-out forwards;
+  will-change: transform, opacity;
+}
+@keyframes sparkle-fly {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(var(--dx, 40px), var(--dy, -40px)) scale(1.1); opacity: 0; }
+}
+
+/* Quadro do ofício — contêiner diegético sobre o asset do quadro */
+.notice-board {
+  position: relative;
+  background: url("/assets/ui/world/rw_obj_hub_daily.png") center / 100% 100% no-repeat;
+  padding: 26px 18px 18px;
+  min-height: 150px;
+}
+.notice-board-body {
+  background: #120d1a55;
+  border-radius: 6px;
+  padding: 6px 10px 2px;
+}
+.notice-board-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #f0d9a8;
+  text-shadow: 0 1px 2px #000;
+}
+.daily-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+.daily-info { flex: 1; font-size: 13px; }
+.daily-btn { width: 92px; min-height: 36px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wobj-sprite, .sparkle, .res-num, .cnode-current { animation: none !important; }
+}

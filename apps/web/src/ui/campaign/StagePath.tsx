@@ -4,7 +4,7 @@
 import { CAMPAIGN_STAGE_BY_ID } from "@relicwake/content";
 import type { CampaignStageDef, StageNodeState } from "@relicwake/content";
 
-export function stagePathClass(state: StageNodeState): string {
+function stagePathClass(state: StageNodeState): string {
   if (state === "boss" || state === "boss_locked") return "path-boss";
   if (state === "completed" || state === "perfect") return "path-completed";
   if (state === "current" || state === "unlocked") return "path-active";

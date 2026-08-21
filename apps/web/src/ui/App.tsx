@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { TUTORIAL_DONE, UI } from "@relicwake/content";
+import { HUD_RESOURCES, TUTORIAL_DONE, UI } from "@relicwake/content";
 import { setBed, unlockAudio } from "../audio";
 import { useGame, type Tab } from "../state";
+import { ResourceCounter, WakerPlate } from "./gameUI";
 import { Hub } from "./Hub";
 import { Roster } from "./Roster";
 import { Battle } from "./Battle";
@@ -54,18 +55,11 @@ export function App() {
     <div className="shell">
       <div className="stage">
         <header className="topbar">
-          <div className="chip">
-            <img src={UI.gold} alt="" />
-            {gold}
-          </div>
-          <div className="chip">
-            <img src={UI.letters} alt="" />
-            {letters}
-          </div>
-          <div className="chip">poeira {dust}</div>
-          <div className="chip grow" style={{ border: "none", background: "transparent" }}>
-            {wakerName ?? email ?? "Relicwake"}
-          </div>
+          <ResourceCounter icon={HUD_RESOURCES[0].icon} value={gold} kind="gold" />
+          <ResourceCounter icon={HUD_RESOURCES[1].icon} value={letters} kind="letters" />
+          <ResourceCounter icon={HUD_RESOURCES[2].icon} value={dust} kind="dust" />
+          <div className="topbar-grow" />
+          <WakerPlate name={wakerName ?? email ?? "Relicwake"} />
         </header>
         <main className="content">
           {!ready && <div className="panel">{error ? `API: ${error}` : "Acordando o Spire…"}</div>}

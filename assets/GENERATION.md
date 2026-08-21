@@ -4,6 +4,26 @@ Regra: **10 por lote**. Fundo: **`#FF00FF`**. Spec: [`docs/13-regras-de-geracao.
 
 **Saída do gerador:** master em `referencias/<taxonomia>` → `npm run assets:finalize` escreve o final transparente em `assets/<taxonomia>`. O jogo nunca processa imagem em runtime (chroma removido em 2026-08-21).
 
+## lote-ui-01 (feito, 10/10) — redesign asset-driven da interface
+
+Fundo `#FF00FF` nos recortes; a praça é plate full-bleed (sem magenta, regra do lote-05).
+
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `environments/hub/rw_env_hub_plaza.png` | plate da praça do hub *(sem magenta)* |
+| 2 | `ui/world/rw_obj_hub_tower.png` | objeto do mundo — Torre |
+| 3 | `ui/world/rw_obj_hub_font.png` | objeto do mundo — Fonte (coleta de Wake) |
+| 4 | `ui/world/rw_obj_hub_arena.png` | objeto do mundo — Arena |
+| 5 | `ui/world/rw_obj_hub_honor.png` | objeto do mundo — Honor |
+| 6 | `ui/world/rw_obj_hub_mail.png` | objeto do mundo — Correio |
+| 7 | `ui/world/rw_obj_hub_pass.png` | objeto do mundo — Passe/Eventos |
+| 8 | `ui/world/rw_obj_hub_daily.png` | quadro do ofício do dia |
+| 9 | `ui/kit/rw_ui_plate_counter.png` | placa de contador do HUD |
+| 10 | `vfx/rw_vfx_sparkle.png` | partícula de coleta |
+
+Notas: Fonte e quadro receberam padding magenta 90px (sujeito na borda). Docs em `docs/ui-redesign/*`. Registry em `packages/content/src/uiRegistry.ts`.
+
+
 ## lote-01 (passado)
 
 Complementos sem a regra do magenta (armor t2, frame common, 4 moedas, 4 facções core).  

@@ -34,6 +34,15 @@ docs/
 ├── 15-systems-complete.md          systems 1.0
 ├── 16-batalha-apresentacao.md      composição, perf e áudio da batalha
 ├── 17-formacao.md                  formação 3x3 (posicionamento estratégico)
+├── ui-redesign/                    interface asset-driven (spec §33)
+│   ├── 01-visual-ui-direction.md   filosofia e regras de uso
+│   ├── 02-game-ui-design-system.md componentes, estados, tipografia, camadas
+│   ├── 03-asset-ui-manifest.md     inventário de assets + placeholders
+│   ├── 04-screen-asset-map.md      mapeamento elemento atual → asset
+│   ├── 05-responsive-game-ui.md    superfícies, safe areas, interação
+│   ├── 06-ui-interaction-spec.md   eventos e feedback por componente
+│   ├── 07-asset-production-guide.md ficha padrão + pipeline
+│   └── 08-screen-redesign-plan.md  plano por tela (fase 1/2) + aceite
 ├── campaign/                       Campaign Map (sistema de progressão)
 │   ├── 01-campaign-map-system.md   objetivo, arquitetura, fluxos, integração
 │   ├── 02-campaign-data-schema.md  campanha/capítulo/estágio/conexão/requisito
