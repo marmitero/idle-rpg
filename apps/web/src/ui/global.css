@@ -528,7 +528,7 @@ h2 { font-size: 16px; margin: 0 0 8px; color: #f3e2a1; }
   position: absolute;
   left: 10%;
   right: 10%;
-  top: 20.5%;
+  top: 23%;
   height: 20%;
   display: flex;
   align-items: center;
@@ -544,7 +544,7 @@ h2 { font-size: 16px; margin: 0 0 8px; color: #f3e2a1; }
   position: absolute;
   left: 12.5%;
   right: 12.5%;
-  top: 40%;
+  top: 35%;
   bottom: 8%;
   display: flex;
   flex-direction: column;
