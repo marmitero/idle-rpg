@@ -1,5 +1,6 @@
 import { UI } from "@relicwake/content";
 import { useState } from "react";
+import { getVolume, isMuted, playSfx, setMuted, setVolume, unlockAudio } from "../audio";
 import { useGame } from "../state";
 
 export function Menu() {
@@ -7,6 +8,7 @@ export function Menu() {
   const pity = useGame((s) => s.pity);
   const email = useGame((s) => s.email);
   const pull = useGame((s) => s.pull);
+  const tutorial = useGame((s) => s.tutorial);
   const register = useGame((s) => s.register);
   const login = useGame((s) => s.login);
   const logout = useGame((s) => s.logout);
@@ -14,6 +16,8 @@ export function Menu() {
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
   const [authMsg, setAuthMsg] = useState("");
+  const [mute, setMute] = useState(isMuted);
+  const [vol, setVol] = useState(getVolume);
 
   return (
     <div className="hero-bg" style={{ backgroundImage: `url(${UI.font})` }}>
@@ -25,7 +29,9 @@ export function Menu() {
           disabled={letters < 1}
           onClick={async () => {
             try {
+              unlockAudio();
               const r = await pull();
+              playSfx("pull");
               setLog(`${r.rarity} — ${r.heroId}`);
             } catch (e) {
               setLog(e instanceof Error ? e.message : "erro");
@@ -92,6 +98,42 @@ export function Menu() {
             {authMsg && <p className="muted">{authMsg}</p>}
           </>
         )}
+      </div>
+      <div className="panel">
+        <h2>Áudio</h2>
+        <p className="muted">Camas procedurais de hub e batalha. Sem master de loja ainda.</p>
+        <button
+          className="cta"
+          onClick={() => {
+            unlockAudio();
+            const next = !mute;
+            setMute(next);
+            setMuted(next);
+          }}
+        >
+          {mute ? "Som off" : "Som on"}
+        </button>
+        <button
+          className="cta"
+          style={{ marginTop: 8 }}
+          onClick={() => void tutorial({ reset: true })}
+        >
+          Rever ofício (tutorial)
+        </button>
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={vol}
+          onChange={(e) => {
+            const v = Number(e.target.value);
+            setVol(v);
+            unlockAudio();
+            setVolume(v);
+          }}
+          style={{ width: "100%", marginTop: 10 }}
+        />
       </div>
     </div>
   );

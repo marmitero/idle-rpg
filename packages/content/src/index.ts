@@ -128,76 +128,19 @@ export const ENEMIES: EnemyDef[] = [
   boss("pale_hydra", "Hidra Pálida", "tidebound", { hp: 1500, atk: 68, def: 36, spd: 48, crit: 12 }),
 ];
 
-export type StageDef = {
-  id: string;
-  chapter: number;
-  index: number;
-  name: string;
-  bg: string;
-  enemies: { enemyId: string; slot: number; scale: number }[];
-  gold: number;
-  wakeRate: number;
-};
+export type { StageDef } from "./stages.ts";
+export { BG, CHAPTERS, STAGES, isStageOpen } from "./stages.ts";
+import { BG } from "./stages.ts";
 
-const gob = (slot: number, scale: number) => ({
-  enemyId: "enemy.goblin_king",
-  slot,
-  scale,
-});
-
-const BG = {
-  spire: "/assets/environments/biomes/rw_env_battle_spire_base.png",
-  ember: "/assets/environments/biomes/rw_env_battle_emberworks.png",
-  tide: "/assets/environments/biomes/rw_env_battle_tidevault.png",
-  thorn: "/assets/environments/biomes/rw_env_battle_thorn.png",
-  ash: "/assets/environments/biomes/rw_env_battle_ash.png",
-  crown: "/assets/environments/biomes/rw_env_battle_crown.png",
-  goblin: "/assets/environments/hunts/rw_env_hunt_goblin.png",
-  wyrm: "/assets/environments/hunts/rw_env_hunt_wyrm.png",
-  hydra: "/assets/environments/hunts/rw_env_hunt_hydra.png",
-};
-
-function wave(
-  id: string,
-  chapter: number,
-  index: number,
-  name: string,
-  bg: string,
-  n: number,
-  scale: number,
-  gold: number,
-  wakeRate: number,
-  boss?: { enemyId: string; scale: number },
-): StageDef {
-  const enemies = Array.from({ length: Math.min(5, n) }, (_, i) => gob(i, scale - i * 0.02));
-  if (boss) enemies[0] = { enemyId: boss.enemyId, slot: 0, scale: boss.scale };
-  return { id, chapter, index, name, bg, enemies, gold, wakeRate };
-}
-
-export const STAGES: StageDef[] = [
-  wave("1-1", 1, 1, "A Base que respira", BG.spire, 3, 0.7, 40, 8),
-  wave("1-2", 1, 2, "Lanternas de Wake", BG.spire, 4, 0.74, 55, 10),
-  wave("1-3", 1, 3, "O primeiro Waker que mente", BG.spire, 5, 0.8, 70, 12),
-  wave("1-4", 1, 4, "Degrau das cinzas", BG.spire, 5, 0.86, 80, 13),
-  wave("1-5", 1, 5, "Trono de osso", BG.goblin, 4, 0.8, 180, 16, {
-    enemyId: "enemy.goblin_king",
-    scale: 1.12,
-  }),
-  wave("2-1", 2, 1, "Emberworks abre", BG.ember, 4, 0.88, 90, 16),
-  wave("2-2", 2, 2, "Canais de magma", BG.ember, 5, 0.92, 100, 17),
-  wave("2-3", 2, 3, "Wyrm na forja", BG.wyrm, 3, 0.85, 220, 20, {
-    enemyId: "enemy.ash_wyrm",
-    scale: 1.05,
-  }),
-  wave("3-1", 3, 1, "Tidevault", BG.tide, 4, 0.9, 110, 18),
-  wave("3-2", 3, 2, "A cisterna sem fundo", BG.hydra, 3, 0.88, 260, 22, {
-    enemyId: "enemy.pale_hydra",
-    scale: 1.08,
-  }),
-  wave("4-1", 4, 1, "Thorn Causeway", BG.thorn, 5, 0.94, 120, 20),
-  wave("5-1", 5, 1, "Ash Cloister", BG.ash, 5, 0.96, 130, 21),
-  wave("6-1", 6, 1, "Crown of Sleep", BG.crown, 5, 1.0, 160, 24),
-];
+export const TUTORIAL_DONE = 8;
+export const TUTORIAL_STAGES = ["1-1", "1-2", "1-3", "1-4"] as const;
+export const HUNT_UNLOCK_STAGE = "1-10";
+export const LOAN_HEROES = ["hero.warrior", "hero.guardian", "hero.mage", "hero.archer", "hero.rogue"];
+export const STARTERS = [
+  { id: "hero.warrior", line: "Kael. Embercourt. O Sono se quebra com trabalho." },
+  { id: "hero.mage", line: "Orren. Tidebound. A memória muda de nome, não de ofício." },
+  { id: "hero.archer", line: "Mira. Thornveil. A cidade é comida. A flecha não." },
+] as const;
 
 export type HuntDef = {
   id: string;

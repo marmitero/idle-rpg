@@ -36,6 +36,10 @@ export type Account = {
   dailyProg: Record<string, number>;
   dailyClaimed: string[];
   ledger: LedgerEntry[];
+  wakerName: string | null;
+  starterId: string | null;
+  tutorialStep: number;
+  tutorialPull: boolean;
 };
 
 function today() {
@@ -50,14 +54,18 @@ function genesis(id: string, deviceId: string): Account {
     gold: 120,
     letters: 12,
     fate: 0,
-    lastCollectAt: Date.now(),
+    lastCollectAt: Date.now() - 2.5 * 3_600_000,
     capHours: 8,
     afkStage: "1-1",
     cleared: [],
     team: ["hero.warrior", "hero.guardian", "hero.mage", "hero.archer", "hero.rogue"],
     owned: HEROES.map((h) => h.id),
     pity: 0,
-    directives: ["foco", "guarda", "execute"],
+    directives: ["foco"],
+    wakerName: null,
+    starterId: null,
+    tutorialStep: 0,
+    tutorialPull: false,
     stamina: 80,
     lastStaminaAt: Date.now(),
     sweep: 4,
@@ -80,6 +88,11 @@ async function loadSnapshot(accountId: string, deviceId: string, email: string |
     a.dailyProg = { login: 1 };
     a.dailyClaimed = [];
   }
+  if (a.tutorialStep == null) a.tutorialStep = a.cleared.length ? 8 : 0;
+  if (a.wakerName === undefined) a.wakerName = null;
+  if (a.starterId === undefined) a.starterId = null;
+  if (a.tutorialPull == null) a.tutorialPull = a.tutorialStep >= 8;
+  if (!a.directives) a.directives = ["foco", "guarda", "execute"];
   return a;
 }
 

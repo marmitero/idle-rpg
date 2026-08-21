@@ -1,9 +1,10 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomInt } from "node:crypto";
-import { DAILIES, HEROES, HUNTS, STAGES } from "@relicwake/content";
+import { DAILIES, HEROES, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE } from "@relicwake/content";
 import { bumpDaily, credit, getByEmail, getById, getOrCreate, publicState, save, bindEmail, type Account } from "./store.ts";
 import { hashPassword, signJwt, validEmail, verifyJwt, verifyPassword } from "./auth.ts";
 import { readBattle, readBattles, resolveBattle } from "./combat.ts";
+import { applyTutorial } from "./tutorial.ts";
 import { dialect } from "./db.ts";
 
 const PORT = Number(process.env.API_PORT ?? 3000);
@@ -190,9 +191,19 @@ const server = createServer(async (req, res) => {
       json(res, 200, { state: publicState(a) });
       return;
     }
+    if (req.method === "POST" && url === "/api/tutorial") {
+      const a = await account(req, res);
+      if (!a) return;
+      const body = await readBody(req);
+      const out = await applyTutorial(a, body);
+      if (!out.ok) return json(res, 400, { error: out.error });
+      json(res, 200, { state: publicState(out.account) });
+      return;
+    }
     if (req.method === "POST" && url === "/api/gacha/pull") {
       const a = await account(req, res);
       if (!a) return;
+      if (a.tutorialStep < TUTORIAL_DONE) return json(res, 400, { error: "tutorial_lock" });
       if (a.letters < 1) return json(res, 400, { error: "no_letters" });
       await credit(a, "letters", -1, "gacha.pull", "font");
       a.pity += 1;
@@ -216,6 +227,8 @@ const server = createServer(async (req, res) => {
       const body = await readBody(req);
       const hunt = HUNTS.find((h) => h.id === String(body.id ?? ""));
       if (!hunt) return json(res, 400, { error: "unknown_hunt" });
+      if (a.tutorialStep < TUTORIAL_DONE) return json(res, 400, { error: "tutorial_lock" });
+      if (!a.cleared.includes(HUNT_UNLOCK_STAGE)) return json(res, 400, { error: "hunt_locked" });
       if (a.stamina < hunt.stamina) return json(res, 400, { error: "no_breath" });
       if (a.sweep < 1) return json(res, 400, { error: "no_echo" });
       await credit(a, "stamina", -hunt.stamina, "hunt.sweep", hunt.id);

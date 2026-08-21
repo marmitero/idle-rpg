@@ -1,5 +1,6 @@
 import { DAILIES, UI } from "@relicwake/content";
 import { useState } from "react";
+import { playSfx, unlockAudio } from "../audio";
 import { useGame } from "../state";
 import { ChromaImg } from "./ChromaImg";
 
@@ -26,7 +27,9 @@ export function Hub() {
           className="cta"
           onClick={async () => {
             try {
+              unlockAudio();
               const r = await collect();
+              playSfx("collect");
               setMsg(r.gold > 0 ? `+${r.gold} ouro em ${r.hours.toFixed(1)} h de sono.` : "O Spire ainda não rendeu.");
             } catch (e) {
               setMsg(e instanceof Error ? e.message : "servidor");

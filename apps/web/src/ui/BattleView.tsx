@@ -2,6 +2,7 @@ import { ENEMIES, HERO_BY_ID } from "@relicwake/content";
 import type { BattleInput, BattleResult } from "@relicwake/sim";
 import { Application, Container, Sprite, Texture } from "pixi.js";
 import { useEffect, useRef } from "react";
+import { playSfx, setBed } from "../audio";
 import { chromaUrl } from "../chroma";
 
 /** Pixi playback of a server-judged BattleResult. Never calls simulate(). */
@@ -45,6 +46,7 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
     const el = host.current;
     if (!el) return;
     done.current = false;
+    setBed("battle");
     const app = new Application();
     let destroyed = false;
 
@@ -120,6 +122,7 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
           const ev = events[i]!;
           i += 1;
           if (ev.kind === "attack" || ev.kind === "ult") {
+            playSfx(ev.kind === "ult" ? "ult" : ev.kind === "attack" && ev.crit ? "crit" : "hit");
             const src = actors.get(ev.src);
             const dst = actors.get(ev.dst);
             if (src) {
@@ -138,11 +141,13 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
             }
           }
           if (ev.kind === "death") {
+            playSfx("death");
             const a = actors.get(ev.id);
             if (a) a.spr.texture = a.textures.die ?? a.textures.idle!;
           }
           if (ev.kind === "end" && !done.current) {
             done.current = true;
+            playSfx(ev.winner === "ally" ? "win" : "lose");
             window.setTimeout(onDone, 900);
           }
         }
@@ -153,6 +158,7 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
     void run();
     return () => {
       destroyed = true;
+      setBed("hub");
       app.destroy(true);
     };
   }, [bg, input, result, onDone]);

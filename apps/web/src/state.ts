@@ -24,6 +24,10 @@ export type Remote = {
   dailyProg: Record<string, number>;
   dailyClaimed: string[];
   email: string | null;
+  wakerName: string | null;
+  starterId: string | null;
+  tutorialStep: number;
+  tutorialPull: boolean;
 };
 
 export type FightPayload = {
@@ -67,6 +71,7 @@ type Store = Remote & {
   register: (email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  tutorial: (body: { step?: number; name?: string; starterId?: string; pull?: boolean; reset?: boolean }) => Promise<void>;
 };
 
 const empty: Remote = {
@@ -88,6 +93,10 @@ const empty: Remote = {
   dailyProg: {},
   dailyClaimed: [],
   email: null,
+  wakerName: null,
+  starterId: null,
+  tutorialStep: 0,
+  tutorialPull: false,
 };
 
 export const useGame = create<Store>((set, get) => ({
@@ -211,5 +220,9 @@ export const useGame = create<Store>((set, get) => ({
   logout: () => {
     setToken(null);
     void get().hydrate();
+  },
+  tutorial: async (body) => {
+    const r = await api<{ state: Remote }>("/api/tutorial", body);
+    get().apply(r.state);
   },
 }));

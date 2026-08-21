@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import { UI } from "@relicwake/content";
+import { TUTORIAL_DONE, UI } from "@relicwake/content";
+import { setBed, unlockAudio } from "../audio";
 import { useGame, type Tab } from "../state";
 import { Hub } from "./Hub";
 import { Roster } from "./Roster";
 import { Battle } from "./Battle";
 import { Guild } from "./Guild";
 import { Menu } from "./Menu";
+import { Tutorial } from "./Tutorial";
 import { ChromaImg } from "./ChromaImg";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
@@ -21,15 +23,32 @@ export function App() {
   const gold = useGame((s) => s.gold);
   const letters = useGame((s) => s.letters);
   const email = useGame((s) => s.email);
+  const wakerName = useGame((s) => s.wakerName);
   const fighting = useGame((s) => s.fighting);
   const ready = useGame((s) => s.ready);
   const error = useGame((s) => s.error);
+  const tutorialStep = useGame((s) => s.tutorialStep);
   const setTab = useGame((s) => s.setTab);
   const hydrate = useGame((s) => s.hydrate);
 
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
+
+  useEffect(() => {
+    const unlock = () => {
+      unlockAudio();
+      setBed(fighting ? "battle" : "hub");
+    };
+    window.addEventListener("pointerdown", unlock, { once: true });
+    return () => window.removeEventListener("pointerdown", unlock);
+  }, [fighting]);
+
+  useEffect(() => {
+    setBed(fighting ? "battle" : "hub");
+  }, [fighting, tab]);
+
+  const tutoring = ready && tutorialStep < TUTORIAL_DONE;
 
   return (
     <div className="shell">
@@ -44,7 +63,7 @@ export function App() {
             {letters}
           </div>
           <div className="chip grow" style={{ border: "none", background: "transparent" }}>
-            {email ?? "Relicwake"}
+            {wakerName ?? email ?? "Relicwake"}
           </div>
         </header>
         <main className="content">
@@ -55,7 +74,8 @@ export function App() {
           {tab === "guild" && <Guild />}
           {tab === "menu" && <Menu />}
         </main>
-        {!fighting && (
+        {tutoring && <Tutorial />}
+        {!fighting && !tutoring && (
           <nav className="nav">
             {TABS.map((t) => (
               <button key={t.id} className={tab === t.id ? "on" : ""} onClick={() => setTab(t.id)}>

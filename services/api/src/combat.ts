@@ -1,5 +1,15 @@
 import { randomInt, randomUUID } from "node:crypto";
-import { ENEMIES, HERO_BY_ID, HEROES, HUNTS, STAGES } from "@relicwake/content";
+import {
+  ENEMIES,
+  HERO_BY_ID,
+  HEROES,
+  HUNT_UNLOCK_STAGE,
+  HUNTS,
+  LOAN_HEROES,
+  STAGES,
+  TUTORIAL_DONE,
+  TUTORIAL_STAGES,
+} from "@relicwake/content";
 import { battleHash, simulate, type BattleInput, type BattleRecord, type LoadoutUnit } from "@relicwake/sim";
 import { signReplay, verifyReplayMac } from "./auth.ts";
 import {
@@ -41,7 +51,12 @@ function scaled(stats: LoadoutUnit["stats"], s: number): LoadoutUnit["stats"] {
 }
 
 export function loadoutFromTeam(a: Account): LoadoutUnit[] {
-  return a.team.slice(0, 5).map((id, slot) => {
+  const ids = [...a.team];
+  for (const id of LOAN_HEROES) {
+    if (ids.length >= 5) break;
+    if (!ids.includes(id)) ids.push(id);
+  }
+  return ids.slice(0, 5).map((id, slot) => {
     const h = HERO_BY_ID[id] ?? HEROES[0]!;
     return { id: `a${slot}`, heroId: h.id, name: h.name, faction: h.faction, stats: h.stats, slot };
   });
@@ -134,6 +149,14 @@ export async function resolveBattle(
   const stage = STAGES.find((s) => s.id === contentId);
   const hunt = HUNTS.find((h) => h.id === contentId);
   if (!stage && !hunt) return { ok: false, error: "unknown_content" };
+
+  if ((a.tutorialStep ?? TUTORIAL_DONE) < TUTORIAL_DONE) {
+    if (hunt) return { ok: false, error: "tutorial_lock" };
+    if (stage && !(TUTORIAL_STAGES as readonly string[]).includes(stage.id)) {
+      return { ok: false, error: "tutorial_lock" };
+    }
+  }
+  if (hunt && !a.cleared.includes(HUNT_UNLOCK_STAGE)) return { ok: false, error: "hunt_locked" };
 
   const enemies = enemiesFor(contentId);
   if (!enemies) return { ok: false, error: "unknown_content" };

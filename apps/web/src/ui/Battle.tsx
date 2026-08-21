@@ -1,4 +1,4 @@
-import { HUNTS, STAGES, UI } from "@relicwake/content";
+import { CHAPTERS, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE, UI, isStageOpen } from "@relicwake/content";
 import { DIRECTIVES, type DirectiveId } from "@relicwake/shared";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "../state";
@@ -31,7 +31,9 @@ export function Battle() {
   const sweep = useGame((s) => s.sweep);
   const replays = useGame((s) => s.replays);
   const openReplay = useGame((s) => s.openReplay);
+  const tutorialStep = useGame((s) => s.tutorialStep);
   const [speed, setSpeed] = useState(1);
+  const [openCh, setOpenCh] = useState(1);
   const [done, setDone] = useState(false);
   const [huntMsg, setHuntMsg] = useState("");
   const settled = useRef(false);
@@ -141,6 +143,9 @@ export function Battle() {
 
       <div className="panel">
         <h2>Hunts</h2>
+        {tutorialStep < TUTORIAL_DONE || !cleared.includes(HUNT_UNLOCK_STAGE) ? (
+          <p className="muted">Abre após o 1-10. Breath não gasta o baú.</p>
+        ) : null}
         {HUNTS.map((h) => (
           <div key={h.id} style={{ marginBottom: 10 }}>
             <strong>{h.name}</strong>
@@ -150,6 +155,7 @@ export function Battle() {
             <div style={{ display: "flex", gap: 8 }}>
               <button
                 className="cta"
+                disabled={tutorialStep < TUTORIAL_DONE || !cleared.includes(HUNT_UNLOCK_STAGE)}
                 onClick={async () => {
                   const r = await startHunt(h.id);
                   setHuntMsg(r.ok ? "" : (r.reason ?? ""));
@@ -159,6 +165,7 @@ export function Battle() {
               </button>
               <button
                 className="cta"
+                disabled={tutorialStep < TUTORIAL_DONE || !cleared.includes(HUNT_UNLOCK_STAGE)}
                 onClick={async () => {
                   const r = await sweepHunt(h.id);
                   setHuntMsg(r.ok ? `Sweep: +${r.gold} ouro` : (r.reason ?? ""));
@@ -194,22 +201,41 @@ export function Battle() {
         </div>
       )}
 
-      {STAGES.map((s, i) => {
-        const open = i === 0 || cleared.includes(STAGES[i - 1]!.id);
+      {CHAPTERS.map((ch) => {
+        const list = STAGES.filter((s) => s.chapter === ch.chapter);
+        const done = list.filter((s) => cleared.includes(s.id)).length;
+        const expanded = openCh === ch.chapter;
         return (
-          <div key={s.id} className="panel">
-            <h2>
-              {s.id} · {s.name}
-            </h2>
-            <p className="muted">
-              +{s.gold} ouro · taxa Wake {s.wakeRate}/h
-            </p>
-            <button className="cta" disabled={!open} onClick={() => void startFight(s.id)}>
-              {open ? "Lutar" : "Trancado"}
+          <div key={ch.chapter} className="panel">
+            <button className="cta" onClick={() => setOpenCh(expanded ? 0 : ch.chapter)}>
+              Cap. {ch.chapter} · {ch.name} · {done}/{list.length}
             </button>
+            <p className="muted">{ch.blurb}</p>
+            {expanded &&
+              list.map((s) => {
+                const open = isStageOpen(cleared, s.id);
+                return (
+                  <div key={s.id} className="stage-row">
+                    <div>
+                      <strong>
+                        {s.id} · {s.name}
+                      </strong>
+                      <div className="muted">
+                        +{s.gold} ouro · Wake {s.wakeRate}/h
+                      </div>
+                    </div>
+                    <button className="cta" style={{ width: 88, minHeight: 40 }} disabled={!open} onClick={() => void startFight(s.id)}>
+                      {open ? "Lutar" : "—"}
+                    </button>
+                  </div>
+                );
+              })}
           </div>
         );
       })}
+      <div className="panel">
+        <p className="muted">Capítulos 3–12 (Tidevault → Crown) entram no content complete. O slice é a subida inteira dos atos 1 e 2.</p>
+      </div>
     </div>
   );
 }
