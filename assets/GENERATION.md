@@ -133,3 +133,22 @@ Reexportar em lote futuro se o chroma for necessário nesses arquivos.
 | 5 | `vfx/rw_vfx_nadir.png` | VFX facção |
 
 Slice de combate (idle/atk/hit/die/ult + VFX das 6 facções) **fechado**.
+
+## lote-12 (feito) — fundo `#FF00FF` — onda roster 1/3 (bustos)
+
+Primeiros 10 heróis placeholder (bust 512; ícone = cópia). Battle clips ainda emprestados.
+
+| # | Arquivo | Herói |
+| --- | --- | --- |
+| 1 | `characters/bust/rw_hero_ember_bril_bust_512.png` | Bril |
+| 2 | `characters/bust/rw_hero_ember_sora_bust_512.png` | Sora |
+| 3 | `characters/bust/rw_hero_ember_durn_bust_512.png` | Durn |
+| 4 | `characters/bust/rw_hero_ember_hest_bust_512.png` | Hest |
+| 5 | `characters/bust/rw_hero_tide_nera_bust_512.png` | Nera |
+| 6 | `characters/bust/rw_hero_tide_luth_bust_512.png` | Luth |
+| 7 | `characters/bust/rw_hero_tide_cale_bust_512.png` | Cale |
+| 8 | `characters/bust/rw_hero_tide_ivo_bust_512.png` | Ivo |
+| 9 | `characters/bust/rw_hero_tide_sem_bust_512.png` | Sem |
+| 10 | `characters/bust/rw_hero_thorn_bramble_bust_512.png` | Bramble |
+
+**Próximo lote-13:** bustos Tess, Quin, Ashleaf, Yew, Choir, Dust, Hymn, Cinder, Veil, Helion.

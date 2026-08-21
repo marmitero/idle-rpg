@@ -50,6 +50,15 @@ const kitOf = (k: HeroClass, faction: Faction) => {
   return KIT.archer;
 };
 
+/** Unique bust/icon; battle clips still borrowed until later lots. */
+function ownBust(slug: string, kit: HeroDef["art"]): HeroDef["art"] {
+  return {
+    ...kit,
+    bust: `/assets/characters/bust/rw_hero_${slug}_bust_512.png`,
+    icon: `/assets/characters/icon/rw_hero_${slug}_icon_256.png`,
+  };
+}
+
 function h(
   id: string,
   name: string,
@@ -76,14 +85,14 @@ function h(
   };
 }
 
-/** 6 com arte própria + 22 com kit emprestado (onda de arte no content complete visual). */
+/** 6 slice com kit completo + 10 com bust próprio (lote-12) + 12 ainda kit emprestado. */
 export const HEROES: HeroDef[] = [
   h("hero.warrior", "Kael", "O Sino Inacabado", "embercourt", "striker", "elite", { hp: 920, atk: 78, def: 42, spd: 62, crit: 12 }, { pas: "Coração de forja", cmd: "Golpe pesado", ult: "Sino rachado" }, KIT.warrior),
   h("hero.guardian", "Ward", "A Visada Azul", "embercourt", "vanguard", "elite", { hp: 1280, atk: 48, def: 88, spd: 44, crit: 6 }, { pas: "Baluarte", cmd: "Escudo-ariete", ult: "Muralha" }, KIT.guardian),
-  h("hero.ember.bril", "Bril", "A Bigorna que Ri", "embercourt", "warden", "rare", { hp: 1100, atk: 55, def: 70, spd: 48, crit: 8 }, { pas: "Calor residual", cmd: "Rebite", ult: "Contrato quente" }, undefined, true),
-  h("hero.ember.sora", "Sora", "Fagulha de Arquivo", "embercourt", "channeler", "rare", { hp: 760, atk: 90, def: 30, spd: 60, crit: 14 }, { pas: "Cinza útil", cmd: "Estilhaço", ult: "Forja aberta" }, undefined, true),
-  h("hero.ember.durn", "Durn", "O Que Não Para", "embercourt", "vanguard", "elite", { hp: 1400, atk: 42, def: 95, spd: 38, crit: 5 }, { pas: "Turno extra", cmd: "Empurra", ult: "Muralha segunda" }, undefined, true),
-  h("hero.ember.hest", "Hest", "Juramento Tarde", "embercourt", "seer", "rare", { hp: 880, atk: 58, def: 48, spd: 52, crit: 9 }, { pas: "Lealdade", cmd: "Brasão", ult: "Corte de honra" }, undefined, true),
+  h("hero.ember.bril", "Bril", "A Bigorna que Ri", "embercourt", "warden", "rare", { hp: 1100, atk: 55, def: 70, spd: 48, crit: 8 }, { pas: "Calor residual", cmd: "Rebite", ult: "Contrato quente" }, ownBust("ember_bril", KIT.guardian), true),
+  h("hero.ember.sora", "Sora", "Fagulha de Arquivo", "embercourt", "channeler", "rare", { hp: 760, atk: 90, def: 30, spd: 60, crit: 14 }, { pas: "Cinza útil", cmd: "Estilhaço", ult: "Forja aberta" }, ownBust("ember_sora", KIT.mage), true),
+  h("hero.ember.durn", "Durn", "O Que Não Para", "embercourt", "vanguard", "elite", { hp: 1400, atk: 42, def: 95, spd: 38, crit: 5 }, { pas: "Turno extra", cmd: "Empurra", ult: "Muralha segunda" }, ownBust("ember_durn", KIT.guardian), true),
+  h("hero.ember.hest", "Hest", "Juramento Tarde", "embercourt", "seer", "rare", { hp: 880, atk: 58, def: 48, spd: 52, crit: 9 }, { pas: "Lealdade", cmd: "Brasão", ult: "Corte de honra" }, ownBust("ember_hest", KIT.cleric), true),
 
   h("hero.mage", "Orren", "Memória Líquida", "tidebound", "channeler", "elite", { hp: 740, atk: 92, def: 28, spd: 58, crit: 14 }, { pas: "Grimório", cmd: "Dardo arcano", ult: "Orbe da cisterna" }, KIT.mage),
   h("hero.tide.nera", "Nera", "Nome desta maré", "tidebound", "warden", "elite", { hp: 1180, atk: 50, def: 72, spd: 50, crit: 8 }, { pas: "Esquece o golpe", cmd: "Refluxo", ult: "Cisterna fecha" }, undefined, true),
@@ -93,7 +102,7 @@ export const HEROES: HeroDef[] = [
   h("hero.tide.sem", "Sem", "Quem era ontem", "tidebound", "seer", "rare", { hp: 840, atk: 60, def: 40, spd: 54, crit: 10 }, { pas: "Ciclo", cmd: "Lembrete", ult: "Apaga o medo" }, undefined, true),
 
   h("hero.archer", "Mira", "Raiz que Aponta", "thornveil", "striker", "elite", { hp: 780, atk: 84, def: 30, spd: 86, crit: 18 }, { pas: "Olho de gavião", cmd: "Flecha única", ult: "Chuva verde" }, KIT.archer),
-  h("hero.thorn.bramble", "Bramble", "Avenida Digestiva", "thornveil", "vanguard", "elite", { hp: 1240, atk: 50, def: 80, spd: 46, crit: 7 }, { pas: "Cerca viva", cmd: "Espinho", ult: "Cidade comida" }, undefined, true),
+  h("hero.thorn.bramble", "Bramble", "Avenida Digestiva", "thornveil", "vanguard", "elite", { hp: 1240, atk: 50, def: 80, spd: 46, crit: 7 }, { pas: "Cerca viva", cmd: "Espinho", ult: "Cidade comida" }, ownBust("thorn_bramble", KIT.guardian), true),
   h("hero.thorn.tess", "Tess", "Paciência com dente", "thornveil", "warden", "rare", { hp: 1080, atk: 52, def: 68, spd: 50, crit: 9 }, { pas: "Cresce depois", cmd: "Seda", ult: "Asfixia doce" }, undefined, true),
   h("hero.thorn.quin", "Quin", "Pólen de arquivo", "thornveil", "channeler", "rare", { hp: 730, atk: 88, def: 28, spd: 64, crit: 15 }, { pas: "Broto", cmd: "Semente", ult: "Bosque instantâneo" }, undefined, true),
   h("hero.thorn.ashleaf", "Ashleaf", "Folha que queima devagar", "thornveil", "striker", "elite", { hp: 760, atk: 90, def: 28, spd: 82, crit: 20 }, { pas: "Verde-cinza", cmd: "Corte de seiva", ult: "Tempestade baixa" }, undefined, true),
