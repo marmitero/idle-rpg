@@ -30,7 +30,8 @@ export function CampaignMap() {
           <button
             key={c.def.id}
             className={`chapter-pill${c.def.id === m.chapter.def.id ? " on" : ""}${!c.unlocked ? " locked" : ""}`}
-            onClick={() => m.setChapterId(c.def.id)}
+            onClick={() => c.unlocked && m.setChapterId(c.def.id)}
+            title={c.def.title}
           >
             {c.unlocked ? c.def.number : "🔒"}
           </button>

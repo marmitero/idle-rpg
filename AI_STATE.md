@@ -2,7 +2,9 @@
 
 **Atualizado:** 2026-08-21  
 **Branch:** `arena/01a02426-idle-rpg`  
-**Último passo:** redesign asset-driven da UI — hub como cena do mundo (objetos interativos + Fonte de coleta), HUD/nav em assets, pele de painel/botão via kit, microinterações (docs/ui-redesign, lote-ui-01).
+**Último passo:** correções visuais pós-restore — CSS duplicado removido (.cta genérico sobrescrevia o asset), proporções reais dos assets de UI (quadro 1556/948, barra 3.4:1, contadores minimalistas), painel de info do mapa vira overlay fixo na base (antes aparecia fora da vista no fim do scroll).
+
+**Nota de ambiente:** o sandbox pode restaurar o disco para o estado inicial — ao retomar, `git reset --hard origin/arena/01a02426-idle-rpg` + `npm ci` + conferir symlink `apps/web/public/assets`. Python do pipeline (PIL/numpy/scipy) também precisa reinstalar.
 
 **BUG FECHADO — tela preta em batalha:** o stack do usuário (`window.onerror: this._cancelResize is not a function` em `ResizePlugin.destroy` do pixi 8.19) provou que o cleanup do useEffect chamava `app.destroy(true)` **antes de o `app.init()` assíncrono terminar** (React StrictMode dev desmonta logo após montar). O `ResizePlugin.destroy()` chama `_cancelResize()` sem guarda → exceção no desmonte → React derruba a árvore inteira → só o fundo escuro do body. Correção (BattleView): flag `ready` pós-init + `safeDestroy()` com try/catch; cleanup só destrói se `ready`, senão o `run()` destrói ao resolver o init (caminho `destroyed`). O fix anterior `Assets.load` (Texture.from não carrega no v8) permanece — eram dois bugs. Instrumentação diag mantida (banner + /api/diag).
 
