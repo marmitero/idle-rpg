@@ -73,3 +73,25 @@ test("same inputs replay identically across seeds (golden)", () => {
     assert.equal(battleHash(input, x), battleHash(input, y));
   }
 });
+
+test("ataques priorizam a fileira da frente até ela cair, depois meio, depois topo", () => {
+  const tanky = (id: string, slot: number, hp: number) => ({
+    ...unit(id, slot, 5),
+    stats: { hp, atk: 5, def: 0, spd: 60, crit: 0 },
+  });
+  // frente indestrutível + alvos fracos no meio e no topo: enquanto a frente
+  // viver, TODO ataque aliado deve cair nela.
+  const input = {
+    seed: 3,
+    allies: [unit("a0", 0, 90), unit("a1", 1, 90)],
+    enemies: [tanky("eFront", 0, 99999), tanky("eMid", 4, 400), tanky("eBack", 7, 400)],
+    directives: [],
+  };
+  const r = simulate(input);
+  const allyAttackDsts = r.events
+    .filter((e) => e.kind === "attack" && e.src.startsWith("a"))
+    .map((e) => (e as { dst: string }).dst);
+  assert.ok(allyAttackDsts.length > 0, "houve ataques aliados");
+  assert.ok(allyAttackDsts.every((d) => d === "eFront"), `tudo caiu na frente: ${allyAttackDsts.slice(0, 5).join(",")}`);
+});
+

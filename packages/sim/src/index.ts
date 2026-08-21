@@ -129,8 +129,15 @@ function pickTarget(src: BattleUnit, foes: BattleUnit[], directives: DirectiveId
     const low = live.filter((u) => u.hp / u.stats.hp < 0.35);
     if (low.length) return low[rng() * low.length | 0] ?? low[0]!;
   }
-  const front = live.filter((u) => u.slot < 3); // grade 3x3: fileira da frente = slots 0-2
-  const pool = front.length ? front : live;
+  // Padrão: prioridade ESTRITA por fileira — frente (slots 0-2) sempre
+  // primeiro; só depois meio (3-5) e por último topo (6-8). Dentro da
+  // fileira, alvo aleatório entre os vivos.
+  const rows = [
+    live.filter((u) => u.slot < 3),
+    live.filter((u) => u.slot >= 3 && u.slot < 6),
+    live.filter((u) => u.slot >= 6),
+  ];
+  const pool = rows.find((r) => r.length) ?? [];
   return pool[rng() * pool.length | 0] ?? pool[0]!;
 }
 

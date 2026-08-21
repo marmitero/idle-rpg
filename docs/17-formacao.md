@@ -44,8 +44,13 @@ Migração: contas antigas (só `team`) preenchem os 5 primeiros slots
 
 ## 3. Como a formação afeta o combate
 
-- `pickTarget` no sim: ataques básicos preferem **slots 0–2 (frente)**;
-  diretivas continuam sobrepondo (foco = maior ATK, execute = <35% HP).
+- `pickTarget` no sim: **prioridade estrita por fileira** — a frente (slots 0–2)
+  é atacada primeiro até cair; depois o meio (3–5) e por último o topo (6–8).
+  Dentro da fileira, o alvo é aleatório entre os vivos. Ataques básicos e
+  ultimates seguem a mesma regra. Teste unitário cobre o comportamento
+  (`sim.test.ts`: frente indestrutível ⇒ todos os ataques caem nela).
+- Diretivas continuam sobrepondo a regra padrão: **foco** = maior ATK,
+  **execute** = alvo <35% HP.
 - `loadoutFromTeam` (servidor): batalhas normais montam o input com os slots
   reais da formação; honor/draft mantém slots por índice.
 - Renderização: `BattleView` converte slot em posição (colunas nas zonas,
