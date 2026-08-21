@@ -2,7 +2,7 @@
 
 **Atualizado:** 2026-08-21  
 **Branch:** `arena/01a02426-idle-rpg`  
-**Último passo:** lote-16 — 5 idles (fecha 22/22) + 5 atks novos (Sem, Bramble, Tess, Quin, Ashleaf).
+**Último passo:** bugfix — tela de batalha preta (Pixi v8 `Texture.from(string)` só lê cache) corrigido com `Assets.load`.
 
 Este arquivo é a **fonte de verdade para o agente**. Atualize-o ao **final de cada execução**.
 
@@ -31,6 +31,7 @@ Preview: `npm run dev` → Vite **5173** + API **3000**. Dependências: `npm ci`
 - 28 heróis / 240 stages / 4×10 hunts / i18n chrome PT-EN
 - Arte slice 6 heróis completa (bust+battle) + 3 bosses + plates
 - lotes 12–16: **22/22 bustos** + **22/22 idles** + **11/28 atks** próprios (6 slice + Sem, Bramble, Tess, Quin, Ashleaf); hit/die/ult dos novos ainda kit
+- **Bugfix batalha preta (esta sessão):** no Pixi v8, `Texture.from(string)` SÓ consulta o Cache (não carrega) — `BattleView` criava sprites com textura vazia desde o slice. Troca por `Assets.load(url)` em `tex()` e no background. Bug pré-existente, não causado pela remoção do chroma.
 - **Reorganização de assets:**
   - `referencias/` = masters magenta `#FF00FF` gerados, espelhando a taxonomia de `assets/`
   - `assets/` = **finais RGBA com fundo removido** — o jogo carrega direto, **sem processamento em runtime**

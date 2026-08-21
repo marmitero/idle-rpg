@@ -1,6 +1,6 @@
 import { ENEMIES, HERO_BY_ID } from "@relicwake/content";
 import type { BattleInput, BattleResult } from "@relicwake/sim";
-import { Application, Container, Sprite, Texture } from "pixi.js";
+import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
 import { useEffect, useRef } from "react";
 import { playSfx, setBed } from "../audio";
 
@@ -31,8 +31,9 @@ function slotPos(team: "ally" | "enemy", slot: number, w: number, h: number) {
 }
 
 async function tex(url: string): Promise<Texture> {
-  // Assets já vêm com fundo removido de `assets/` (pipeline remove_bg.py).
-  return Texture.from(url);
+  // Pixi v8: Texture.from(string) SÓ lê o cache (não carrega). Assets.load
+  // carrega e devolve a Texture pronta — assets já vêm com fundo removido.
+  return (await Assets.load(url)) as Texture;
 }
 
 export function BattleView({ bg, input, result, speed, onDone }: Props) {
@@ -66,8 +67,8 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
       const h = app.renderer.height;
 
       try {
-        const bgTex = Texture.from(bg);
-        const bgSpr = new Sprite(bgTex);
+        const bgTex = await Assets.load(bg);
+        const bgSpr = new Sprite(bgTex as Texture);
         bgSpr.width = w;
         bgSpr.height = h;
         app.stage.addChild(bgSpr);
