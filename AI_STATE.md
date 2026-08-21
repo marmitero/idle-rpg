@@ -2,7 +2,7 @@
 
 **Atualizado:** 2026-08-21  
 **Branch:** `arena/01a02426-idle-rpg`  
-**Último passo:** reorganização de assets (referencias × assets) + Rift regenerado + chroma runtime removido.
+**Último passo:** lote-16 — 5 idles (fecha 22/22) + 5 atks novos (Sem, Bramble, Tess, Quin, Ashleaf).
 
 Este arquivo é a **fonte de verdade para o agente**. Atualize-o ao **final de cada execução**.
 
@@ -30,8 +30,8 @@ Preview: `npm run dev` → Vite **5173** + API **3000**. Dependências: `npm ci`
 - Slice jogável, replay, auth, SQLite/Postgres, systems (gear, torre 200, arena, guilda, passe, honor, admin)
 - 28 heróis / 240 stages / 4×10 hunts / i18n chrome PT-EN
 - Arte slice 6 heróis completa (bust+battle) + 3 bosses + plates
-- lotes 12–15: **22/22 bustos únicos** + **17/22 idles próprios** (faltam Cinder, Veil, Helion, Umbral, Rift)
-- **Reorganização de assets (esta sessão):**
+- lotes 12–16: **22/22 bustos** + **22/22 idles** + **11/28 atks** próprios (6 slice + Sem, Bramble, Tess, Quin, Ashleaf); hit/die/ult dos novos ainda kit
+- **Reorganização de assets:**
   - `referencias/` = masters magenta `#FF00FF` gerados, espelhando a taxonomia de `assets/`
   - `assets/` = **finais RGBA com fundo removido** — o jogo carrega direto, **sem processamento em runtime**
   - Novo pipeline `tools/asset-pipeline/remove_bg.py` (flood de borda; sujeito nunca é removido por cor). `chroma_magenta.py`, `chroma.ts` e `ChromaImg.tsx` removidos.
@@ -44,14 +44,14 @@ Preview: `npm run dev` → Vite **5173** + API **3000**. Dependências: `npm ci`
 
 | Lote | Conteúdo | Estado |
 | --- | --- | --- |
-| 12–15 | 22 bustos + 17 idles + loop do slice | feito |
-| 16 | 5 idle restantes + 5 atk dos novos | **próximo** |
-| 17+ | atk/hit/die/ult dos 22 | pendente |
+| 12–16 | 22 bustos + 22 idles + 5 atks novos + loop do slice | feito |
+| 17 | 10 atk restantes (Bril, Sora, Durn, Hest, Nera, Luth, Cale, Ivo, Yew, Choir) | **próximo** |
+| 18+ | 7 atk + hit/die/ult dos 22 | pendente |
 | — | inimigos ilustrados, cutscenes, stems, loc 100%, marketing | pendente |
 
 Regras: master → `referencias/<taxonomia>`; final → `npm run assets:finalize`. ≤10/sessão, `#FF00FF`, sem magenta no sujeito. `assets/GENERATION.md`.
 
-Idle ainda kit: Cinder, Veil, Helion, Umbral, Rift (5).
+Atk ainda kit: Bril, Sora, Durn, Hest, Nera, Luth, Cale, Ivo, Yew, Choir, Dust, Hymn, Cinder, Veil, Helion, Umbral, Rift (17).
 
 ---
 
@@ -68,4 +68,4 @@ Typecheck web/content (erros pré-existentes: `allowImportingTsExtensions` nos i
 3. Só esta branch. Economia no servidor. Magenta ≤10.
 4. Atualizar **este arquivo**. `npm run dev` se pedirem preview.
 
-**Próximo passo:** lote-16 — 5 idle restantes (Cinder, Veil, Helion, Umbral, Rift) + 5 atk dos novos (Sem, Bramble, Tess, Quin, Ashleaf), masters em `referencias/`, finais via `npm run assets:finalize`.
+**Próximo passo:** lote-17 — 10 atk restantes (Bril, Sora, Durn, Hest, Nera, Luth, Cale, Ivo, Yew, Choir), masters em `referencias/`, finais via `npm run assets:finalize`.

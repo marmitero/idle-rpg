@@ -67,6 +67,14 @@ function ownIdle(slug: string, kit: HeroDef["art"]): HeroDef["art"] {
   };
 }
 
+/** Bust/icon + own idle + own atk; hit/die/ult still borrowed from class kit. */
+function ownAtk(slug: string, kit: HeroDef["art"]): HeroDef["art"] {
+  return {
+    ...ownIdle(slug, kit),
+    atk: `/assets/characters/battle/rw_hero_${slug}_atk.png`,
+  };
+}
+
 function h(
   id: string,
   name: string,
@@ -93,7 +101,7 @@ function h(
   };
 }
 
-/** 6 slice completo + 22 bustos próprios (lotes 12–15); 17 idle próprios (lotes 14–15); atk/hit/die/ult ainda kit. */
+/** 6 slice completo + 22 bustos (lotes 12–15) + 22 idles (lotes 14–16); 5 atks próprios (lote-16); hit/die/ult ainda kit. */
 export const HEROES: HeroDef[] = [
   h("hero.warrior", "Kael", "O Sino Inacabado", "embercourt", "striker", "elite", { hp: 920, atk: 78, def: 42, spd: 62, crit: 12 }, { pas: "Coração de forja", cmd: "Golpe pesado", ult: "Sino rachado" }, KIT.warrior),
   h("hero.guardian", "Ward", "A Visada Azul", "embercourt", "vanguard", "elite", { hp: 1280, atk: 48, def: 88, spd: 44, crit: 6 }, { pas: "Baluarte", cmd: "Escudo-ariete", ult: "Muralha" }, KIT.guardian),
@@ -107,27 +115,27 @@ export const HEROES: HeroDef[] = [
   h("hero.tide.luth", "Luth", "Sal que Corta", "tidebound", "striker", "rare", { hp: 800, atk: 86, def: 32, spd: 80, crit: 16 }, { pas: "Adaptação", cmd: "Corte úmido", ult: "Maré curta" }, ownIdle("tide_luth", KIT.archer), true),
   h("hero.tide.cale", "Cale", "O Arquivo Molhado", "tidebound", "channeler", "rare", { hp: 720, atk: 96, def: 26, spd: 56, crit: 15 }, { pas: "Página nova", cmd: "Gotas", ult: "Nome errado" }, ownIdle("tide_cale", KIT.mage), true),
   h("hero.tide.ivo", "Ivo", "Âncora Cortês", "tidebound", "vanguard", "elite", { hp: 1320, atk: 46, def: 84, spd: 42, crit: 6 }, { pas: "Peso", cmd: "Amarra", ult: "Porto" }, ownIdle("tide_ivo", KIT.guardian), true),
-  h("hero.tide.sem", "Sem", "Quem era ontem", "tidebound", "seer", "rare", { hp: 840, atk: 60, def: 40, spd: 54, crit: 10 }, { pas: "Ciclo", cmd: "Lembrete", ult: "Apaga o medo" }, ownIdle("tide_sem", KIT.cleric), true),
+  h("hero.tide.sem", "Sem", "Quem era ontem", "tidebound", "seer", "rare", { hp: 840, atk: 60, def: 40, spd: 54, crit: 10 }, { pas: "Ciclo", cmd: "Lembrete", ult: "Apaga o medo" }, ownAtk("tide_sem", KIT.cleric), true),
 
   h("hero.archer", "Mira", "Raiz que Aponta", "thornveil", "striker", "elite", { hp: 780, atk: 84, def: 30, spd: 86, crit: 18 }, { pas: "Olho de gavião", cmd: "Flecha única", ult: "Chuva verde" }, KIT.archer),
-  h("hero.thorn.bramble", "Bramble", "Avenida Digestiva", "thornveil", "vanguard", "elite", { hp: 1240, atk: 50, def: 80, spd: 46, crit: 7 }, { pas: "Cerca viva", cmd: "Espinho", ult: "Cidade comida" }, ownIdle("thorn_bramble", KIT.guardian), true),
-  h("hero.thorn.tess", "Tess", "Paciência com dente", "thornveil", "warden", "rare", { hp: 1080, atk: 52, def: 68, spd: 50, crit: 9 }, { pas: "Cresce depois", cmd: "Seda", ult: "Asfixia doce" }, ownIdle("thorn_tess", KIT.guardian), true),
-  h("hero.thorn.quin", "Quin", "Pólen de arquivo", "thornveil", "channeler", "rare", { hp: 730, atk: 88, def: 28, spd: 64, crit: 15 }, { pas: "Broto", cmd: "Semente", ult: "Bosque instantâneo" }, ownIdle("thorn_quin", KIT.mage), true),
-  h("hero.thorn.ashleaf", "Ashleaf", "Folha que queima devagar", "thornveil", "striker", "elite", { hp: 760, atk: 90, def: 28, spd: 82, crit: 20 }, { pas: "Verde-cinza", cmd: "Corte de seiva", ult: "Tempestade baixa" }, ownIdle("thorn_ashleaf", KIT.archer), true),
+  h("hero.thorn.bramble", "Bramble", "Avenida Digestiva", "thornveil", "vanguard", "elite", { hp: 1240, atk: 50, def: 80, spd: 46, crit: 7 }, { pas: "Cerca viva", cmd: "Espinho", ult: "Cidade comida" }, ownAtk("thorn_bramble", KIT.guardian), true),
+  h("hero.thorn.tess", "Tess", "Paciência com dente", "thornveil", "warden", "rare", { hp: 1080, atk: 52, def: 68, spd: 50, crit: 9 }, { pas: "Cresce depois", cmd: "Seda", ult: "Asfixia doce" }, ownAtk("thorn_tess", KIT.guardian), true),
+  h("hero.thorn.quin", "Quin", "Pólen de arquivo", "thornveil", "channeler", "rare", { hp: 730, atk: 88, def: 28, spd: 64, crit: 15 }, { pas: "Broto", cmd: "Semente", ult: "Bosque instantâneo" }, ownAtk("thorn_quin", KIT.mage), true),
+  h("hero.thorn.ashleaf", "Ashleaf", "Folha que queima devagar", "thornveil", "striker", "elite", { hp: 760, atk: 90, def: 28, spd: 82, crit: 20 }, { pas: "Verde-cinza", cmd: "Corte de seiva", ult: "Tempestade baixa" }, ownAtk("thorn_ashleaf", KIT.archer), true),
   h("hero.thorn.yew", "Yew", "O pacto pedido", "thornveil", "seer", "rare", { hp: 900, atk: 56, def: 44, spd: 50, crit: 8 }, { pas: "Raiz ouve", cmd: "Cura verde", ult: "Pacto" }, ownIdle("thorn_yew", KIT.cleric), true),
 
   h("hero.rogue", "Vell", "O Véu que Ri", "ashen", "striker", "elite", { hp: 700, atk: 88, def: 26, spd: 94, crit: 22 }, { pas: "Fumaça", cmd: "Punhal", ult: "Dança cinza" }, KIT.rogue),
   h("hero.ashen.choir", "Choir", "Ensaio do que ficou", "ashen", "channeler", "elite", { hp: 750, atk: 86, def: 30, spd: 58, crit: 13 }, { pas: "Harmonia rachada", cmd: "Nota", ult: "Requiem curto" }, ownIdle("ashen_choir", KIT.mage), true),
   h("hero.ashen.dust", "Dust", "Quem acordou errado", "ashen", "vanguard", "rare", { hp: 1200, atk: 48, def: 78, spd: 44, crit: 8 }, { pas: "Não desmancha", cmd: "Cinza dura", ult: "Coro em pé" }, ownIdle("ashen_dust", KIT.guardian), true),
   h("hero.ashen.hymn", "Hymn", "Memória que não perdoa", "ashen", "seer", "rare", { hp: 860, atk: 54, def: 42, spd: 52, crit: 9 }, { pas: "Lembra o golpe", cmd: "Canto", ult: "Nome dos mortos" }, ownIdle("ashen_hymn", KIT.cleric), true),
-  h("hero.ashen.cinder", "Cinder", "Brasa no arquivo", "ashen", "warden", "elite", { hp: 1120, atk: 52, def: 74, spd: 48, crit: 8 }, { pas: "Restos", cmd: "Protege o ensaio", ult: "Fumaça densa" }, ownBust("ashen_cinder", KIT.guardian), true),
-  h("hero.ashen.veil", "Veil", "Sombra educada", "ashen", "striker", "rare", { hp: 720, atk: 92, def: 24, spd: 90, crit: 24 }, { pas: "Sumiu", cmd: "Corte de véu", ult: "Risada" }, ownBust("ashen_veil", KIT.rogue), true),
+  h("hero.ashen.cinder", "Cinder", "Brasa no arquivo", "ashen", "warden", "elite", { hp: 1120, atk: 52, def: 74, spd: 48, crit: 8 }, { pas: "Restos", cmd: "Protege o ensaio", ult: "Fumaça densa" }, ownIdle("ashen_cinder", KIT.guardian), true),
+  h("hero.ashen.veil", "Veil", "Sombra educada", "ashen", "striker", "rare", { hp: 720, atk: 92, def: 24, spd: 90, crit: 24 }, { pas: "Sumiu", cmd: "Corte de véu", ult: "Risada" }, ownIdle("ashen_veil", KIT.rogue), true),
 
   h("hero.cleric", "Ira", "Halo Rachado", "solstice", "seer", "relic", { hp: 860, atk: 54, def: 40, spd: 52, crit: 8 }, { pas: "Bênção", cmd: "Sol menor", ult: "Aurora" }, KIT.cleric),
-  h("hero.solstice.helion", "Helion", "Quem recusou o Sono", "solstice", "striker", "relic", { hp: 820, atk: 96, def: 34, spd: 70, crit: 16 }, { pas: "Ofensa luminosa", cmd: "Raio curto", ult: "Meio-dia" }, ownBust("solstice_helion", KIT.warrior), true),
+  h("hero.solstice.helion", "Helion", "Quem recusou o Sono", "solstice", "striker", "relic", { hp: 820, atk: 96, def: 34, spd: 70, crit: 16 }, { pas: "Ofensa luminosa", cmd: "Raio curto", ult: "Meio-dia" }, ownIdle("solstice_helion", KIT.warrior), true),
 
-  h("hero.nadir.umbral", "Umbral", "Olhou a rachadura", "nadir", "channeler", "relic", { hp: 780, atk: 98, def: 30, spd: 62, crit: 14 }, { pas: "Vão", cmd: "Escuro útil", ult: "Dentro do sol" }, ownBust("nadir_umbral", KIT.mage), true),
-  h("hero.nadir.rift", "Rift", "Necessário e mal-amado", "nadir", "warden", "relic", { hp: 1260, atk: 50, def: 86, spd: 40, crit: 7 }, { pas: "Fenda", cmd: "Segura o vazio", ult: "Pálpebra inversa" }, ownBust("nadir_rift", KIT.guardian), true),
+  h("hero.nadir.umbral", "Umbral", "Olhou a rachadura", "nadir", "channeler", "relic", { hp: 780, atk: 98, def: 30, spd: 62, crit: 14 }, { pas: "Vão", cmd: "Escuro útil", ult: "Dentro do sol" }, ownIdle("nadir_umbral", KIT.mage), true),
+  h("hero.nadir.rift", "Rift", "Necessário e mal-amado", "nadir", "warden", "relic", { hp: 1260, atk: 50, def: 86, spd: 40, crit: 7 }, { pas: "Fenda", cmd: "Segura o vazio", ult: "Pálpebra inversa" }, ownIdle("nadir_rift", KIT.guardian), true),
 ];
 
 export const HERO_BY_ID = Object.fromEntries(HEROES.map((x) => [x.id, x]));

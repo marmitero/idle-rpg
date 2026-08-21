@@ -197,7 +197,9 @@ def main() -> int:
     if args.all:
         return cmd_all()
     if args.src and args.out:
-        return cmd_single(args.src, args.out)
+        src = args.src if args.src.is_absolute() else ROOT / args.src
+        dst = args.out if args.out.is_absolute() else ROOT / args.out
+        return cmd_single(src, dst)
     if args.scan:
         return cmd_scan()
     if args.check:

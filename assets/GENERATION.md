@@ -211,5 +211,22 @@ master tinha sido perfurado pelo chroma global do pipeline antigo (6.195 recorte
 internos). Novo pipeline `remove_bg.py` (flood de borda, sem kill por cor) substitui
 `chroma_magenta.py`; masters vivem em `referencias/`, finais transparentes em `assets/`.
 
-**Próximo lote-16:** 5 idle restantes (Cinder, Veil, Helion, Umbral, Rift) + 5 atk dos novos (Sem, Bramble, Tess, Quin, Ashleaf).
+## lote-16 (feito, 10/10) — fundo `#FF00FF` — fecha os idles + abre os atk
+
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `characters/battle/rw_hero_ashen_cinder_idle.png` | idle Cinder |
+| 2 | `characters/battle/rw_hero_ashen_veil_idle.png` | idle Veil |
+| 3 | `characters/battle/rw_hero_solstice_helion_idle.png` | idle Helion |
+| 4 | `characters/battle/rw_hero_nadir_umbral_idle.png` | idle Umbral |
+| 5 | `characters/battle/rw_hero_nadir_rift_idle.png` | idle Rift |
+| 6 | `characters/battle/rw_hero_tide_sem_atk.png` | atk Sem |
+| 7 | `characters/battle/rw_hero_thorn_bramble_atk.png` | atk Bramble |
+| 8 | `characters/battle/rw_hero_thorn_tess_atk.png` | atk Tess |
+| 9 | `characters/battle/rw_hero_thorn_quin_atk.png` | atk Quin |
+| 10 | `characters/battle/rw_hero_thorn_ashleaf_atk.png` | atk Ashleaf |
+
+Wiring: `ownIdle()` nos 5 que faltavam (**idles 22/22 fechados**); novo helper `ownAtk()` ligado nos 5 primeiros (Sem, Bramble, Tess, Quin, Ashleaf) — **atk próprios 11/28** (6 slice + 5). Helion/Quin/Ashleaf/Sem tiveram padding magenta 100px (pose encostava na borda).
+
+**Próximo lote-17:** 10 atk restantes (Bril, Sora, Durn, Hest, Nera, Luth, Cale, Ivo, Yew, Choir).
 
