@@ -4,6 +4,7 @@ import { DAILIES, ENEMIES, HERO_BY_ID, HEROES, HUNTS, STAGES } from "@relicwake/
 import { simulate, type LoadoutUnit } from "@relicwake/sim";
 import { bumpDaily, credit, getByEmail, getById, getOrCreate, publicState, save, bindEmail, type Account } from "./store.ts";
 import { hashPassword, signJwt, validEmail, verifyJwt, verifyPassword } from "./auth.ts";
+import { dialect } from "./db.ts";
 
 const PORT = Number(process.env.API_PORT ?? 3000);
 const CORS = process.env.CORS_ORIGIN ?? "*";
@@ -51,11 +52,11 @@ function bearer(req: IncomingMessage): { sub: string; dev: string } | null {
   return verifyJwt(v.slice(7));
 }
 
-function account(req: IncomingMessage, res: ServerResponse): Account | null {
+async function account(req: IncomingMessage, res: ServerResponse): Promise<Account | null> {
   const tok = bearer(req);
   const dev = device(req);
   if (tok) {
-    const a = getById(tok.sub, dev || tok.dev || `jwt-${tok.sub}`);
+    const a = await getById(tok.sub, dev || tok.dev || `jwt-${tok.sub}`);
     if (!a) {
       json(res, 401, { error: "invalid_token" });
       return null;
@@ -107,11 +108,11 @@ const server = createServer(async (req, res) => {
   const url = req.url?.split("?")[0] ?? "";
   try {
     if (req.method === "GET" && url === "/api/health") {
-      json(res, 200, { ok: true, service: "relicwake-api", env: RW_ENV });
+      json(res, 200, { ok: true, service: "relicwake-api", env: RW_ENV, dialect });
       return;
     }
     if (req.method === "POST" && url === "/api/session") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       json(res, 200, { state: publicState(a) });
       return;
@@ -123,12 +124,12 @@ const server = createServer(async (req, res) => {
       const email = String(body.email ?? "").trim();
       const password = String(body.password ?? "");
       if (!validEmail(email) || password.length < 8) return json(res, 400, { error: "invalid_credentials" });
-      if (getByEmail(email)) return json(res, 409, { error: "email_taken" });
-      const a = getOrCreate(dev);
+      if (await getByEmail(email)) return json(res, 409, { error: "email_taken" });
+      const a = await getOrCreate(dev);
       if (a.email) return json(res, 409, { error: "already_bound" });
-      bindEmail(a.id, email, hashPassword(password));
+      await bindEmail(a.id, email, hashPassword(password));
       a.email = email.toLowerCase();
-      save(a);
+      await save(a);
       json(res, 200, { token: signJwt(a.id, dev), state: publicState(a) });
       return;
     }
@@ -136,12 +137,12 @@ const server = createServer(async (req, res) => {
       const body = await readBody(req);
       const email = String(body.email ?? "").trim().toLowerCase();
       const password = String(body.password ?? "");
-      const row = getByEmail(email);
+      const row = await getByEmail(email);
       if (!row?.password_hash || !verifyPassword(password, row.password_hash)) {
         return json(res, 401, { error: "invalid_credentials" });
       }
       const dev = device(req) ?? `login-${row.id}`;
-      const a = getById(row.id, dev);
+      const a = await getById(row.id, dev);
       if (!a) return json(res, 401, { error: "invalid_credentials" });
       json(res, 200, { token: signJwt(a.id, dev), state: publicState(a) });
       return;
@@ -151,39 +152,39 @@ const server = createServer(async (req, res) => {
       return;
     }
     if (req.method === "GET" && url === "/api/state") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       regen(a);
-      save(a);
+      await save(a);
       json(res, 200, { state: publicState(a) });
       return;
     }
     if (req.method === "POST" && url === "/api/wake/collect") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       const now = Date.now();
       const stage = STAGES.find((s) => s.id === a.afkStage) ?? STAGES[0]!;
       const hours = Math.min(a.capHours, (now - a.lastCollectAt) / 3_600_000);
       const gold = Math.floor(hours * stage.wakeRate * 12);
-      credit(a, "gold", gold, "wake.collect", a.afkStage);
+      await credit(a, "gold", gold, "wake.collect", a.afkStage);
       a.lastCollectAt = now;
       bumpDaily(a, "wake");
-      save(a);
+      await save(a);
       json(res, 200, { gold, hours, state: publicState(a) });
       return;
     }
     if (req.method === "POST" && url === "/api/directives") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       const body = await readBody(req);
       const d = Array.isArray(body.directives) ? (body.directives as Account["directives"]).slice(0, 3) : a.directives;
       a.directives = d;
-      save(a);
+      await save(a);
       json(res, 200, { state: publicState(a) });
       return;
     }
     if (req.method === "POST" && url === "/api/daily/claim") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       const body = await readBody(req);
       const id = String(body.id ?? "");
@@ -192,19 +193,19 @@ const server = createServer(async (req, res) => {
       if (a.dailyClaimed.includes(id)) return json(res, 400, { error: "already_claimed" });
       if ((a.dailyProg[id] ?? 0) < def.target) return json(res, 400, { error: "incomplete" });
       const ref = `daily:${id}:${a.dailyDay}`;
-      credit(a, "gold", def.gold, "daily.claim", ref);
-      credit(a, "letters", def.letters, "daily.claim", ref);
-      credit(a, "sweep", def.sweep, "daily.claim", ref);
+      await credit(a, "gold", def.gold, "daily.claim", ref);
+      await credit(a, "letters", def.letters, "daily.claim", ref);
+      await credit(a, "sweep", def.sweep, "daily.claim", ref);
       a.dailyClaimed.push(id);
-      save(a);
+      await save(a);
       json(res, 200, { state: publicState(a) });
       return;
     }
     if (req.method === "POST" && url === "/api/gacha/pull") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       if (a.letters < 1) return json(res, 400, { error: "no_letters" });
-      credit(a, "letters", -1, "gacha.pull", "font");
+      await credit(a, "letters", -1, "gacha.pull", "font");
       a.pity += 1;
       const roll = randomInt(0, 1_000_000) / 1_000_000;
       let rarity = "rare";
@@ -215,12 +216,12 @@ const server = createServer(async (req, res) => {
       const hero = pool[randomInt(0, pool.length)] ?? HEROES[0]!;
       if (!a.owned.includes(hero.id)) a.owned.push(hero.id);
       bumpDaily(a, "pull");
-      save(a);
+      await save(a);
       json(res, 200, { rarity, heroId: hero.id, state: publicState(a) });
       return;
     }
     if (req.method === "POST" && url === "/api/hunt/sweep") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       regen(a);
       const body = await readBody(req);
@@ -228,17 +229,17 @@ const server = createServer(async (req, res) => {
       if (!hunt) return json(res, 400, { error: "unknown_hunt" });
       if (a.stamina < hunt.stamina) return json(res, 400, { error: "no_breath" });
       if (a.sweep < 1) return json(res, 400, { error: "no_echo" });
-      credit(a, "stamina", -hunt.stamina, "hunt.sweep", hunt.id);
-      credit(a, "sweep", -1, "hunt.sweep", hunt.id);
-      credit(a, "gold", hunt.gold, "hunt.sweep", hunt.id);
-      credit(a, "letters", hunt.letters, "hunt.sweep", hunt.id);
+      await credit(a, "stamina", -hunt.stamina, "hunt.sweep", hunt.id);
+      await credit(a, "sweep", -1, "hunt.sweep", hunt.id);
+      await credit(a, "gold", hunt.gold, "hunt.sweep", hunt.id);
+      await credit(a, "letters", hunt.letters, "hunt.sweep", hunt.id);
       bumpDaily(a, "hunt");
-      save(a);
+      await save(a);
       json(res, 200, { gold: hunt.gold, letters: hunt.letters, state: publicState(a) });
       return;
     }
     if (req.method === "POST" && url === "/api/battle") {
-      const a = account(req, res);
+      const a = await account(req, res);
       if (!a) return;
       regen(a);
       const body = await readBody(req);
@@ -248,7 +249,7 @@ const server = createServer(async (req, res) => {
       if (!stage && !hunt) return json(res, 400, { error: "unknown_content" });
       if (hunt) {
         if (a.stamina < hunt.stamina) return json(res, 400, { error: "no_breath" });
-        credit(a, "stamina", -hunt.stamina, "hunt.enter", hunt.id);
+        await credit(a, "stamina", -hunt.stamina, "hunt.enter", hunt.id);
       }
       const allies = loadoutFromTeam(a);
       let enemies: LoadoutUnit[] = [];
@@ -283,7 +284,7 @@ const server = createServer(async (req, res) => {
       if (result.winner === "ally") {
         if (stage) {
           gold = stage.gold;
-          credit(a, "gold", gold, "battle.win", battleId);
+          await credit(a, "gold", gold, "battle.win", battleId);
           if (!a.cleared.includes(stage.id)) a.cleared.push(stage.id);
           const idx = STAGES.findIndex((s) => s.id === stage.id);
           const afk = STAGES.findIndex((s) => s.id === a.afkStage);
@@ -293,12 +294,12 @@ const server = createServer(async (req, res) => {
         if (hunt) {
           gold = hunt.gold;
           letters = hunt.letters;
-          credit(a, "gold", gold, "hunt.win", battleId);
-          credit(a, "letters", letters, "hunt.win", battleId);
+          await credit(a, "gold", gold, "hunt.win", battleId);
+          await credit(a, "letters", letters, "hunt.win", battleId);
           bumpDaily(a, "hunt");
         }
       }
-      save(a);
+      await save(a);
       json(res, 200, {
         battleId,
         seed,

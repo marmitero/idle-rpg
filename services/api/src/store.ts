@@ -67,10 +67,8 @@ function genesis(id: string, deviceId: string): Account {
   };
 }
 
-function loadSnapshot(accountId: string, deviceId: string, email: string | null): Account | null {
-  const row = db.prepare("SELECT json FROM snapshots WHERE account_id = ?").get(accountId) as
-    | { json: string }
-    | undefined;
+async function loadSnapshot(accountId: string, deviceId: string, email: string | null): Promise<Account | null> {
+  const row = await db.get<{ json: string }>("SELECT json FROM snapshots WHERE account_id = ?", [accountId]);
   if (!row) return null;
   const a = JSON.parse(row.json) as Account;
   a.id = accountId;
@@ -89,69 +87,68 @@ export function publicState(a: Account) {
   return rest;
 }
 
-export function getOrCreate(deviceId: string): Account {
+export async function getOrCreate(deviceId: string): Promise<Account> {
   const now = Date.now();
-  const dev = db.prepare("SELECT account_id FROM devices WHERE id = ?").get(deviceId) as
-    | { account_id: string }
-    | undefined;
+  const dev = await db.get<{ account_id: string }>("SELECT account_id FROM devices WHERE id = ?", [deviceId]);
   if (dev) {
-    const acc = db.prepare("SELECT email FROM accounts WHERE id = ?").get(dev.account_id) as
-      | { email: string | null }
-      | undefined;
-    const loaded = loadSnapshot(dev.account_id, deviceId, acc?.email ?? null);
+    const acc = await db.get<{ email: string | null }>("SELECT email FROM accounts WHERE id = ?", [dev.account_id]);
+    const loaded = await loadSnapshot(dev.account_id, deviceId, acc?.email ?? null);
     if (loaded) return loaded;
   }
   const id = randomUUID();
   const a = genesis(id, deviceId);
-  db.exec("BEGIN");
-  db.prepare("INSERT INTO accounts (id, email, password_hash, created_at) VALUES (?, NULL, NULL, ?)").run(id, now);
-  db.prepare("INSERT INTO devices (id, account_id, created_at) VALUES (?, ?, ?)").run(deviceId, id, now);
-  db.prepare("INSERT INTO snapshots (account_id, json) VALUES (?, ?)").run(id, JSON.stringify(a));
-  db.exec("COMMIT");
+  await db.tx(async (q) => {
+    await q.run("INSERT INTO accounts (id, email, password_hash, created_at) VALUES (?, NULL, NULL, ?)", [id, now]);
+    await q.run("INSERT INTO devices (id, account_id, created_at) VALUES (?, ?, ?)", [deviceId, id, now]);
+    await q.run("INSERT INTO snapshots (account_id, json) VALUES (?, ?)", [id, JSON.stringify(a)]);
+  });
   return a;
 }
 
-export function getById(accountId: string, deviceId: string): Account | null {
-  const acc = db.prepare("SELECT email FROM accounts WHERE id = ?").get(accountId) as
-    | { email: string | null }
-    | undefined;
+export async function getById(accountId: string, deviceId: string): Promise<Account | null> {
+  const acc = await db.get<{ email: string | null }>("SELECT email FROM accounts WHERE id = ?", [accountId]);
   if (!acc) return null;
-  const dev = db.prepare("SELECT account_id FROM devices WHERE id = ?").get(deviceId) as
-    | { account_id: string }
-    | undefined;
-  if (!dev) {
-    db.prepare("INSERT OR IGNORE INTO devices (id, account_id, created_at) VALUES (?, ?, ?)").run(
+  const existing = await db.get<{ account_id: string }>("SELECT account_id FROM devices WHERE id = ?", [deviceId]);
+  if (!existing) {
+    await db.run("INSERT OR IGNORE INTO devices (id, account_id, created_at) VALUES (?, ?, ?)", [
       deviceId,
       accountId,
       Date.now(),
-    );
+    ]);
   }
-  return loadSnapshot(accountId, deviceId, acc.email);
+  return loadSnapshot(accountId, deviceId, acc.email ?? null);
 }
 
-export function getByEmail(email: string): { id: string; password_hash: string | null } | null {
-  const row = db.prepare("SELECT id, password_hash FROM accounts WHERE email = ?").get(email.toLowerCase()) as
-    | { id: string; password_hash: string | null }
-    | undefined;
+export async function getByEmail(email: string): Promise<{ id: string; password_hash: string | null } | null> {
+  const row = await db.get<{ id: string; password_hash: string | null }>(
+    "SELECT id, password_hash FROM accounts WHERE email = ?",
+    [email.toLowerCase()],
+  );
   return row ?? null;
 }
 
-export function bindEmail(accountId: string, email: string, passwordHash: string) {
-  db.prepare("UPDATE accounts SET email = ?, password_hash = ? WHERE id = ?").run(
+export async function bindEmail(accountId: string, email: string, passwordHash: string) {
+  await db.run("UPDATE accounts SET email = ?, password_hash = ? WHERE id = ?", [
     email.toLowerCase(),
     passwordHash,
     accountId,
+  ]);
+}
+
+export async function save(a: Account) {
+  await db.run(
+    "INSERT INTO snapshots (account_id, json) VALUES (?, ?) ON CONFLICT(account_id) DO UPDATE SET json = excluded.json",
+    [a.id, JSON.stringify(a)],
   );
 }
 
-export function save(a: Account) {
-  db.prepare("INSERT INTO snapshots (account_id, json) VALUES (?, ?) ON CONFLICT(account_id) DO UPDATE SET json = excluded.json").run(
-    a.id,
-    JSON.stringify(a),
-  );
-}
-
-export function credit(a: Account, currency: LedgerEntry["currency"], delta: number, reason: string, ref: string) {
+export async function credit(
+  a: Account,
+  currency: LedgerEntry["currency"],
+  delta: number,
+  reason: string,
+  ref: string,
+) {
   if (!delta) return a;
   a[currency] += delta;
   if (a[currency] < 0) throw new Error(`ledger_negative:${currency}`);
@@ -165,9 +162,15 @@ export function credit(a: Account, currency: LedgerEntry["currency"], delta: num
     at: Date.now(),
   };
   a.ledger.push(entry);
-  db.prepare(
-    "INSERT INTO ledger (id, account_id, currency, delta, reason, ref, at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-  ).run(entry.id, entry.accountId, entry.currency, entry.delta, entry.reason, entry.ref, entry.at);
+  await db.run("INSERT INTO ledger (id, account_id, currency, delta, reason, ref, at) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+    entry.id,
+    entry.accountId,
+    entry.currency,
+    entry.delta,
+    entry.reason,
+    entry.ref,
+    entry.at,
+  ]);
   return a;
 }
 

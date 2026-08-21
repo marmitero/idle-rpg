@@ -9,4 +9,7 @@
 
 Copie `.env.example` para `.env` em dev. Staging/prod: `infra/env/*.example` → secrets do vault, nunca git.
 
-O adapter Postgres (substituir `node:sqlite`) é o passo depois deste: o schema já está em `infra/schema.sql`.
+A API escolhe o dialecto por `DATABASE_URL`:
+
+- vazio ou `sqlite:...` → SQLite (dev/ci)
+- `postgres://` / `postgresql://` → Postgres (`pg`), mesmo schema em `infra/schema.sql`
