@@ -152,3 +152,20 @@ Primeiros 10 heróis placeholder (bust 512; ícone = cópia). Battle clips ainda
 | 10 | `characters/bust/rw_hero_thorn_bramble_bust_512.png` | Bramble |
 
 **Próximo lote-13:** bustos Tess, Quin, Ashleaf, Yew, Choir, Dust, Hymn, Cinder, Veil, Helion.
+
+## lote-13 (feito) — fundo `#FF00FF` — onda roster 2/3 (bustos)
+
+| # | Arquivo | Herói |
+| --- | --- | --- |
+| 1 | `characters/bust/rw_hero_thorn_tess_bust_512.png` | Tess |
+| 2 | `characters/bust/rw_hero_thorn_quin_bust_512.png` | Quin |
+| 3 | `characters/bust/rw_hero_thorn_ashleaf_bust_512.png` | Ashleaf |
+| 4 | `characters/bust/rw_hero_thorn_yew_bust_512.png` | Yew |
+| 5 | `characters/bust/rw_hero_ashen_choir_bust_512.png` | Choir |
+| 6 | `characters/bust/rw_hero_ashen_dust_bust_512.png` | Dust |
+| 7 | `characters/bust/rw_hero_ashen_hymn_bust_512.png` | Hymn |
+| 8 | `characters/bust/rw_hero_ashen_cinder_bust_512.png` | Cinder |
+| 9 | `characters/bust/rw_hero_ashen_veil_bust_512.png` | Veil |
+| 10 | `characters/bust/rw_hero_solstice_helion_bust_512.png` | Helion |
+
+**Próximo lote-14:** bustos Umbral + Rift (Nadir) e 8 idle/atk dos novos (ou 8 bustos já feitos não). Só restam 2 bustos; completar Nadir e começar sprites idle.
