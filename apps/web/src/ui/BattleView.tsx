@@ -27,6 +27,14 @@ type Actor = {
 };
 
 /**
+ * Linha dos pés por fileira — banda decidida com o usuário (2026-08-21):
+ * o pé nunca fica acima de 75% da altura, nem abaixo do meio exato entre a
+ * linha de 95% e a borda inferior (97,5%). Frente pisa no limite baixo,
+ * topo no limite alto e meio no centro da banda.
+ */
+const FEET_ROW_Y = [0.975, 0.8625, 0.75]; // fileiras 0 (frente), 1 (meio), 2 (topo)
+
+/**
  * Posição por slot em ZONAS: aliados na esquerda, inimigos na direita.
  * Fileiras: 0 = frente (baixo), 1 = meio, 2 = topo. Slot 4 centralizado no
  * topo da zona. Tudo relativo ao canvas — sem pixels fixos.
@@ -37,7 +45,7 @@ function slotPos(team: "ally" | "enemy", slot: number, w: number, h: number) {
   const col = slot % 2;
   const colX = slot === 4 ? 0.5 : 0.28 + 0.44 * col;
   const x = w * (zone.start + zone.width * colX);
-  const y = h * (row === 0 ? 0.8 : row === 1 ? 0.54 : 0.28);
+  const y = h * FEET_ROW_Y[row];
   return { x, y, row };
 }
 
@@ -179,9 +187,9 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
             grid.addChild(lbl);
           }
           const rows: [number, string][] = [
-            [0.8, "frente"],
-            [0.54, "meio"],
-            [0.28, "topo"],
+            [0.975, "frente (máx. baixo)"],
+            [0.8625, "meio (centro da banda)"],
+            [0.75, "topo (máx. alto)"],
           ];
           const rg = new Graphics();
           for (const [f, name] of rows) {

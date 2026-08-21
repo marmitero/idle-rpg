@@ -34,9 +34,9 @@ desempenho de carga e som. Referências externas citadas ao longo do texto.
 
 | Fileira | Y (pés, × altura) | Escala de profundidade |
 | --- | --- | --- |
-| Frente (slots 0–1) | 0.80 | ×1.04 |
-| Meio (slots 2–3) | 0.54 | ×0.98 |
-| Topo (slot 4, centralizado) | 0.28 | ×0.92 |
+| Frente (slots 0–1) | **0.975** (limite baixo da banda) | ×1.04 |
+| Meio (slots 2–3) | **0.8625** (centro da banda) | ×0.98 |
+| Topo (slot 4, centralizado) | **0.75** (limite alto da banda) | ×0.92 |
 
 | Medida | Valor |
 | --- | --- |
@@ -53,11 +53,9 @@ pixels fixos — a composição sobrevive a PC, tablet e telefone.
 
 ### 1.3 Linha do chão — como identificar e o padrão proposto
 
-**Diagnóstico (2026-08-21):** as fileiras usam Y fixo (frente 0.80, meio 0.54,
-topo 0.28 da altura), mas cada plate desenha o chão numa altura diferente →
-alguns personagens "voam". Os pés dentro dos sprites **não** são o problema
-(medição: todos os idles têm pés entre 0.90 e 1.0 da altura do sprite — âncora
-0.9 correta).
+**Diagnóstico (2026-08-21):** as fileiras usavam Y fixo (frente 0.80, meio 0.54,
+topo 0.28 da altura), deixando fileiras de trás acima da linha de chão dos
+plates → personagens "voando".
 
 **Como identificar o chão de cada plate (duas ferramentas):**
 
@@ -69,16 +67,25 @@ alguns personagens "voam". Os pés dentro dos sprites **não** são o problema
    fileiras atuais em vermelho. **Leia o rótulo % da linha azul que coincide
    com o chão desenhado no plate** — esse é o valor a registrar.
 
-**Padrão proposto (aguardando validação dos valores):**
+**Padrão decidido (validação do usuário, 2026-08-21):** nada de tabela por
+plate — os pés vivem numa **banda única**, definida pelo usuário sobre o
+overlay `?floordebug`:
 
-| Peça | Regra |
-| --- | --- |
-| Fonte de verdade | `BATTLE_FLOOR: Record<bgId, number>` no `@relicwake/content` — chão como % da altura do plate (1:1 com o canvas, pois o plate é esticado) |
-| Frente (slots 0–1) | pés exatamente em `FLOOR` |
-| Meio (slots 2–3) | pés em `FLOOR − 0.10` com escala de profundidade (menor) |
-| Topo (slot 4) | pés em `FLOOR − 0.20` com escala de profundidade |
-| Âncora do sprite | 0.9 (pés) — validada pela medição |
-| Fallback | 0.82 se o plate não estiver na tabela |
+| Limite | Valor | Regra |
+| --- | --- | --- |
+| Máximo alto | **75%** da altura | o pé de qualquer personagem/inimigo **nunca fica acima** |
+| Máximo baixo | **97,5%** | meio exato entre a linha azul de 95% e a borda inferior — **nunca fica abaixo** |
+
+| Fileira | Pés em | Leitura |
+| --- | --- | --- |
+| Frente (slots 0–1) | 97,5% | pisa no limite baixo |
+| Meio (slots 2–3) | 86,25% | centro da banda |
+| Topo (slot 4) | 75% | limite alto |
+
+- Fonte de verdade: constante `FEET_ROW_Y = [0.975, 0.8625, 0.75]` em
+  `BattleView.tsx` (linhas dos pés das fileiras 0/1/2).
+- Qualquer exceção futura por plate **deve respeitar a banda** [75%, 97,5%].
+- Âncora do sprite em 0.9 (pés) — validada pela medição dos idles.
 
 > Opção em aberto (decisão com o usuário): se os plates tiverem apenas UMA
 > linha de chão, as fileiras de trás leem como "atrás" (perspectiva, padrão
