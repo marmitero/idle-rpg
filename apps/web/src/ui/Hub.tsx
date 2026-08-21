@@ -15,10 +15,18 @@ export function Hub() {
   const claimDaily = useGame((s) => s.claimDaily);
   const panel = useGame((s) => s.hubPanel);
   const setHubPanel = useGame((s) => s.setHubPanel);
+  const setTab = useGame((s) => s.setTab);
   const locale = useGame((s) => s.locale);
   const [msg, setMsg] = useState("");
   const [burst, setBurst] = useState(0);
   const hours = Math.min(cap, (Date.now() - last) / 3_600_000);
+
+  /** Cada missão aponta para a tela onde pode ser cumprida. */
+  const goMission = (id: string) => {
+    if (id === "fight" || id === "hunt") setTab("battle");
+    else if (id === "pull") setTab("menu");
+    else setHubPanel("home"); // wake / login: a Fonte e o hub
+  };
 
   const open = (def: HubWorldDef) => {
     if (def.action === "open_tower") setHubPanel("tower");
@@ -80,7 +88,7 @@ export function Hub() {
       {msg && <div className="hub-msg">{msg}</div>}
 
       <div className="hub-board">
-        <NoticeBoard title={t("daily", locale)}>
+        <NoticeBoard title={t("missions", locale)}>
           {DAILIES.map((d) => {
             const p = prog[d.id] ?? 0;
             const done = p >= d.target;
@@ -88,18 +96,24 @@ export function Hub() {
             return (
               <div key={d.id} className="daily-row">
                 <div className="daily-info">
-                  <div>{d.label}</div>
-                  <div className="muted">
+                  <div className="daily-label">{d.label}</div>
+                  <div className="daily-prog">
                     {Math.min(p, d.target)}/{d.target}
                   </div>
                 </div>
-                <button
-                  className="cta daily-btn"
-                  disabled={!done || took}
-                  onClick={() => claimDaily(d.id)}
-                >
-                  {took ? "Ok" : done ? "Coletar" : "…"}
-                </button>
+                {took ? (
+                  <button className="cta daily-btn" disabled>
+                    {t("ok", locale)}
+                  </button>
+                ) : done ? (
+                  <button className="cta daily-btn" onClick={() => claimDaily(d.id)}>
+                    {t("collect_btn", locale)}
+                  </button>
+                ) : (
+                  <button className="cta daily-btn" onClick={() => goMission(d.id)}>
+                    {t("go_mission", locale)}
+                  </button>
+                )}
               </div>
             );
           })}

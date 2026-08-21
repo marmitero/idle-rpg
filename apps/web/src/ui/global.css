@@ -511,34 +511,80 @@ h2 { font-size: 16px; margin: 0 0 8px; color: #f3e2a1; }
   100% { transform: translate(var(--dx, 40px), var(--dy, -40px)) scale(1.1); opacity: 0; }
 }
 
-/* Quadro do ofício — contêiner diegético sobre o asset do quadro */
+/* Quadro de missões — contêiner diegético sobre as duas placas do asset.
+   Título na placa de cima; missões na placa de baixo; dourado = borda. */
 .notice-board {
   position: relative;
-  background: url("/assets/ui/world/rw_obj_hub_daily.png") center / 100% 100% no-repeat;
-  padding: 26px 18px 18px;
-  min-height: 150px;
+  height: 320px;
 }
-.notice-board-body {
-  background: #120d1a55;
-  border-radius: 6px;
-  padding: 6px 10px 2px;
+.notice-board-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
 }
 .notice-board-title {
-  margin: 0 0 6px;
-  font-size: 13px;
-  letter-spacing: 0.1em;
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 15.5%;
+  height: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #f0d9a8;
-  text-shadow: 0 1px 2px #000;
+  color: var(--gold);
+  text-shadow: 0 0 8px #e8b15a66, 0 1px 2px #000;
+}
+.notice-board-body {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 45%;
+  bottom: 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  overflow: hidden;
 }
 .daily-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 6px 0;
+  min-height: 26px;
 }
-.daily-info { flex: 1; font-size: 13px; }
-.daily-btn { width: 92px; min-height: 36px; }
+.daily-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.daily-label {
+  font-size: 11.5px;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px #000;
+}
+.daily-prog {
+  font-size: 10.5px;
+  color: #d8bd7e;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px #000;
+}
+.daily-btn {
+  width: 108px;
+  min-height: 26px;
+  flex-shrink: 0;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .wobj-sprite, .sparkle, .res-num, .cnode-current { animation: none !important; }

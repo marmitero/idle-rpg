@@ -117,16 +117,14 @@ export function SparkleBurst({ count = 6 }: { count?: number }) {
   );
 }
 
-// ── Quadro do ofício (contêiner diegético) ─────────────────────────────────
+// ── Quadro de missões (contêiner diegético com as duas placas do asset) ────
 
 export function NoticeBoard({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="notice-board">
       <img className="notice-board-bg" src={HUB_DAILY_BOARD} alt="" />
-      <div className="notice-board-body">
-        <h2 className="notice-board-title">{title}</h2>
-        {children}
-      </div>
+      <div className="notice-board-title">{title}</div>
+      <div className="notice-board-body">{children}</div>
     </div>
   );
 }
