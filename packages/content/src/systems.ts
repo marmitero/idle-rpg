@@ -28,7 +28,7 @@ export const LEVEL_CAP = 60;
 export const STAR_CAP = 6;
 export const IMPRINT_CAP = 15;
 export const ENHANCE_CAP = 15;
-export const TOWER_FLOORS = 100;
+export const TOWER_FLOORS = 200;
 export const FACTION_TOWER_FLOORS = 25;
 
 export const ARENA_RANKS = [

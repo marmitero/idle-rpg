@@ -7,6 +7,7 @@ export type StageDef = {
   enemies: { enemyId: string; slot: number; scale: number }[];
   gold: number;
   wakeRate: number;
+  boss?: boolean;
 };
 
 export const BG = {
@@ -21,96 +22,62 @@ export const BG = {
   hydra: "/assets/environments/hunts/rw_env_hunt_hydra.png",
 };
 
-export const CHAPTERS = [
-  { chapter: 1, name: "A Base que respira", blurb: "O primeiro degrau ainda tem pulso." },
-  { chapter: 2, name: "O primeiro Waker que mente", blurb: "Alguém subiu antes e fechou a porta." },
-] as const;
-
-const GOB = "enemy.goblin_king";
-const WYR = "enemy.ash_wyrm";
-const HYD = "enemy.pale_hydra";
-
-type Spec = {
-  name: string;
-  bg: string;
-  fodder: string;
-  n: number;
-  boss?: { enemyId: string; scale: number };
-};
-
-const CH1: Spec[] = [
-  { name: "A Base que respira", bg: BG.spire, fodder: GOB, n: 2 },
-  { name: "Lanternas de Wake", bg: BG.spire, fodder: GOB, n: 3 },
-  { name: "Degrau úmido", bg: BG.spire, fodder: GOB, n: 3 },
-  { name: "O arquivo de Moth", bg: BG.spire, fodder: GOB, n: 4 },
-  { name: "Cinzas no corrimão", bg: BG.spire, fodder: GOB, n: 4 },
-  { name: "Quem fechou as janelas", bg: BG.spire, fodder: GOB, n: 4 },
-  { name: "Três relíquias sem nome", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "O Sino Inacabado ecoa", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Corredor das pálpebras", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "Trono de osso", bg: BG.goblin, fodder: GOB, n: 4, boss: { enemyId: GOB, scale: 1.18 } },
-  { name: "Depois do rei menor", bg: BG.spire, fodder: GOB, n: 4 },
-  { name: "Poço que tosse", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "Cartas no chão", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "A escada que mente", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "Vigia adormecido", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Bronze rachado", bg: BG.ember, fodder: WYR, n: 4 },
-  { name: "Um Waker passou aqui", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "A porta sem maçaneta", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "Fôlego emprestado", bg: BG.spire, fodder: GOB, n: 5 },
-  { name: "O primeiro contrato", bg: BG.goblin, fodder: GOB, n: 4, boss: { enemyId: GOB, scale: 1.38 } },
+export const CHAPTERS: { chapter: number; name: string; blurb: string; bg: string; fodder: string; bossId: string }[] = [
+  { chapter: 1, name: "A Base que respira", blurb: "O primeiro degrau ainda tem pulso.", bg: BG.spire, fodder: "enemy.fodder.ash", bossId: "enemy.boss.goblin_king" },
+  { chapter: 2, name: "O primeiro Waker que mente", blurb: "Alguém subiu antes e fechou a porta.", bg: BG.ember, fodder: "enemy.fodder.ember", bossId: "enemy.boss.ash_wyrm" },
+  { chapter: 3, name: "Emberworks — o contrato da forja", blurb: "Trabalho demais também é Sono.", bg: BG.ember, fodder: "enemy.fodder.ember", bossId: "enemy.boss.ch3" },
+  { chapter: 4, name: "Um brasão que não quer ser acordado", blurb: "Lealdade contra o relógio.", bg: BG.ember, fodder: "enemy.elite.ember", bossId: "enemy.boss.ch4" },
+  { chapter: 5, name: "Tidevault — nomes na água", blurb: "Cada ciclo, outro você.", bg: BG.tide, fodder: "enemy.fodder.tide", bossId: "enemy.boss.pale_hydra" },
+  { chapter: 6, name: "A cisterna sem fundo", blurb: "Memória demais afoga.", bg: BG.hydra, fodder: "enemy.elite.tide", bossId: "enemy.boss.ch6" },
+  { chapter: 7, name: "Thorn Causeway — a cidade comida", blurb: "O mato não odeia. Ele digere.", bg: BG.thorn, fodder: "enemy.fodder.thorn", bossId: "enemy.boss.ch7" },
+  { chapter: 8, name: "Raiz que pede um pacto", blurb: "Paciência com dente.", bg: BG.thorn, fodder: "enemy.elite.thorn", bossId: "enemy.boss.ch8" },
+  { chapter: 9, name: "Ash Cloister — o ensaio do coro", blurb: "Acordaram errado e aprenderam a cantar.", bg: BG.ash, fodder: "enemy.fodder.ash", bossId: "enemy.boss.ch9" },
+  { chapter: 10, name: "Uma Relíquia que recusa o roster", blurb: "Nem todo nome quer voltar.", bg: BG.ash, fodder: "enemy.elite.ash", bossId: "enemy.boss.ch10" },
+  { chapter: 11, name: "A pálpebra", blurb: "O topo não é céu.", bg: BG.crown, fodder: "enemy.elite.ember", bossId: "enemy.boss.ch11" },
+  { chapter: 12, name: "Acordar é um ofício, não um milagre", blurb: "Negociar com o Sono.", bg: BG.crown, fodder: "enemy.elite.tide", bossId: "enemy.boss.ch12" },
 ];
 
-const CH2: Spec[] = [
-  { name: "Emberworks abre", bg: BG.ember, fodder: WYR, n: 4 },
-  { name: "O contrato da forja", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Canais de magma", bg: BG.ember, fodder: WYR, n: 4 },
-  { name: "Brasão quente", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Quem vendeu o degrau", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Fole e mentira", bg: BG.ember, fodder: WYR, n: 4 },
-  { name: "A Visada Azul", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Bigorna que lembra", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Cinza na boca", bg: BG.ash, fodder: WYR, n: 4 },
-  { name: "Wyrm na forja", bg: BG.wyrm, fodder: WYR, n: 3, boss: { enemyId: WYR, scale: 1.12 } },
-  { name: "Escória ainda viva", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Nomes gravados errado", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Sable Index deixa um recado", bg: BG.ash, fodder: WYR, n: 4 },
-  { name: "O Sono com sotaque", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Ponte de ferro dormindo", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "Oficiais de bronze", bg: BG.ember, fodder: WYR, n: 4 },
-  { name: "A mentira tem degrau", bg: BG.tide, fodder: HYD, n: 4 },
-  { name: "Forja sem fogo", bg: BG.ash, fodder: WYR, n: 4 },
-  { name: "Um brasão que recusa", bg: BG.ember, fodder: GOB, n: 5 },
-  { name: "A porta que ele fechou", bg: BG.wyrm, fodder: WYR, n: 3, boss: { enemyId: WYR, scale: 1.32 } },
-];
+export const ACT_CUTSCENES = CHAPTERS.map((c) => ({
+  chapter: c.chapter,
+  enter: {
+    "pt-BR": `${c.name}. Moth anota: o Spire ainda respira neste degrau.`,
+    en: `${c.name}. Moth files: the Spire still breathes on this step.`,
+  },
+  boss: {
+    "pt-BR": `O Sono pesou no fim do ato ${c.chapter}. Diretiva, não milagre.`,
+    en: `Sleep weighed at the end of act ${c.chapter}. A directive, not a miracle.`,
+  },
+}));
 
-function pack(chapter: number, specs: Spec[]): StageDef[] {
-  return specs.map((s, i) => {
+const LABELS = ["degrau", "corredor", "poço", "janela", "arquivo", "ponte", "vigia", "porta", "fôlego", "contrato"];
+
+function chapterStages(meta: (typeof CHAPTERS)[number]): StageDef[] {
+  return Array.from({ length: 20 }, (_, i) => {
     const index = i + 1;
-    const global = (chapter - 1) * 20 + index;
-    const scale = 0.58 + global * 0.011;
-    const gold = s.boss ? 140 + chapter * 40 + index * 4 : 36 + global * 6;
-    const wakeRate = 8 + Math.floor(global * 0.4);
-    const enemies = Array.from({ length: Math.min(5, s.n) }, (_, slot) => ({
-      enemyId: s.fodder,
+    const global = (meta.chapter - 1) * 20 + index;
+    const isBoss = index === 10 || index === 20;
+    const scale = 0.55 + global * 0.0048;
+    const n = isBoss ? 4 : 2 + (index % 4);
+    const enemies = Array.from({ length: Math.min(5, n) }, (_, slot) => ({
+      enemyId: isBoss && slot === 0 ? meta.bossId : meta.fodder,
       slot,
-      scale: Math.max(0.45, scale - slot * 0.03),
+      scale: isBoss && slot === 0 ? 1.05 + meta.chapter * 0.04 : Math.max(0.4, scale - slot * 0.03),
     }));
-    if (s.boss) enemies[0] = { enemyId: s.boss.enemyId, slot: 0, scale: s.boss.scale };
     return {
-      id: `${chapter}-${index}`,
-      chapter,
+      id: `${meta.chapter}-${index}`,
+      chapter: meta.chapter,
       index,
-      name: s.name,
-      bg: s.bg,
+      name: isBoss ? `Boss · ${meta.name}` : `${LABELS[(index - 1) % LABELS.length]} ${index}`,
+      bg: isBoss ? (index === 20 ? meta.bg : meta.bg) : meta.bg,
       enemies,
-      gold,
-      wakeRate,
+      gold: isBoss ? 120 + meta.chapter * 18 : 28 + global * 2,
+      wakeRate: 8 + Math.floor(global * 0.12),
+      boss: isBoss,
     };
   });
 }
 
-export const STAGES: StageDef[] = [...pack(1, CH1), ...pack(2, CH2)];
+export const STAGES: StageDef[] = CHAPTERS.flatMap(chapterStages);
 
 export function isStageOpen(cleared: string[], id: string): boolean {
   const i = STAGES.findIndex((s) => s.id === id);

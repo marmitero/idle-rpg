@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import type { DirectiveId } from "@relicwake/shared";
+import type { Locale } from "@relicwake/content";
 import type { BattleInput, BattleRecord, BattleResult } from "@relicwake/sim";
 import { api, setToken } from "./api";
+import { getLocale, setLocale as saveLocale } from "./i18n";
 
 export type Tab = "hub" | "roster" | "battle" | "guild" | "menu";
 export type HubPanel = "home" | "tower" | "arena" | "honor" | "live";
@@ -78,8 +80,10 @@ type Store = Remote & {
   fighting: FightPayload | null;
   replays: BattleSummary[];
   hubPanel: HubPanel;
+  locale: Locale;
   setTab: (t: Tab) => void;
   setHubPanel: (p: HubPanel) => void;
+  setLocale: (l: Locale) => void;
   cmd: (path: string, body?: unknown) => Promise<unknown>;
   startFight: (id: string, extra?: { opponentId?: string }) => Promise<void>;
   hydrate: () => Promise<void>;
@@ -89,7 +93,6 @@ type Store = Remote & {
   collect: () => Promise<{ gold: number; hours: number }>;
   claimDaily: (id: string) => Promise<boolean>;
   setDirectives: (d: DirectiveId[]) => Promise<void>;
-  startFight: (id: string) => Promise<void>;
   startHunt: (id: string) => Promise<{ ok: boolean; reason?: string }>;
   sweepHunt: (id: string) => Promise<{ ok: boolean; reason?: string; gold?: number }>;
   clearFight: () => void;
@@ -154,8 +157,13 @@ export const useGame = create<Store>((set, get) => ({
   fighting: null,
   replays: [],
   hubPanel: "home",
+  locale: getLocale(),
   setTab: (tab) => set({ tab }),
   setHubPanel: (hubPanel) => set({ hubPanel }),
+  setLocale: (locale) => {
+    saveLocale(locale);
+    set({ locale });
+  },
   cmd: async (path, body) => {
     const r = await api<{ state?: Remote }>(path, body);
     if (r.state) get().apply(r.state);

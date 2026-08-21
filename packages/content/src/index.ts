@@ -1,105 +1,7 @@
-import type { Faction, HeroClass, Rarity, Stats } from "@relicwake/shared";
-
-export type HeroDef = {
-  id: string;
-  name: string;
-  epithet: string;
-  faction: Faction;
-  klass: HeroClass;
-  rarity: Rarity;
-  stats: Stats;
-  skills: { pas: string; cmd: string; ult: string };
-  art: {
-    bust: string;
-    icon: string;
-    idle: string;
-    atk: string;
-    hit: string;
-    die: string;
-    ult: string;
-  };
-};
-
-const art = (slug: string) => ({
-  bust: `/assets/characters/bust/rw_hero_${slug}_bust_512.png`,
-  icon: `/assets/characters/icon/rw_hero_${slug}_icon_256.png`,
-  idle: `/assets/characters/battle/rw_hero_${slug}_idle.png`,
-  atk: `/assets/characters/battle/rw_hero_${slug}_atk.png`,
-  hit: `/assets/characters/battle/rw_hero_${slug}_hit.png`,
-  die: `/assets/characters/battle/rw_hero_${slug}_die.png`,
-  ult: `/assets/characters/battle/rw_hero_${slug}_ult.png`,
-});
-
-export const HEROES: HeroDef[] = [
-  {
-    id: "hero.warrior",
-    name: "Kael",
-    epithet: "O Sino Inacabado",
-    faction: "embercourt",
-    klass: "striker",
-    rarity: "elite",
-    stats: { hp: 920, atk: 78, def: 42, spd: 62, crit: 12 },
-    skills: { pas: "Coração de forja", cmd: "Golpe pesado", ult: "Sino rachado" },
-    art: art("warrior"),
-  },
-  {
-    id: "hero.guardian",
-    name: "Ward",
-    epithet: "A Visada Azul",
-    faction: "embercourt",
-    klass: "vanguard",
-    rarity: "elite",
-    stats: { hp: 1280, atk: 48, def: 88, spd: 44, crit: 6 },
-    skills: { pas: "Baluarte", cmd: "Escudo-ariete", ult: "Muralha" },
-    art: art("guardian"),
-  },
-  {
-    id: "hero.mage",
-    name: "Orren",
-    epithet: "Memória Líquida",
-    faction: "tidebound",
-    klass: "channeler",
-    rarity: "elite",
-    stats: { hp: 740, atk: 92, def: 28, spd: 58, crit: 14 },
-    skills: { pas: "Grimório", cmd: "Dardo arcano", ult: "Orbe da cisterna" },
-    art: art("mage"),
-  },
-  {
-    id: "hero.archer",
-    name: "Mira",
-    epithet: "Raiz que Aponta",
-    faction: "thornveil",
-    klass: "striker",
-    rarity: "elite",
-    stats: { hp: 780, atk: 84, def: 30, spd: 86, crit: 18 },
-    skills: { pas: "Olho de gavião", cmd: "Flecha única", ult: "Chuva verde" },
-    art: art("archer"),
-  },
-  {
-    id: "hero.rogue",
-    name: "Vell",
-    epithet: "O Véu que Ri",
-    faction: "ashen",
-    klass: "striker",
-    rarity: "elite",
-    stats: { hp: 700, atk: 88, def: 26, spd: 94, crit: 22 },
-    skills: { pas: "Fumaça", cmd: "Punhal", ult: "Dança cinza" },
-    art: art("rogue"),
-  },
-  {
-    id: "hero.cleric",
-    name: "Ira",
-    epithet: "Halo Rachado",
-    faction: "solstice",
-    klass: "seer",
-    rarity: "relic",
-    stats: { hp: 860, atk: 54, def: 40, spd: 52, crit: 8 },
-    skills: { pas: "Bênção", cmd: "Sol menor", ult: "Aurora" },
-    art: art("cleric"),
-  },
-];
-
-export const HERO_BY_ID = Object.fromEntries(HEROES.map((h) => [h.id, h]));
+import type { Faction, Stats } from "@relicwake/shared";
+export type { HeroDef } from "./heroes.ts";
+export { HEROES, HERO_BY_ID, SLICE_OWNED } from "./heroes.ts";
+import { HEROES, HERO_BY_ID } from "./heroes.ts";
 
 export type EnemyDef = {
   id: string;
@@ -107,30 +9,79 @@ export type EnemyDef = {
   faction: Faction;
   stats: Stats;
   art: { idle: string; atk: string; hit: string; die: string };
+  kind: "fodder" | "elite" | "boss";
 };
 
-const boss = (slug: string, name: string, faction: Faction, stats: Stats): EnemyDef => ({
-  id: `enemy.${slug}`,
-  name,
-  faction,
-  stats,
-  art: {
-    idle: `/assets/enemies/rw_enemy_boss_${slug}_idle.png`,
-    atk: `/assets/enemies/rw_enemy_boss_${slug}_atk.png`,
-    hit: `/assets/enemies/rw_enemy_boss_${slug}_hit.png`,
-    die: `/assets/enemies/rw_enemy_boss_${slug}_die.png`,
-  },
+const bossArt = (slug: string) => ({
+  idle: `/assets/enemies/rw_enemy_boss_${slug}_idle.png`,
+  atk: `/assets/enemies/rw_enemy_boss_${slug}_atk.png`,
+  hit: `/assets/enemies/rw_enemy_boss_${slug}_hit.png`,
+  die: `/assets/enemies/rw_enemy_boss_${slug}_die.png`,
 });
 
+const ART = {
+  goblin: bossArt("goblin_king"),
+  wyrm: bossArt("ash_wyrm"),
+  hydra: bossArt("pale_hydra"),
+};
+
+function enemy(id: string, name: string, faction: Faction, stats: Stats, art: EnemyDef["art"], kind: EnemyDef["kind"]): EnemyDef {
+  return { id, name, faction, stats, art, kind };
+}
+
+/** 36 fodder + 12 elite + 12 bosses (3 artes-base emprestadas). */
 export const ENEMIES: EnemyDef[] = [
-  boss("goblin_king", "Rei Goblin", "ashen", { hp: 640, atk: 52, def: 28, spd: 50, crit: 8 }),
-  boss("ash_wyrm", "Wyrm de Cinza", "embercourt", { hp: 1100, atk: 72, def: 40, spd: 40, crit: 10 }),
-  boss("pale_hydra", "Hidra Pálida", "tidebound", { hp: 1500, atk: 68, def: 36, spd: 48, crit: 12 }),
+  enemy("enemy.goblin_king", "Rei Goblin", "ashen", { hp: 640, atk: 52, def: 28, spd: 50, crit: 8 }, ART.goblin, "boss"),
+  enemy("enemy.ash_wyrm", "Wyrm de Cinza", "embercourt", { hp: 1100, atk: 72, def: 40, spd: 40, crit: 10 }, ART.wyrm, "boss"),
+  enemy("enemy.pale_hydra", "Hidra Pálida", "tidebound", { hp: 1500, atk: 68, def: 36, spd: 48, crit: 12 }, ART.hydra, "boss"),
+  enemy("enemy.boss.goblin_king", "Rei Goblin", "ashen", { hp: 640, atk: 52, def: 28, spd: 50, crit: 8 }, ART.goblin, "boss"),
+  enemy("enemy.boss.ash_wyrm", "Wyrm de Cinza", "embercourt", { hp: 1100, atk: 72, def: 40, spd: 40, crit: 10 }, ART.wyrm, "boss"),
+  enemy("enemy.boss.pale_hydra", "Hidra Pálida", "tidebound", { hp: 1500, atk: 68, def: 36, spd: 48, crit: 12 }, ART.hydra, "boss"),
+  ...(["ember", "tide", "thorn", "ash"] as const).flatMap((fac, fi) => {
+    const faction: Faction = fac === "ember" ? "embercourt" : fac === "tide" ? "tidebound" : fac === "thorn" ? "thornveil" : "ashen";
+    const art = fi % 3 === 0 ? ART.goblin : fi % 3 === 1 ? ART.wyrm : ART.hydra;
+    const fodder = Array.from({ length: 9 }, (_, i) =>
+      enemy(
+        `enemy.fodder.${fac}${i ? `.${i}` : ""}`,
+        `Eco ${fac} ${i + 1}`,
+        faction,
+        { hp: 420 + i * 20, atk: 36 + i * 2, def: 20 + i, spd: 46 + i, crit: 6 },
+        art,
+        "fodder",
+      ),
+    );
+    const elites = Array.from({ length: 3 }, (_, i) =>
+      enemy(
+        `enemy.elite.${fac}${i ? `.${i}` : ""}`,
+        `Elite ${fac} ${i + 1}`,
+        faction,
+        { hp: 800 + i * 40, atk: 58 + i * 4, def: 32 + i * 2, spd: 50, crit: 10 },
+        art,
+        "elite",
+      ),
+    );
+    return [...fodder, ...elites];
+  }),
+  ...Array.from({ length: 12 }, (_, i) => {
+    const ch = i + 1;
+    const art = i % 3 === 0 ? ART.goblin : i % 3 === 1 ? ART.wyrm : ART.hydra;
+    const faction: Faction = (["embercourt", "tidebound", "thornveil", "ashen"] as const)[i % 4]!;
+    return enemy(
+      `enemy.boss.ch${ch}`,
+      `Ato ${ch}`,
+      faction,
+      { hp: 900 + ch * 80, atk: 60 + ch * 4, def: 34 + ch, spd: 44, crit: 10 },
+      art,
+      "boss",
+    );
+  }),
 ];
 
 export type { StageDef } from "./stages.ts";
-export { BG, CHAPTERS, STAGES, isStageOpen } from "./stages.ts";
+export { BG, CHAPTERS, STAGES, ACT_CUTSCENES, isStageOpen } from "./stages.ts";
 export * from "./systems.ts";
+export * from "./i18n.ts";
+export * from "./events.ts";
 import { BG } from "./stages.ts";
 import { HUNT_ROOT } from "./systems.ts";
 
@@ -146,6 +97,8 @@ export const STARTERS = [
 
 export type HuntDef = {
   id: string;
+  dungeon: string;
+  level: number;
   name: string;
   bg: string;
   enemyId: string;
@@ -154,50 +107,41 @@ export type HuntDef = {
   letters: number;
 };
 
-export const HUNTS: HuntDef[] = [
-  {
-    id: "hunt.goblin",
-    name: "Toca Goblin",
-    bg: BG.goblin,
-    enemyId: "enemy.goblin_king",
-    stamina: 8,
-    gold: 70,
-    letters: 1,
-  },
-  {
-    id: "hunt.wyrm",
-    name: "Covil do Wyrm",
-    bg: BG.wyrm,
-    enemyId: "enemy.ash_wyrm",
-    stamina: 10,
-    gold: 95,
-    letters: 1,
-  },
-  {
-    id: "hunt.hydra",
-    name: "Cisterna da Hidra",
-    bg: BG.hydra,
-    enemyId: "enemy.pale_hydra",
-    stamina: 12,
-    gold: 120,
-    letters: 2,
-  },
-  {
-    id: HUNT_ROOT.id,
-    name: HUNT_ROOT.name,
-    bg: HUNT_ROOT.bg,
-    enemyId: HUNT_ROOT.enemyId,
-    stamina: HUNT_ROOT.stamina,
-    gold: HUNT_ROOT.gold,
-    letters: HUNT_ROOT.letters,
-  },
+const HUNT_BASE: Omit<HuntDef, "id" | "level">[] = [
+  { dungeon: "goblin", name: "Toca Goblin", bg: BG.goblin, enemyId: "enemy.goblin_king", stamina: 8, gold: 70, letters: 1 },
+  { dungeon: "wyrm", name: "Covil do Wyrm", bg: BG.wyrm, enemyId: "enemy.ash_wyrm", stamina: 10, gold: 95, letters: 1 },
+  { dungeon: "hydra", name: "Cisterna da Hidra", bg: BG.hydra, enemyId: "enemy.pale_hydra", stamina: 12, gold: 120, letters: 2 },
+  { dungeon: "root", name: HUNT_ROOT.name, bg: HUNT_ROOT.bg, enemyId: HUNT_ROOT.enemyId, stamina: HUNT_ROOT.stamina, gold: HUNT_ROOT.gold, letters: HUNT_ROOT.letters },
 ];
 
-export const HONOR_POOL: { id: string; heroId: string; name: string }[] = [
-  ...HEROES.map((h) => ({ id: `honor.${h.id}`, heroId: h.id, name: h.name })),
-  ...HEROES.map((h, i) => ({ id: `honor.echo.${i}`, heroId: h.id, name: `${h.name} · eco` })),
-  ...HEROES.slice(0, 4).map((h, i) => ({ id: `honor.shade.${i}`, heroId: h.id, name: `${h.name} · sombra` })),
-];
+export const HUNTS: HuntDef[] = HUNT_BASE.flatMap((h) =>
+  Array.from({ length: 10 }, (_, i) => {
+    const level = i + 1;
+    return {
+      ...h,
+      id: `hunt.${h.dungeon}.${level}`,
+      level,
+      name: `${h.name} ${level}`,
+      stamina: h.stamina + i,
+      gold: Math.round(h.gold * (1 + i * 0.12)),
+      letters: h.letters + (i % 4 === 3 ? 1 : 0),
+    };
+  }),
+);
+
+/** aliases do slice */
+HUNTS.push(
+  { ...HUNTS[0]!, id: "hunt.goblin" },
+  { ...HUNTS[10]!, id: "hunt.wyrm" },
+  { ...HUNTS[20]!, id: "hunt.hydra" },
+  { ...HUNTS[30]!, id: "hunt.root" },
+);
+
+export const HONOR_POOL: { id: string; heroId: string; name: string }[] = HEROES.slice(0, 16).map((h) => ({
+  id: `honor.${h.id}`,
+  heroId: h.id,
+  name: h.name,
+}));
 
 export const DAILIES = [
   { id: "wake", label: "Coletar Wake", target: 1, gold: 40, letters: 2, sweep: 1 },
@@ -241,3 +185,5 @@ export const UI = {
     cisma: "/assets/ui/icons/directives/rw_directive_cisma.png",
   } as Record<string, string>,
 };
+
+

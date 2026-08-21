@@ -21,6 +21,8 @@ Este repositório é o estúdio: planejamento, conteúdo, cliente, simulação, 
 | Áudio | Camas + SFX procedurais; mute no Menu |
 | Tutorial (ofício) | 8 min até o primeiro Wake — `docs/14-slice-onboarding.md` |
 | Systems complete | Gear, torre, arena, guilda, passe, honor, admin — `docs/15-systems-complete.md` |
+| Content complete (dados) | 28 heróis, 240 stages, 4×10 hunts, torre 200, i18n PT/EN |
+| Estado para o agente | [`AI_STATE.md`](AI_STATE.md) — atualizar ao fim de cada execução |
 | Replay de batalha | Persistido (`battles`) — cliente só faz playback |
 | CI + ambientes | GitHub Actions + `infra/environments.md` |
 

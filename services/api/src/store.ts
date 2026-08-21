@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { HEROES, defaultProg, starterGear, type GearPiece, type HeroProg } from "@relicwake/content";
+import { HEROES, SLICE_OWNED, defaultProg, starterGear, type GearPiece, type HeroProg } from "@relicwake/content";
 import type { DirectiveId } from "@relicwake/shared";
 import type { BattleInput, BattleRecord, BattleResult } from "@relicwake/sim";
 import { db } from "./db.ts";
@@ -91,7 +91,7 @@ function genesis(id: string, deviceId: string): Account {
     afkStage: "1-1",
     cleared: [],
     team: ["hero.warrior", "hero.guardian", "hero.mage", "hero.archer", "hero.rogue"],
-    owned: HEROES.map((h) => h.id),
+    owned: [...SLICE_OWNED],
     pity: 0,
     directives: ["foco"],
     wakerName: null,
@@ -108,7 +108,7 @@ function genesis(id: string, deviceId: string): Account {
     dust: 40,
     crests: 0,
     ember: 0,
-    heroProg: defaultProg(HEROES.map((h) => h.id)),
+    heroProg: defaultProg([...SLICE_OWNED]),
     gear: starterGear(),
     equipped: Object.fromEntries(starterGear().map((g) => [g.slot, g.id])),
     towerFloor: 1,

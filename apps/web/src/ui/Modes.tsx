@@ -1,5 +1,6 @@
 import {
   ARENA_RANKS,
+  EVENTS,
   FACTION_TOWERS,
   GEAR_SETS,
   GEAR_SLOTS,
@@ -7,6 +8,7 @@ import {
   LOGIN_EVENT,
   PASS_TRACK,
   SKUS,
+  TOWER_FLOORS,
   arenaRank,
 } from "@relicwake/content";
 import { useEffect, useState } from "react";
@@ -21,7 +23,7 @@ export function TowerPanel() {
     <div>
       <div className="panel">
         <h1>Torre do Spire</h1>
-        <p className="muted">Andar {floor}/100. Sem Breath. Vitória sobe o degrau.</p>
+        <p className="muted">Andar {floor}/{TOWER_FLOORS}. Sem Breath. Vitória sobe o degrau.</p>
         <button className="cta" onClick={() => void startFight(`tower.${floor}`)}>
           Andar {floor}
         </button>

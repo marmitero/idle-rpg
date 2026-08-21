@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   CHAPTERS,
+  ENEMIES,
+  EVENTS,
+  HEROES,
   HONOR_POOL,
   HUNTS,
   HUNT_UNLOCK_STAGE,
@@ -13,15 +16,15 @@ import {
   starterGear,
 } from "./index.ts";
 
-test("slice campaign is 40 stages across 2 chapters", () => {
-  assert.equal(STAGES.length, 40);
-  assert.equal(CHAPTERS.length, 2);
+test("campaign is 12 chapters × 20 stages", () => {
+  assert.equal(STAGES.length, 240);
+  assert.equal(CHAPTERS.length, 12);
   assert.equal(STAGES.filter((s) => s.chapter === 1).length, 20);
-  assert.equal(STAGES.filter((s) => s.chapter === 2).length, 20);
+  assert.equal(STAGES.filter((s) => s.chapter === 12).length, 20);
   const ids = STAGES.map((s) => s.id);
   assert.equal(new Set(ids).size, ids.length);
   assert.equal(STAGES[0]!.id, "1-1");
-  assert.equal(STAGES[39]!.id, "2-20");
+  assert.equal(STAGES[239]!.id, "12-20");
 });
 
 test("wake rate and gold climb", () => {
@@ -39,9 +42,9 @@ test("tutorial and hunt gates exist", () => {
 });
 
 test("systems complete content exists", () => {
-  assert.equal(HUNTS.length, 4);
+  assert.equal(HUNTS.filter((h) => /^hunt\.[a-z]+\.\d+$/.test(h.id)).length, 40);
   assert.equal(HONOR_POOL.length, 16);
-  assert.equal(TOWER_FLOORS, 100);
+  assert.equal(TOWER_FLOORS, 200);
   assert.equal(starterGear().length, 4);
   const h = {
     id: "hero.warrior",
@@ -52,4 +55,10 @@ test("systems complete content exists", () => {
   const p = { level: 10, stars: 2, imprint: 2, pas: 1, cmd: 1, ult: 1 };
   const s = poweredStats(h, p, starterGear(), [h, h, h], false, 10);
   assert.ok(s.atk > 10);
+});
+
+test("content complete roster and acts", () => {
+  assert.equal(HEROES.length, 28);
+  assert.ok(ENEMIES.length >= 36 + 12 + 12);
+  assert.equal(EVENTS.length, 3);
 });

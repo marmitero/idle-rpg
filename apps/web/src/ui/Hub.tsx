@@ -1,4 +1,5 @@
 import { DAILIES, UI } from "@relicwake/content";
+import { t } from "../i18n";
 import { useState } from "react";
 import { playSfx, unlockAudio } from "../audio";
 import { useGame } from "../state";
@@ -14,6 +15,7 @@ export function Hub() {
   const claimDaily = useGame((s) => s.claimDaily);
   const panel = useGame((s) => s.hubPanel);
   const setHubPanel = useGame((s) => s.setHubPanel);
+  const locale = useGame((s) => s.locale);
   const [msg, setMsg] = useState("");
   const hours = Math.min(cap, (Date.now() - last) / 3_600_000);
   if (panel === "tower") {
@@ -62,7 +64,7 @@ export function Hub() {
     <div className="hero-bg" style={{ backgroundImage: `url(${UI.hub})`, minHeight: "100%" }}>
       <div style={{ height: 220 }} />
       <div className="panel">
-        <h1>O Spire dorme</h1>
+        <h1>{t("spire_sleeps", locale)}</h1>
         <p className="muted">
           Wake acumulado: {hours.toFixed(1)} h / {cap} h.
         </p>
@@ -81,24 +83,24 @@ export function Hub() {
         >
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
             <ChromaImg src={UI.chest} alt="" width={28} height={28} />
-            Coletar Wake
+            {t("collect_wake", locale)}
           </span>
         </button>
         {msg && <p className="muted">{msg}</p>}
       </div>
       <div className="panel">
-        <h2>Destinos</h2>
+        <h2>{t("destinations", locale)}</h2>
         <div className="grid3">
           {(
             [
-              ["tower", "Torre"],
-              ["arena", "Arena"],
-              ["honor", "Honor"],
-              ["live", "Passe / Mail"],
+              ["tower", "tower"],
+              ["arena", "arena"],
+              ["honor", "honor"],
+              ["live", "live"],
             ] as const
-          ).map(([id, label]) => (
+          ).map(([id, key]) => (
             <button key={id} className="cta" onClick={() => setHubPanel(id)}>
-              {label}
+              {t(key, locale)}
             </button>
           ))}
         </div>

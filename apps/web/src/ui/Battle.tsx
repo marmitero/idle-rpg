@@ -1,4 +1,4 @@
-import { BG, CHAPTERS, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE, UI, isStageOpen } from "@relicwake/content";
+import { ACT_CUTSCENES, BG, CHAPTERS, HUNT_UNLOCK_STAGE, HUNTS, STAGES, TUTORIAL_DONE, UI, isStageOpen } from "@relicwake/content";
 import { DIRECTIVES, type DirectiveId } from "@relicwake/shared";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "../state";
@@ -45,6 +45,8 @@ export function Battle() {
   const [openCh, setOpenCh] = useState(1);
   const [done, setDone] = useState(false);
   const [huntMsg, setHuntMsg] = useState("");
+  const [huntLv, setHuntLv] = useState<Record<string, number>>({});
+  const locale = useGame((s) => s.locale);
   const settled = useRef(false);
 
   useEffect(() => {
@@ -155,36 +157,50 @@ export function Battle() {
         {tutorialStep < TUTORIAL_DONE || !cleared.includes(HUNT_UNLOCK_STAGE) ? (
           <p className="muted">Abre após o 1-10. Breath não gasta o baú.</p>
         ) : null}
-        {HUNTS.map((h) => (
-          <div key={h.id} style={{ marginBottom: 10 }}>
-            <strong>{h.name}</strong>
-            <p className="muted">
-              {h.stamina} Breath · +{h.gold} ouro · +{h.letters} Letters
-            </p>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                className="cta"
-                disabled={tutorialStep < TUTORIAL_DONE || !cleared.includes(HUNT_UNLOCK_STAGE)}
-                onClick={async () => {
-                  const r = await startHunt(h.id);
-                  setHuntMsg(r.ok ? "" : (r.reason ?? ""));
-                }}
-              >
-                Lutar
-              </button>
-              <button
-                className="cta"
-                disabled={tutorialStep < TUTORIAL_DONE || !cleared.includes(HUNT_UNLOCK_STAGE)}
-                onClick={async () => {
-                  const r = await sweepHunt(h.id);
-                  setHuntMsg(r.ok ? `Sweep: +${r.gold} ouro` : (r.reason ?? ""));
-                }}
-              >
-                Sweep
-              </button>
+        {(["goblin", "wyrm", "hydra", "root"] as const).map((dungeon) => {
+          const levels = HUNTS.filter((h) => h.dungeon === dungeon && /\\.[0-9]+$/.test(h.id));
+          const lv = huntLv[dungeon] ?? 1;
+          const h = levels.find((x) => x.level === lv) ?? levels[0];
+          if (!h) return null;
+          const lock = tutorialStep < TUTORIAL_DONE || !cleared.includes(HUNT_UNLOCK_STAGE);
+          return (
+            <div key={dungeon} style={{ marginBottom: 12 }}>
+              <strong>{h.name.replace(/ \\d+$/, "")}</strong>
+              <p className="muted">
+                Nv {lv}/10 · {h.stamina} Breath · +{h.gold} ouro · +{h.letters} Letters
+              </p>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}>
+                {levels.map((x) => (
+                  <button key={x.id} className={`dir ${lv === x.level ? "on" : ""}`} style={{ flex: "0 0 36px", minHeight: 36 }} onClick={() => setHuntLv((s) => ({ ...s, [dungeon]: x.level }))}>
+                    {x.level}
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  className="cta"
+                  disabled={lock}
+                  onClick={async () => {
+                    const r = await startHunt(h.id);
+                    setHuntMsg(r.ok ? "" : (r.reason ?? ""));
+                  }}
+                >
+                  Lutar
+                </button>
+                <button
+                  className="cta"
+                  disabled={lock}
+                  onClick={async () => {
+                    const r = await sweepHunt(h.id);
+                    setHuntMsg(r.ok ? `Sweep: +${r.gold} ouro` : (r.reason ?? ""));
+                  }}
+                >
+                  Sweep
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {huntMsg && <p className="muted">{huntMsg}</p>}
       </div>
 
@@ -220,6 +236,9 @@ export function Battle() {
               Cap. {ch.chapter} · {ch.name} · {done}/{list.length}
             </button>
             <p className="muted">{ch.blurb}</p>
+            {expanded && (
+              <p className="muted">{ACT_CUTSCENES.find((a) => a.chapter === ch.chapter)?.enter[locale]}</p>
+            )}
             {expanded &&
               list.map((s) => {
                 const open = isStageOpen(cleared, s.id);
@@ -243,7 +262,7 @@ export function Battle() {
         );
       })}
       <div className="panel">
-        <p className="muted">Capítulos 3–12 (Tidevault → Crown) entram no content complete. O slice é a subida inteira dos atos 1 e 2.</p>
+        <p className="muted">12 atos · 240 stages. Arte de inimigo ainda empresta os 3 bosses do slice.</p>
       </div>
     </div>
   );

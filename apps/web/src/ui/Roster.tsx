@@ -1,16 +1,21 @@
 import { FACTION_LABEL, GEAR_SETS, GEAR_SLOTS, HEROES, enhanceCost, levelCost, starDust } from "@relicwake/content";
 import { useState } from "react";
+import { t } from "../i18n";
 import { useGame } from "../state";
 
 export function Roster() {
   const team = useGame((s) => s.team);
+  const owned = useGame((s) => s.owned);
   const prog = useGame((s) => s.heroProg);
   const gear = useGame((s) => s.gear);
   const equipped = useGame((s) => s.equipped);
   const gold = useGame((s) => s.gold);
   const dust = useGame((s) => s.dust);
   const cmd = useGame((s) => s.cmd);
+  const locale = useGame((s) => s.locale);
   const [sel, setSel] = useState(HEROES[0]!.id);
+  const [all, setAll] = useState(false);
+  const list = all ? HEROES : HEROES.filter((h) => owned.includes(h.id));
   const p = prog[sel] ?? { level: 1, stars: 1, imprint: 0, pas: 1, cmd: 1, ult: 1 };
   const toggleTeam = (id: string) => {
     const next = team.includes(id) ? team.filter((x) => x !== id) : [...team, id].slice(0, 5);
@@ -21,10 +26,13 @@ export function Roster() {
       <div className="panel">
         <h1>Relíquias</h1>
         <p className="muted">
-          Ouro {gold} · Poeira {dust} · Resonance puxa os 5 mais altos.
+          Ouro {gold} · Poeira {dust} · {t("all_relics", locale)}
         </p>
-        <div className="grid3">
-          {HEROES.map((h) => (
+        <button className="cta" onClick={() => setAll((v) => !v)}>
+          {all ? t("owned_only", locale) : t("all_relics", locale)}
+        </button>
+        <div className="grid3" style={{ marginTop: 8 }}>
+          {list.map((h) => (
             <button
               key={h.id}
               className="card"

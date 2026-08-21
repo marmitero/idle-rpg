@@ -19,6 +19,8 @@ export function Menu() {
   const [mute, setMute] = useState(isMuted);
   const [vol, setVol] = useState(getVolume);
   const [admin, setAdmin] = useState("");
+  const locale = useGame((s) => s.locale);
+  const setLocale = useGame((s) => s.setLocale);
 
   return (
     <div className="hero-bg" style={{ backgroundImage: `url(${UI.font})` }}>
@@ -135,6 +137,17 @@ export function Menu() {
           }}
           style={{ width: "100%", marginTop: 10 }}
         />
+      </div>
+      <div className="panel">
+        <h2>Idioma / Language</h2>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="cta" onClick={() => setLocale("pt-BR")}>
+            PT-BR{locale === "pt-BR" ? " •" : ""}
+          </button>
+          <button className="cta" onClick={() => setLocale("en")}>
+            EN{locale === "en" ? " •" : ""}
+          </button>
+        </div>
       </div>
       <div className="panel">
         <h2>Admin live-ops</h2>
