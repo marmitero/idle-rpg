@@ -111,6 +111,13 @@ const server = createServer(async (req, res) => {
       json(res, 200, { ok: true, service: "relicwake-api", env: RW_ENV, dialect });
       return;
     }
+    if (RW_ENV === "dev" && req.method === "POST" && url === "/api/diag") {
+      // Instrumentação de dev: o cliente reporta progresso/erros de batalha.
+      const body = await readBody(req).catch(() => ({}));
+      console.log(`[diag] ${device(req) ?? "-"} ${JSON.stringify(body.msg ?? body).slice(0, 500)}`);
+      json(res, 200, { ok: true });
+      return;
+    }
     if (req.method === "POST" && url === "/api/session") {
       const a = await account(req, res);
       if (!a) return;
