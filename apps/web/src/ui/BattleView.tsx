@@ -1,8 +1,9 @@
 import { ENEMIES, HERO_BY_ID } from "@relicwake/content";
 import type { BattleInput, BattleResult } from "@relicwake/sim";
-import { Application, Assets, Container, Sprite, Texture } from "pixi.js";
+import { Application, Container, Sprite, Texture } from "pixi.js";
 import { useEffect, useRef } from "react";
 import { playSfx, setBed } from "../audio";
+import { loadTex, preloadBattle } from "../battleAssets";
 import { report, reportError } from "../diag";
 
 /** Pixi playback of a server-judged BattleResult. Never calls simulate(). */
@@ -22,20 +23,25 @@ type Actor = {
   y: number;
 };
 
+/**
+ * Posição por slot em ZONAS: aliados na esquerda, inimigos na direita.
+ * Fileiras: 0 = frente (baixo), 1 = meio, 2 = topo. Slot 4 centralizado no
+ * topo da zona. Tudo relativo ao canvas — sem pixels fixos.
+ */
 function slotPos(team: "ally" | "enemy", slot: number, w: number, h: number) {
-  const col = slot < 2 ? 0 : 1;
-  const row = slot < 2 ? slot : slot - 2;
-  const ox = team === "ally" ? w * 0.22 : w * 0.62;
-  const oy = h * 0.42 + row * (h * 0.14);
-  const dx = col * w * 0.16;
-  return { x: ox + (team === "ally" ? dx : -dx), y: oy };
+  const zone = team === "ally" ? { start: 0.1, width: 0.32 } : { start: 0.58, width: 0.32 };
+  const row = slot < 2 ? 0 : slot < 4 ? 1 : 2;
+  const col = slot % 2;
+  const colX = slot === 4 ? 0.5 : 0.28 + 0.44 * col;
+  const x = w * (zone.start + zone.width * colX);
+  const y = h * (row === 0 ? 0.8 : row === 1 ? 0.54 : 0.28);
+  return { x, y, row };
 }
 
 async function tex(url: string): Promise<Texture> {
-  // Pixi v8: Texture.from(string) SÓ lê o cache (não carrega). Assets.load
-  // carrega e devolve a Texture pronta — assets já vêm com fundo removido.
+  // Assets pré-carregados em paralelo; loadTex devolve do cache/dedupe.
   try {
-    return (await Assets.load(url)) as Texture;
+    return await loadTex(url);
   } catch (e) {
     reportError(`tex ${url.split("/").pop()}`, e);
     return Texture.EMPTY;
@@ -88,9 +94,14 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
         const h = app.renderer.height;
         report(`pixi ok canvas=${w}x${h} dpr=${window.devicePixelRatio}`);
 
+        // Pré-carga paralela (pool 8) — elimina os ~50 awaits sequenciais.
+        const t0 = performance.now();
+        const n = await preloadBattle(input, bg);
+        report(`preload ${n} texturas em ${Math.round(performance.now() - t0)}ms`);
+
         try {
-          const bgTex = await Assets.load(bg);
-          const bgSpr = new Sprite(bgTex as Texture);
+          const bgTex = await loadTex(bg);
+          const bgSpr = new Sprite(bgTex);
           bgSpr.width = w;
           bgSpr.height = h;
           app.stage.addChild(bgSpr);
@@ -113,16 +124,25 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
           const enemy = ENEMIES.find((e) => e.id === u.heroId);
           const art = hero?.art ?? enemy?.art;
           if (!art) continue;
-          const idle = await tex("idle" in art ? art.idle : art.idle);
-          const atk = await tex("atk" in art ? art.atk : art.idle);
-          const hit = await tex("hit" in art ? art.hit : art.idle);
-          const die = await tex("die" in art ? art.die : art.idle);
-          const ult = await tex("ult" in art && art.ult ? art.ult : art.atk);
+          const a = art as { idle: string; atk: string; hit: string; die: string; ult?: string };
+          const idle = await tex(a.idle);
+          const atk = await tex(a.atk);
+          const hit = await tex(a.hit);
+          const die = await tex(a.die);
+          const ult = await tex(a.ult ?? a.atk);
           const spr = new Sprite(idle);
           const pos = slotPos(team, u.slot, w, h);
-          const scale = team === "enemy" && u.heroId.includes("wyrm") ? 0.22 : team === "enemy" ? 0.2 : 0.22;
-          spr.anchor.set(0.5, 0.85);
-          spr.scale.set(team === "ally" ? scale : -scale, Math.abs(scale));
+          // Tamanho relativo ao CANVAS: herói ≈ 19% da altura, boss ≈ 26%;
+          // limite de largura para caber na coluna; fileiras de trás menores
+          // (profundidade 2.5D).
+          const isBoss = enemy?.kind === "boss";
+          const targetH = h * (isBoss ? 0.26 : 0.19);
+          let s = targetH / (idle.height || 1024);
+          s = Math.min(s, (w * 0.15) / (idle.width || 1024));
+          s = Math.min(0.32, Math.max(0.05, s));
+          const depth = pos.row === 0 ? 1.04 : pos.row === 1 ? 0.98 : 0.92;
+          spr.anchor.set(0.5, 0.9);
+          spr.scale.set((team === "ally" ? s : -s) * depth, s * depth);
           spr.position.set(pos.x, pos.y);
           layer.addChild(spr);
           actors.set(u.id, {
