@@ -60,18 +60,34 @@ function scaled(stats: LoadoutUnit["stats"], s: number): LoadoutUnit["stats"] {
 }
 
 export function loadoutFromTeam(a: Account, honor = false, draftIds?: string[]): LoadoutUnit[] {
-  let ids = draftIds?.length
-    ? draftIds.map((d) => HONOR_POOL.find((p) => p.id === d)?.heroId ?? d)
-    : [...a.team];
-  for (const id of LOAN_HEROES) {
-    if (ids.length >= 5) break;
-    if (!ids.includes(id)) ids.push(id);
+  let entries: { id: string; slot: number }[];
+  if (!honor && !draftIds?.length) {
+    // Batalhas normais: a formação 3x3 é a fonte de verdade do posicionamento.
+    entries = a.formation
+      .map((id, slot) => (typeof id === "string" ? { id, slot } : null))
+      .filter((x): x is { id: string; slot: number } => x !== null);
+    const used = new Set(entries.map((e) => e.id));
+    for (const id of LOAN_HEROES) {
+      if (entries.length >= 5) break;
+      if (used.has(id)) continue;
+      const slot = a.formation.indexOf(null);
+      if (slot < 0) break;
+      a.formation[slot] = id; // temporário: só para montar o input desta batalha
+      used.add(id);
+      entries.push({ id, slot });
+    }
+  } else {
+    const ids = (draftIds?.length
+      ? draftIds.map((d) => HONOR_POOL.find((p) => p.id === d)?.heroId ?? d)
+      : [...a.team]
+    ).slice(0, 5);
+    entries = ids.map((id, slot) => ({ id, slot }));
   }
-  ids = ids.slice(0, 5);
+  const ids = entries.map((e) => e.id);
   const teamHeroes = ids.map((id) => HERO_BY_ID[id] ?? HEROES[0]!);
   const res = resonanceFloor(Object.values(a.heroProg ?? {}));
   const gear = honor ? [] : equippedPieces(a);
-  return ids.map((id, slot) => {
+  return entries.map(({ id, slot }) => {
     const h = HERO_BY_ID[id] ?? HEROES[0]!;
     const prog: HeroProg = a.heroProg?.[id] ?? { level: 1, stars: 1, imprint: 0, pas: 1, cmd: 1, ult: 1 };
     return {

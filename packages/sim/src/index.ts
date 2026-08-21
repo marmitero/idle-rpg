@@ -39,6 +39,8 @@ export type LoadoutUnit = {
   name: string;
   faction: Faction;
   stats: Stats;
+  /** Posição na grade 3x3: 0-8. coluna = slot % 3, fileira = floor(slot / 3).
+   *  Frente (slots 0-2) é alvo prioritário de ataques básicos (pickTarget). */
   slot: number;
 };
 
@@ -127,7 +129,7 @@ function pickTarget(src: BattleUnit, foes: BattleUnit[], directives: DirectiveId
     const low = live.filter((u) => u.hp / u.stats.hp < 0.35);
     if (low.length) return low[rng() * low.length | 0] ?? low[0]!;
   }
-  const front = live.filter((u) => u.slot < 2);
+  const front = live.filter((u) => u.slot < 3); // grade 3x3: fileira da frente = slots 0-2
   const pool = front.length ? front : live;
   return pool[rng() * pool.length | 0] ?? pool[0]!;
 }

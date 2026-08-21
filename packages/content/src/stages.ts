@@ -10,6 +10,15 @@ export type StageDef = {
   boss?: boolean;
 };
 
+/** Distribuição centralizada de inimigos na grade 3x3 (slot 0-8). */
+const ENEMY_SLOTS: Record<number, number[]> = {
+  1: [1], // boss solo: centro da frente
+  2: [0, 2],
+  3: [0, 1, 2],
+  4: [0, 1, 2, 4],
+  5: [0, 1, 2, 3, 4],
+};
+
 export const BG = {
   spire: "/assets/environments/biomes/rw_env_battle_spire_base.png",
   ember: "/assets/environments/biomes/rw_env_battle_emberworks.png",
@@ -58,10 +67,11 @@ function chapterStages(meta: (typeof CHAPTERS)[number]): StageDef[] {
     const isBoss = index === 10 || index === 20;
     const scale = 0.55 + global * 0.0048;
     const n = isBoss ? 4 : 2 + (index % 4);
-    const enemies = Array.from({ length: Math.min(5, n) }, (_, slot) => ({
-      enemyId: isBoss && slot === 0 ? meta.bossId : meta.fodder,
+    const slots = ENEMY_SLOTS[Math.min(5, n)] ?? [0, 1, 2];
+    const enemies = slots.map((slot, i) => ({
+      enemyId: isBoss && i === 0 ? meta.bossId : meta.fodder,
       slot,
-      scale: isBoss && slot === 0 ? 1.05 + meta.chapter * 0.04 : Math.max(0.4, scale - slot * 0.03),
+      scale: isBoss && i === 0 ? 1.05 + meta.chapter * 0.04 : Math.max(0.4, scale - i * 0.03),
     }));
     return {
       id: `${meta.chapter}-${index}`,

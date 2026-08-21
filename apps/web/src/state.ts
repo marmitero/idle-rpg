@@ -17,6 +17,8 @@ export type Remote = {
   afkStage: string;
   cleared: string[];
   team: string[];
+  /** Formação 3x3: 9 slots (0-2 frente, 3-5 meio, 6-8 topo; col = slot % 3). */
+  formation: (string | null)[];
   owned: string[];
   pity: number;
   directives: DirectiveId[];
@@ -93,6 +95,7 @@ type Store = Remote & {
   collect: () => Promise<{ gold: number; hours: number }>;
   claimDaily: (id: string) => Promise<boolean>;
   setDirectives: (d: DirectiveId[]) => Promise<void>;
+  setFormation: (layout: (string | null)[]) => Promise<void>;
   startHunt: (id: string) => Promise<{ ok: boolean; reason?: string }>;
   sweepHunt: (id: string) => Promise<{ ok: boolean; reason?: string; gold?: number }>;
   clearFight: () => void;
@@ -112,6 +115,7 @@ const empty: Remote = {
   afkStage: "1-1",
   cleared: [],
   team: [],
+  formation: Array(9).fill(null),
   owned: [],
   pity: 0,
   directives: ["foco", "guarda", "execute"],
@@ -219,6 +223,10 @@ export const useGame = create<Store>((set, get) => ({
   },
   setDirectives: async (directives) => {
     const r = await api<{ state: Remote }>("/api/directives", { directives });
+    get().apply(r.state);
+  },
+  setFormation: async (layout) => {
+    const r = await api<{ state: Remote }>("/api/formation", { layout });
     get().apply(r.state);
   },
   startFight: async (id, extra) => {

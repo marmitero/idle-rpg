@@ -1,10 +1,19 @@
-import { FACTION_LABEL, GEAR_SETS, GEAR_SLOTS, HEROES, enhanceCost, levelCost, starDust } from "@relicwake/content";
+import { FACTION_LABEL, GEAR_SETS, GEAR_SLOTS, HEROES, HERO_BY_ID, enhanceCost, levelCost, starDust } from "@relicwake/content";
 import { useState } from "react";
 import { t } from "../i18n";
 import { useGame } from "../state";
 
+/** Fileiras da grade 3x3 exibidas de trás p/ frente: 2 (topo), 1 (meio), 0 (frente). */
+const ROWS: { row: number; label: string }[] = [
+  { row: 2, label: "Topo" },
+  { row: 1, label: "Meio" },
+  { row: 0, label: "Frente" },
+];
+
 export function Roster() {
   const team = useGame((s) => s.team);
+  const formation = useGame((s) => s.formation);
+  const setFormation = useGame((s) => s.setFormation);
   const owned = useGame((s) => s.owned);
   const prog = useGame((s) => s.heroProg);
   const gear = useGame((s) => s.gear);
@@ -17,10 +26,40 @@ export function Roster() {
   const [all, setAll] = useState(false);
   const list = all ? HEROES : HEROES.filter((h) => owned.includes(h.id));
   const p = prog[sel] ?? { level: 1, stars: 1, imprint: 0, pas: 1, cmd: 1, ult: 1 };
-  const toggleTeam = (id: string) => {
-    const next = team.includes(id) ? team.filter((x) => x !== id) : [...team, id].slice(0, 5);
-    void cmd("/api/team", { team: next });
+  const inFormation = formation.includes(sel);
+  const count = formation.filter(Boolean).length;
+
+  const place = (slot: number) => {
+    const cur = formation[slot];
+    if (cur) {
+      setSel(cur); // slot ocupado: seleciona para mover
+      return;
+    }
+    if (!owned.includes(sel)) return;
+    const next = [...formation];
+    const from = next.indexOf(sel);
+    if (from >= 0) {
+      next[from] = null; // move
+    } else if (count >= 5) {
+      return; // formação cheia
+    }
+    next[slot] = sel;
+    void setFormation(next);
   };
+
+  const addSel = () => {
+    if (inFormation || count >= 5 || !owned.includes(sel)) return;
+    const next = [...formation];
+    const i = next.indexOf(null);
+    if (i >= 0) next[i] = sel;
+    void setFormation(next);
+  };
+
+  const removeSel = () => {
+    if (!inFormation || count <= 1) return;
+    void setFormation(formation.map((id) => (id === sel ? null : id)));
+  };
+
   return (
     <div>
       <div className="panel">
@@ -47,10 +86,57 @@ export function Roster() {
             </button>
           ))}
         </div>
-        <button className="cta" style={{ marginTop: 10 }} onClick={() => toggleTeam(sel)}>
-          {team.includes(sel) ? "Tirar do time" : "Colocar no time"}
-        </button>
+        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <button className="cta" style={{ flex: 1 }} disabled={inFormation || count >= 5} onClick={addSel}>
+            {inFormation ? "Já está na formação" : "Colocar na formação"}
+          </button>
+          <button className="cta" style={{ flex: 1 }} disabled={!inFormation || count <= 1} onClick={removeSel}>
+            Tirar da formação
+          </button>
+        </div>
       </div>
+
+      <div className="panel">
+        <h2>Formação · {count}/5</h2>
+        <p className="muted">
+          Selecione um herói e toque num espaço para posicionar. A frente apanha primeiro; atrás fica protegido.
+        </p>
+        {ROWS.map(({ row, label }) => (
+          <div key={row} style={{ display: "flex", alignItems: "center", gap: 8, margin: "6px 0" }}>
+            <div style={{ width: 46, fontSize: 11, color: "#cbb88a", textAlign: "right", flexShrink: 0 }}>{label}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, flex: 1 }}>
+              {[0, 1, 2].map((col) => {
+                const slot = row * 3 + col;
+                const id = formation[slot] ?? null;
+                const hero = id ? HERO_BY_ID[id] : null;
+                return (
+                  <button
+                    key={slot}
+                    className="card"
+                    onClick={() => place(slot)}
+                    style={{
+                      minHeight: 56,
+                      padding: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      outline: id === sel ? "1px solid #e8b15a" : undefined,
+                      background: id ? undefined : "#16101c",
+                    }}
+                  >
+                    {hero ? (
+                      <img src={hero.art.icon} alt={hero.name} style={{ width: "100%", height: 52, objectFit: "contain" }} />
+                    ) : (
+                      <span style={{ color: "#5d5066", fontSize: 18 }}>＋</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="panel">
         <h2>
           {HEROES.find((h) => h.id === sel)?.name} · nv {p.level} · {p.stars}★ · imprint {p.imprint}

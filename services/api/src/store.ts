@@ -26,6 +26,9 @@ export type Account = {
   afkStage: string;
   cleared: string[];
   team: string[];
+  /** Formação na grade 3x3 (9 slots, da esquerda p/ direita, frente p/ topo).
+   *  Fonte de verdade do posicionamento; `team` é derivado (ordem dos slots). */
+  formation: (string | null)[];
   owned: string[];
   pity: number;
   directives: DirectiveId[];
@@ -91,6 +94,7 @@ function genesis(id: string, deviceId: string): Account {
     afkStage: "1-1",
     cleared: [],
     team: ["hero.warrior", "hero.guardian", "hero.mage", "hero.archer", "hero.rogue"],
+    formation: ["hero.warrior", "hero.guardian", "hero.mage", "hero.archer", "hero.rogue", null, null, null, null],
     owned: [...SLICE_OWNED],
     pity: 0,
     directives: ["foco"],
@@ -160,6 +164,13 @@ async function loadSnapshot(accountId: string, deviceId: string, email: string |
   if (a.starterId === undefined) a.starterId = null;
   if (a.tutorialPull == null) a.tutorialPull = a.tutorialStep >= 8;
   if (!a.directives) a.directives = ["foco", "guarda", "execute"];
+  // Migração: contas antigas só têm `team` — preenche os primeiros slots
+  // (frente 3 + meio 2) e deriva `team` da ordem da formação.
+  if (!Array.isArray(a.formation) || a.formation.length !== 9) {
+    a.formation = Array(9).fill(null);
+    for (let i = 0; i < Math.min(5, a.team.length); i++) a.formation[i] = a.team[i] ?? null;
+  }
+  syncFormationTeam(a);
   ensureSystems(a);
   return a;
 }
@@ -244,7 +255,27 @@ export async function bindEmail(accountId: string, email: string, passwordHash: 
   ]);
 }
 
+/**
+ * Mantém `formation` e `team` coerentes:
+ * - heróis fora do team saem da formação;
+ * - heróis do team sem slot entram nos primeiros espaços livres (frente primeiro);
+ * - `team` é rederivado na ordem dos slots.
+ * Preserva os posicionamentos escolhidos pelo jogador.
+ */
+export function syncFormationTeam(a: Account) {
+  if (!Array.isArray(a.formation) || a.formation.length !== 9) a.formation = Array(9).fill(null);
+  const f = a.formation.map((id) => (typeof id === "string" && a.team.includes(id) ? id : null));
+  for (const id of a.team) {
+    if (f.includes(id)) continue;
+    const i = f.indexOf(null);
+    if (i >= 0) f[i] = id;
+  }
+  a.formation = f;
+  a.team = f.filter((x): x is string => typeof x === "string");
+}
+
 export async function save(a: Account) {
+  syncFormationTeam(a);
   await db.run(
     "INSERT INTO snapshots (account_id, json) VALUES (?, ?) ON CONFLICT(account_id) DO UPDATE SET json = excluded.json",
     [a.id, JSON.stringify(a)],

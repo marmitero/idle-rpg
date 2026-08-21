@@ -29,14 +29,18 @@ desempenho de carga e som. Referências externas citadas ao longo do texto.
 
 | Zona | Faixa X (× largura) |
 | --- | --- |
-| Aliados | **10% → 42%** (esquerda) |
-| Inimigos | **58% → 90%** (direita) |
+| Aliados | **8% → 46%** (esquerda) |
+| Inimigos | **54% → 92%** (direita) |
 
-| Fileira | Y (pés, × altura) | Escala de profundidade |
-| --- | --- | --- |
-| Frente (slots 0–1) | **0.975** (limite baixo da banda) | ×1.04 |
-| Meio (slots 2–3) | **0.8625** (centro da banda) | ×0.98 |
-| Topo (slot 4, centralizado) | **0.75** (limite alto da banda) | ×0.92 |
+Cada zona tem **3 colunas** (grade 3×3 da formação — docs/17): centros em
+1/6, 1/2 e 5/6 da zona. Largura máxima por unidade = **11% da largura**
+(espaço garantido entre colunas).
+
+| Fileira | Slots (grade 3×3) | Y (pés, × altura) | Escala de profundidade |
+| --- | --- | --- | --- |
+| Frente | 0–2 (3 colunas) | **0.975** (limite baixo da banda) | ×1.04 |
+| Meio | 3–5 | **0.8625** (centro da banda) | ×0.98 |
+| Topo | 6–8 | **0.75** (limite alto da banda) | ×0.92 |
 
 | Medida | Valor |
 | --- | --- |

@@ -35,17 +35,18 @@ type Actor = {
 const FEET_ROW_Y = [0.975, 0.8625, 0.75]; // fileiras 0 (frente), 1 (meio), 2 (topo)
 
 /**
- * Posição por slot em ZONAS: aliados na esquerda, inimigos na direita.
- * Fileiras: 0 = frente (baixo), 1 = meio, 2 = topo. Slot 4 centralizado no
- * topo da zona. Tudo relativo ao canvas — sem pixels fixos.
+ * Posição por slot na GRADE 3x3 (9 espaços por time): aliados na esquerda,
+ * inimigos na direita. coluna = slot % 3, fileira = floor(slot / 3) — frente
+ * (0-2) embaixo, meio (3-5), topo (6-8). Tudo relativo ao canvas.
  */
 function slotPos(team: "ally" | "enemy", slot: number, w: number, h: number) {
-  const zone = team === "ally" ? { start: 0.1, width: 0.32 } : { start: 0.58, width: 0.32 };
-  const row = slot < 2 ? 0 : slot < 4 ? 1 : 2;
-  const col = slot % 2;
-  const colX = slot === 4 ? 0.5 : 0.28 + 0.44 * col;
+  const zone = team === "ally" ? { start: 0.08, width: 0.38 } : { start: 0.54, width: 0.38 };
+  const s = Math.min(8, Math.max(0, slot));
+  const col = s % 3;
+  const row = Math.floor(s / 3);
+  const colX = (col + 0.5) / 3;
   const x = w * (zone.start + zone.width * colX);
-  const y = h * FEET_ROW_Y[row];
+  const y = h * (FEET_ROW_Y[row] ?? 0.8625);
   return { x, y, row };
 }
 
@@ -144,12 +145,12 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
           const spr = new Sprite(idle);
           const pos = slotPos(team, u.slot, w, h);
           // Tamanho relativo ao CANVAS: herói ≈ 19% da altura, boss ≈ 26%;
-          // limite de largura para caber na coluna; fileiras de trás menores
-          // (profundidade 2.5D).
+          // limite de largura para caber na coluna da grade 3x3; fileiras de
+          // trás menores (profundidade 2.5D).
           const isBoss = enemy?.kind === "boss";
           const targetH = h * (isBoss ? 0.26 : 0.19);
           let s = targetH / (idle.height || 1024);
-          s = Math.min(s, (w * 0.15) / (idle.width || 1024));
+          s = Math.min(s, (w * 0.11) / (idle.width || 1024));
           s = Math.min(0.32, Math.max(0.05, s));
           const depth = pos.row === 0 ? 1.04 : pos.row === 1 ? 0.98 : 0.92;
           spr.anchor.set(0.5, 0.9);

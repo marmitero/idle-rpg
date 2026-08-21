@@ -88,8 +88,22 @@ export async function handleSystems(
 
   if (method === "POST" && url === "/api/team") {
     const team = Array.isArray(body.team) ? (body.team as string[]).slice(0, 5) : [];
+    if (team.length < 1) return { code: 400, body: { error: "min_heroes" } };
     if (team.some((id) => !a.owned.includes(id))) return { code: 400, body: { error: "not_owned" } };
     a.team = team;
+    await save(a); // save() sincroniza a formação (frente primeiro, espaços livres)
+    return { code: 200, body: { state: publicState(a) } };
+  }
+
+  if (method === "POST" && url === "/api/formation") {
+    const layout = Array.isArray(body.layout) ? (body.layout as (string | null)[]).slice(0, 9) : null;
+    if (!layout || layout.length !== 9) return { code: 400, body: { error: "bad_layout" } };
+    const ids = layout.filter((x): x is string => typeof x === "string" && x.length > 0);
+    if (ids.length < 1 || ids.length > 5) return { code: 400, body: { error: "bad_count" } };
+    if (new Set(ids).size !== ids.length) return { code: 400, body: { error: "duplicate" } };
+    if (ids.some((id) => !a.owned.includes(id))) return { code: 400, body: { error: "not_owned" } };
+    a.formation = layout.map((x) => (typeof x === "string" && x.length > 0 ? x : null));
+    a.team = ids; // ordem dos slots (frente p/ topo, esquerda p/ direita)
     await save(a);
     return { code: 200, body: { state: publicState(a) } };
   }
