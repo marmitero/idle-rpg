@@ -187,4 +187,24 @@ Primeiros 10 heróis placeholder (bust 512; ícone = cópia). Battle clips ainda
 
 Wiring: `ownIdle()` para os 8 Ember/Tide; `ownBust` Helion (atrasado do lote-13) + Umbral. Rift ainda kit da classe.
 
-**Próximo lote-15:** busto Rift (retomado) + 9 idle (Sem, Bramble, Tess, Quin, Ashleaf, Yew, Choir, Dust, Hymn) ou mix idle/atk.
+## lote-15 (feito, 10/10) — fundo `#FF00FF` — fecha os bustos + onda 3 de idle
+
+| # | Arquivo | Tipo |
+| --- | --- | --- |
+| 1 | `characters/bust/rw_hero_nadir_rift_bust_512.png` | busto Rift *(retomado do lote-14)* |
+| 2 | `characters/battle/rw_hero_tide_sem_idle.png` | idle Sem |
+| 3 | `characters/battle/rw_hero_thorn_bramble_idle.png` | idle Bramble |
+| 4 | `characters/battle/rw_hero_thorn_tess_idle.png` | idle Tess |
+| 5 | `characters/battle/rw_hero_thorn_quin_idle.png` | idle Quin |
+| 6 | `characters/battle/rw_hero_thorn_ashleaf_idle.png` | idle Ashleaf |
+| 7 | `characters/battle/rw_hero_thorn_yew_idle.png` | idle Yew |
+| 8 | `characters/battle/rw_hero_ashen_choir_idle.png` | idle Choir |
+| 9 | `characters/battle/rw_hero_ashen_dust_idle.png` | idle Dust |
+| 10 | `characters/battle/rw_hero_ashen_hymn_idle.png` | idle Hymn |
+
+Wiring: `ownBust("nadir_rift", KIT.guardian)` (Rift sai do kit caído — ver nota) e `ownIdle()` para os 9. Ícone do Rift = cópia do busto (convenção lotes 12–13). Busto do Rift precisou de padding magenta 112px (geração sangrou até a borda) — chroma + cantos `#FF00FF` verificados.
+
+Nota: o `undefined` do Rift **não era bug** — `h()` faz fallback `kitOf(klass, faction)`; todos os heróis nasceram assim em "Content complete" e ganharam arte própria conforme a fila. Com o lote-15, **nenhum herói depende mais do fallback de busto**.
+
+**Próximo lote-16:** 5 idle restantes (Cinder, Veil, Helion, Umbral, Rift) + 5 atk dos novos (Sem, Bramble, Tess, Quin, Ashleaf) ou mix idle/atk conforme prioridade.
+

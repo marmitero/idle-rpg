@@ -1,8 +1,8 @@
 # AI_STATE — Relicwake
 
 **Atualizado:** 2026-08-21  
-**Branch:** `arena/01a01ca8-idle-rpg`  
-**Último passo:** lote-14 — Umbral bust + 8 idle Ember/Tide (Rift falhou).
+**Branch:** `arena/01a02426-idle-rpg`  
+**Último passo:** lote-15 — busto Rift + 9 idle Thorn/Ashen (bustos 22/22, idles 17/22).
 
 Este arquivo é a **fonte de verdade para o agente**. Atualize-o ao **final de cada execução**.
 
@@ -21,7 +21,7 @@ Produto: **Relicwake** (mundo Vaelith). Idle auto-battle gacha web (PC + Android
 | 4 Polish + cert + soft | Não começou |
 | 5 Launch global | Não começou |
 
-Preview: `npm run dev` → Vite **5173** + API **3000**.
+Preview: `npm run dev` → Vite **5173** + API **3000**. Dependências: `npm ci` + symlink `apps/web/public/assets` → `../../../assets`.
 
 ---
 
@@ -32,9 +32,10 @@ Preview: `npm run dev` → Vite **5173** + API **3000**.
 - Arte slice 6 heróis completa (bust+battle) + 3 bosses + plates
 - **lote-12:** bustos Bril Sora Durn Hest Nera Luth Cale Ivo Sem Bramble
 - **lote-13:** bustos Tess Quin Ashleaf Yew Choir Dust Hymn Cinder Veil Helion
-- **lote-14 (esta sessão, 9/10):** bust Umbral; idle Bril Sora Durn Hest Nera Luth Cale Ivo. Helion `ownBust` ligado (atraso do 13). **Rift falhou** (erro + teto 10).
+- **lote-14:** bust Umbral; idle Bril Sora Durn Hest Nera Luth Cale Ivo
+- **lote-15 (esta sessão, 10/10):** busto **Rift** (retomado do lote-14) + 9 idle Sem Bramble Tess Quin Ashleaf Yew Choir Dust Hymn.
 
-Bustos únicos: **21/22**. Falta **Rift**. Idle próprios: 6 slice + 8 novos. atk/hit/die/ult dos 22 ainda emprestam kit.
+Bustos únicos: **22/22** (fechado). Idle próprios: **17/22** (6 slice + 8 lote-14 + 9 lote-15). atk/hit/die/ult dos 22 ainda emprestam kit.
 
 ---
 
@@ -44,28 +45,29 @@ Bustos únicos: **21/22**. Falta **Rift**. Idle próprios: 6 slice + 8 novos. at
 | --- | --- | --- |
 | 12 | 10 bustos Ember/Tide/Bramble | feito |
 | 13 | 10 bustos Thorn/Ashen/Helion | feito |
-| 14 | Umbral + 8 idle Ember/Tide | **feito 9/10** |
-| 15 | **Rift bust (retomado)** + 9 idle restantes | **próximo** |
-| 16+ | atk/hit/die/ult dos 22 | pendente |
+| 14 | Umbral + 8 idle Ember/Tide | feito |
+| 15 | **Rift bust + 9 idle Thorn/Ashen** | **feito 10/10** |
+| 16 | 5 idle restantes + 5 atk dos novos | **próximo** |
+| 17+ | atk/hit/die/ult dos 22 | pendente |
 | — | inimigos ilustrados, cutscenes, stems, loc 100%, marketing | pendente |
 
 Regras: `#FF00FF`, ≤10/sessão, sem magenta no sujeito. `assets/GENERATION.md`.
 
-Idle ainda kit: Sem, Bramble, Tess, Quin, Ashleaf, Yew, Choir, Dust, Hymn, Cinder, Veil, Helion, Umbral, Rift (14).
+Idle ainda kit: Cinder, Veil, Helion, Umbral, Rift (5).
 
 ---
 
 ## 4. Falta além de arte
 
-Typecheck web, CI `.github/workflows` (copiar `infra/ci.yml`), OAuth, Postgres live, Redis, idle worker, Capacitor/billing, LGPD/odds, stems, loc completa, calibrar stages.
+Typecheck web/content (erros pré-existentes: `allowImportingTsExtensions` nos imports `.ts` de `content/src/index.ts` + narrowing de ranks em `systems.ts`; `shared` e `sim` já passam), CI `.github/workflows` (copiar `infra/ci.yml`), OAuth, Postgres live, Redis, idle worker, Capacitor/billing, LGPD/odds, stems, loc completa, calibrar stages.
 
 ---
 
 ## 5. Como continuar
 
-1. `git fetch` + `reset --hard origin/arena/01a01ca8-idle-rpg`
-2. Symlink `apps/web/public/assets` → `../../../assets`
+1. `git fetch` + `reset --hard origin/arena/01a02426-idle-rpg`
+2. `npm ci` + symlink `apps/web/public/assets` → `../../../assets`
 3. Só esta branch. Economia no servidor. Magenta ≤10.
 4. Atualizar **este arquivo**. `npm run dev` se pedirem preview.
 
-**Próximo passo:** lote-15 — busto Rift (retomado) e 9 idle (Sem, Bramble, Tess, Quin, Ashleaf, Yew, Choir, Dust, Hymn).
+**Próximo passo:** lote-16 — 5 idle restantes (Cinder, Veil, Helion, Umbral, Rift) + 5 atk dos novos (Sem, Bramble, Tess, Quin, Ashleaf).
