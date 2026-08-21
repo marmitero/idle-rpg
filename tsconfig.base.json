@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@relicwake/shared": ["packages/shared/src/index.ts"],
+      "@relicwake/sim": ["packages/sim/src/index.ts"],
+      "@relicwake/content": ["packages/content/src/index.ts"],
+      "@relicwake/protocol": ["packages/protocol/src/index.ts"]
+    }
+  }
+}

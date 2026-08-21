@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@relicwake/shared": ["../../packages/shared/src/index.ts"],
+      "@relicwake/sim": ["../../packages/sim/src/index.ts"],
+      "@relicwake/content": ["../../packages/content/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}

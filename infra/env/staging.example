@@ -1,0 +1,7 @@
+RW_ENV=staging
+NODE_ENV=production
+API_PORT=3000
+JWT_SECRET=replace-me
+CORS_ORIGIN=https://staging.relicwake.example
+DATABASE_URL=postgres://relicwake:relicwake@postgres:5432/relicwake
+CONTENT_SEMVER=0.1.0
