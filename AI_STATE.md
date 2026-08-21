@@ -2,7 +2,9 @@
 
 **Atualizado:** 2026-08-21  
 **Branch:** `arena/01a02426-idle-rpg`  
-**Último passo:** bugfix — tela de batalha preta (Pixi v8 `Texture.from(string)` só lê cache) corrigido com `Assets.load`.
+**Último passo:** investigação da tela preta em batalha — instrumentação de diag adicionada; aguardando teste do usuário.
+
+**BUG ABERTO — tela preta ao iniciar batalha:** o fix `Assets.load` (commit 6410235) era necessário e está correto (`Texture.from(string)` não carrega no Pixi v8), mas o usuário reporta sintoma persistente. Causas candidatas: (a) build/cache antigo no navegador do usuário; (b) `app.init()` falhando (WebGL) no ambiente dele; (c) crash React. Instrumentação (commit e5e9eb8): banner vermelho visível + logs de progresso (init/bg/atores) e erros enviados a `POST /api/diag` (dev-only) — ler o log da API (`get_process_output`) após o usuário jogar uma batalha. `window.__battle` exposto no cliente. PRÓXIMA AÇÃO: pedir hard-refresh + uma batalha; ler `[diag]` no log; corrigir a causa real.
 
 Este arquivo é a **fonte de verdade para o agente**. Atualize-o ao **final de cada execução**.
 
