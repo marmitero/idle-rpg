@@ -2,7 +2,7 @@
 
 **Atualizado:** 2026-08-21  
 **Branch:** `arena/01a02426-idle-rpg`  
-**Último passo:** fix de orientação dos sprites de batalha — times frente a frente (aliados espelhados à direita, inimigos à esquerda).
+**Último passo:** identificação do chão dos plates — floor_scan.py (candidatos) + overlay `?floordebug` no BattleView; aguardando valores do usuário para travar `BATTLE_FLOOR`.
 
 **BUG FECHADO — tela preta em batalha:** o stack do usuário (`window.onerror: this._cancelResize is not a function` em `ResizePlugin.destroy` do pixi 8.19) provou que o cleanup do useEffect chamava `app.destroy(true)` **antes de o `app.init()` assíncrono terminar** (React StrictMode dev desmonta logo após montar). O `ResizePlugin.destroy()` chama `_cancelResize()` sem guarda → exceção no desmonte → React derruba a árvore inteira → só o fundo escuro do body. Correção (BattleView): flag `ready` pós-init + `safeDestroy()` com try/catch; cleanup só destrói se `ready`, senão o `run()` destrói ao resolver o init (caminho `destroyed`). O fix anterior `Assets.load` (Texture.from não carrega no v8) permanece — eram dois bugs. Instrumentação diag mantida (banner + /api/diag).
 

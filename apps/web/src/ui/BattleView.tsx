@@ -1,10 +1,13 @@
 import { ENEMIES, HERO_BY_ID } from "@relicwake/content";
 import type { BattleInput, BattleResult } from "@relicwake/sim";
-import { Application, Container, Sprite, Texture } from "pixi.js";
+import { Application, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 import { useEffect, useRef } from "react";
 import { playSfx, setBed } from "../audio";
 import { loadTex, preloadBattle } from "../battleAssets";
 import { report, reportError } from "../diag";
+
+/** Grade de depuração do chão: ative com ?floordebug na URL. */
+const FLOOR_DEBUG = new URLSearchParams(window.location.search).has("floordebug");
 
 /** Pixi playback of a server-judged BattleResult. Never calls simulate(). */
 type Props = {
@@ -158,6 +161,39 @@ export function BattleView({ bg, input, result, speed, onDone }: Props) {
         }
         report(`atores ${actors.size}/${all.length} eventos=${result.events.length}`);
         (window as unknown as { __battle?: unknown }).__battle = { app, actors, input, result };
+
+        if (FLOOR_DEBUG) {
+          // Grade de % para identificar a linha do chão de cada plate.
+          const grid = new Container();
+          const g = new Graphics();
+          for (let p = 30; p <= 95; p += 5) {
+            g.moveTo(0, (h * p) / 100).lineTo(w, (h * p) / 100).stroke({
+              width: 1,
+              color: p % 10 === 0 ? 0x53e0ff : 0x2f7d94,
+            });
+          }
+          grid.addChild(g);
+          for (let p = 30; p <= 95; p += 5) {
+            const lbl = new Text({ text: `${p}%`, style: { fontSize: 10, fill: 0xbdf0ff } });
+            lbl.position.set(4, (h * p) / 100 + 2);
+            grid.addChild(lbl);
+          }
+          const rows: [number, string][] = [
+            [0.8, "frente"],
+            [0.54, "meio"],
+            [0.28, "topo"],
+          ];
+          const rg = new Graphics();
+          for (const [f, name] of rows) {
+            rg.moveTo(0, h * f).lineTo(w, h * f).stroke({ width: 2, color: 0xff6b6b });
+            const lbl = new Text({ text: `${name} ${f}`, style: { fontSize: 10, fill: 0xffc9c9 } });
+            lbl.position.set(w - 96, h * f + 2);
+            grid.addChild(lbl);
+          }
+          grid.addChild(rg);
+          app.stage.addChild(grid);
+          report("floordebug: grade 30–95% (azul) + fileiras atuais (vermelho)");
+        }
 
         let i = 0;
         let acc = 0;

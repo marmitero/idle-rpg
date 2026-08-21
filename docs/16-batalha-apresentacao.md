@@ -51,6 +51,40 @@ A escala é calculada **por textura** (`targetH / tex.height`), então os assets
 de tamanhos variados (1024², 1376×768, 1152×922…) normalizam sozinhos. Sem
 pixels fixos — a composição sobrevive a PC, tablet e telefone.
 
+### 1.3 Linha do chão — como identificar e o padrão proposto
+
+**Diagnóstico (2026-08-21):** as fileiras usam Y fixo (frente 0.80, meio 0.54,
+topo 0.28 da altura), mas cada plate desenha o chão numa altura diferente →
+alguns personagens "voam". Os pés dentro dos sprites **não** são o problema
+(medição: todos os idles têm pés entre 0.90 e 1.0 da altura do sprite — âncora
+0.9 correta).
+
+**Como identificar o chão de cada plate (duas ferramentas):**
+
+1. **`tools/asset-pipeline/floor_scan.py`** — mede bordas horizontais e textura
+   por linha e imprime candidatos (%) para os 10 plates de batalha. Não "vê"
+   a imagem: os candidatos precisam de validação visual.
+2. **Overlay `?floordebug`** — abra o jogo com `?floordebug` na URL e inicie
+   uma batalha: aparece uma grade azul de 5 em 5% (30–95%) com rótulos, e as
+   fileiras atuais em vermelho. **Leia o rótulo % da linha azul que coincide
+   com o chão desenhado no plate** — esse é o valor a registrar.
+
+**Padrão proposto (aguardando validação dos valores):**
+
+| Peça | Regra |
+| --- | --- |
+| Fonte de verdade | `BATTLE_FLOOR: Record<bgId, number>` no `@relicwake/content` — chão como % da altura do plate (1:1 com o canvas, pois o plate é esticado) |
+| Frente (slots 0–1) | pés exatamente em `FLOOR` |
+| Meio (slots 2–3) | pés em `FLOOR − 0.10` com escala de profundidade (menor) |
+| Topo (slot 4) | pés em `FLOOR − 0.20` com escala de profundidade |
+| Âncora do sprite | 0.9 (pés) — validada pela medição |
+| Fallback | 0.82 se o plate não estiver na tabela |
+
+> Opção em aberto (decisão com o usuário): se os plates tiverem apenas UMA
+> linha de chão, as fileiras de trás leem como "atrás" (perspectiva, padrão
+> idle-gacha) em vez de plataformas — ou, no futuro, os plates ganham
+> degraus/plataformas desenhados para as fileiras 2 e 3.
+
 ---
 
 ## 2. Desempenho de carga
