@@ -24,3 +24,19 @@ CREATE TABLE IF NOT EXISTS ledger (
   at BIGINT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ledger_account ON ledger(account_id, at);
+CREATE TABLE IF NOT EXISTS battles (
+  id TEXT PRIMARY KEY,
+  account_id TEXT NOT NULL REFERENCES accounts(id),
+  content_id TEXT NOT NULL,
+  content_semver TEXT NOT NULL,
+  seed BIGINT NOT NULL,
+  input_json TEXT NOT NULL,
+  result_json TEXT NOT NULL,
+  hash TEXT NOT NULL,
+  mac TEXT NOT NULL,
+  winner TEXT NOT NULL,
+  duration_ms INTEGER NOT NULL,
+  idempotency_key TEXT UNIQUE,
+  created_at BIGINT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS battles_account ON battles(account_id, created_at);

@@ -1,9 +1,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { randomInt, randomUUID } from "node:crypto";
-import { DAILIES, ENEMIES, HERO_BY_ID, HEROES, HUNTS, STAGES } from "@relicwake/content";
-import { simulate, type LoadoutUnit } from "@relicwake/sim";
+import { randomInt } from "node:crypto";
+import { DAILIES, HEROES, HUNTS, STAGES } from "@relicwake/content";
 import { bumpDaily, credit, getByEmail, getById, getOrCreate, publicState, save, bindEmail, type Account } from "./store.ts";
 import { hashPassword, signJwt, validEmail, verifyJwt, verifyPassword } from "./auth.ts";
+import { readBattle, readBattles, resolveBattle } from "./combat.ts";
 import { dialect } from "./db.ts";
 
 const PORT = Number(process.env.API_PORT ?? 3000);
@@ -78,21 +78,10 @@ function regen(a: Account) {
   a.lastStaminaAt += gained * (3_600_000 / STAMINA_PER_H);
 }
 
-function scaled(stats: LoadoutUnit["stats"], s: number): LoadoutUnit["stats"] {
-  return {
-    hp: Math.round(stats.hp * s),
-    atk: Math.round(stats.atk * s),
-    def: Math.round(stats.def * s),
-    spd: stats.spd,
-    crit: stats.crit,
-  };
-}
-
-function loadoutFromTeam(a: Account): LoadoutUnit[] {
-  return a.team.slice(0, 5).map((id, slot) => {
-    const h = HERO_BY_ID[id] ?? HEROES[0]!;
-    return { id: `a${slot}`, heroId: h.id, name: h.name, faction: h.faction, stats: h.stats, slot };
-  });
+function header(req: IncomingMessage, name: string): string | null {
+  const h = req.headers[name];
+  const v = Array.isArray(h) ? h[0] : h;
+  return v && v.length > 0 ? v : null;
 }
 
 const server = createServer(async (req, res) => {
@@ -238,75 +227,34 @@ const server = createServer(async (req, res) => {
       json(res, 200, { gold: hunt.gold, letters: hunt.letters, state: publicState(a) });
       return;
     }
+    if (req.method === "GET" && url === "/api/battles") {
+      const a = await account(req, res);
+      if (!a) return;
+      json(res, 200, { battles: await readBattles(a) });
+      return;
+    }
+    const battleGet = url.match(/^\/api\/battle\/([0-9a-f-]{8,})$/i);
+    if (req.method === "GET" && battleGet) {
+      const a = await account(req, res);
+      if (!a) return;
+      const got = await readBattle(a, battleGet[1]!);
+      if (!got.ok) return json(res, got.error === "not_found" ? 404 : 409, { error: got.error });
+      json(res, 200, { record: got.record });
+      return;
+    }
     if (req.method === "POST" && url === "/api/battle") {
       const a = await account(req, res);
       if (!a) return;
       regen(a);
       const body = await readBody(req);
       const id = String(body.id ?? "");
-      const stage = STAGES.find((s) => s.id === id);
-      const hunt = HUNTS.find((h) => h.id === id);
-      if (!stage && !hunt) return json(res, 400, { error: "unknown_content" });
-      if (hunt) {
-        if (a.stamina < hunt.stamina) return json(res, 400, { error: "no_breath" });
-        await credit(a, "stamina", -hunt.stamina, "hunt.enter", hunt.id);
+      const key = header(req, "idempotency-key");
+      const out = await resolveBattle(a, id, key);
+      if (!out.ok) {
+        const code = out.error === "unknown_content" || out.error === "no_breath" ? 400 : 409;
+        return json(res, code, { error: out.error });
       }
-      const allies = loadoutFromTeam(a);
-      let enemies: LoadoutUnit[] = [];
-      if (stage) {
-        enemies = stage.enemies.map((e, i) => {
-          const def = ENEMIES.find((x) => x.id === e.enemyId) ?? ENEMIES[0]!;
-          return {
-            id: `e${i}`,
-            heroId: def.id,
-            name: def.name,
-            faction: def.faction,
-            stats: scaled(def.stats, e.scale),
-            slot: e.slot,
-          };
-        });
-      } else if (hunt) {
-        const def = ENEMIES.find((x) => x.id === hunt.enemyId) ?? ENEMIES[0]!;
-        enemies = [0, 2, 3].map((slot, i) => ({
-          id: `e${i}`,
-          heroId: def.id,
-          name: def.name,
-          faction: def.faction,
-          stats: scaled(def.stats, i === 0 ? 1 : 0.72),
-          slot,
-        }));
-      }
-      const seed = randomInt(1, 2_147_000_000);
-      const result = simulate({ seed, allies, enemies, directives: a.directives });
-      const battleId = randomUUID();
-      let gold = 0;
-      let letters = 0;
-      if (result.winner === "ally") {
-        if (stage) {
-          gold = stage.gold;
-          await credit(a, "gold", gold, "battle.win", battleId);
-          if (!a.cleared.includes(stage.id)) a.cleared.push(stage.id);
-          const idx = STAGES.findIndex((s) => s.id === stage.id);
-          const afk = STAGES.findIndex((s) => s.id === a.afkStage);
-          if (idx >= afk) a.afkStage = stage.id;
-          bumpDaily(a, "fight");
-        }
-        if (hunt) {
-          gold = hunt.gold;
-          letters = hunt.letters;
-          await credit(a, "gold", gold, "hunt.win", battleId);
-          await credit(a, "letters", letters, "hunt.win", battleId);
-          bumpDaily(a, "hunt");
-        }
-      }
-      await save(a);
-      json(res, 200, {
-        battleId,
-        seed,
-        result,
-        rewards: { gold, letters, win: result.winner === "ally" },
-        state: publicState(a),
-      });
+      json(res, 200, out.payload);
       return;
     }
     json(res, 404, { error: "not_found" });

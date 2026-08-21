@@ -32,6 +32,22 @@ CREATE TABLE IF NOT EXISTS ledger (
   at BIGINT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ledger_account ON ledger(account_id, at);
+CREATE TABLE IF NOT EXISTS battles (
+  id TEXT PRIMARY KEY,
+  account_id TEXT NOT NULL,
+  content_id TEXT NOT NULL,
+  content_semver TEXT NOT NULL,
+  seed BIGINT NOT NULL,
+  input_json TEXT NOT NULL,
+  result_json TEXT NOT NULL,
+  hash TEXT NOT NULL,
+  mac TEXT NOT NULL,
+  winner TEXT NOT NULL,
+  duration_ms INTEGER NOT NULL,
+  idempotency_key TEXT UNIQUE,
+  created_at BIGINT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS battles_account ON battles(account_id, created_at);
 `;
 
 function isPostgres(url: string | undefined): boolean {
@@ -54,6 +70,7 @@ function toPg(sql: string): string {
 
 export type Query = {
   get: <T extends Row>(sql: string, params?: unknown[]) => Promise<T | undefined>;
+  all: <T extends Row>(sql: string, params?: unknown[]) => Promise<T[]>;
   run: (sql: string, params?: unknown[]) => Promise<void>;
 };
 
@@ -74,6 +91,9 @@ async function sqliteDb(): Promise<Db> {
   const q: Query = {
     async get<T extends Row>(sql: string, params: unknown[] = []) {
       return raw.prepare(sql).get(...params) as T | undefined;
+    },
+    async all<T extends Row>(sql: string, params: unknown[] = []) {
+      return raw.prepare(sql).all(...params) as T[];
     },
     async run(sql: string, params: unknown[] = []) {
       raw.prepare(sql).run(...params);
@@ -107,6 +127,10 @@ async function postgresDb(url: string): Promise<Db> {
     async get<T extends Row>(sql: string, params: unknown[] = []) {
       const r = await query(toPg(sql), params);
       return r.rows[0] as T | undefined;
+    },
+    async all<T extends Row>(sql: string, params: unknown[] = []) {
+      const r = await query(toPg(sql), params);
+      return r.rows as T[];
     },
     async run(sql: string, params: unknown[] = []) {
       await query(toPg(sql), params);

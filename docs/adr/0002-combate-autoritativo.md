@@ -15,13 +15,16 @@ Idle + arena + guild hunt criam incentivo para mentir o resultado no cliente. Ba
 simulate(loadoutA, loadoutB, directives, seed) → BattleResult
 ```
 
-O servidor executa e persiste `(inputs, seed, hash)`. O cliente executa para apresentação. Divergência gera resync. Recompensas só após o hash do servidor.
+O servidor executa e persiste um `BattleRecord` (`seed`, `input`, `result.events`, `hash` FNV-1a, HMAC-SHA256). Recompensas só depois do insert do record. O cliente **não julga**: recebe o record e faz playback dos eventos no Pixi. Relutar o mesmo `Idempotency-Key` devolve o record já persistido sem recrédito.
+
+`GET /api/battles` lista. `GET /api/battle/:id` devolve o record se o HMAC e o hash baterem.
 
 ## Consequências
 
 - RNG da batalha usa PRNG seedado (xorshift), nunca `Math.random`.
 - Dados de herói na sim vêm do `content_semver` daquela batalha, não do “latest”.
 - Fuzz e golden files são obrigação de CI.
+- Previsão local 3x (sim no cliente) fica reservada a polish; o slice 1.0 é playback puro.
 
 ## Alternativas rejeitadas
 

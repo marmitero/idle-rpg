@@ -4,6 +4,7 @@ import { Application, Container, Sprite, Texture } from "pixi.js";
 import { useEffect, useRef } from "react";
 import { chromaUrl } from "../chroma";
 
+/** Pixi playback of a server-judged BattleResult. Never calls simulate(). */
 type Props = {
   bg: string;
   input: BattleInput;

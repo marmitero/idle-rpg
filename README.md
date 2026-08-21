@@ -17,6 +17,7 @@ Este repositório é o estúdio: planejamento, conteúdo, cliente, simulação, 
 | Pacote de assets do cliente | **Absorvido** — ver `assets/CATALOG.md` |
 | Responsividade PC/mobile | `docs/12-responsividade.md` |
 | Vertical slice | Jogável: `npm run dev` (web:5173 + api:3000) |
+| Replay de batalha | Persistido (`battles`) — cliente só faz playback |
 | CI + ambientes | GitHub Actions + `infra/environments.md` |
 
 Comece por [`docs/README.md`](docs/README.md).

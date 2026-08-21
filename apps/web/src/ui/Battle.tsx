@@ -1,6 +1,6 @@
 import { HUNTS, STAGES, UI } from "@relicwake/content";
 import { DIRECTIVES, type DirectiveId } from "@relicwake/shared";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGame } from "../state";
 import { BattleView } from "./BattleView";
 import { ChromaImg } from "./ChromaImg";
@@ -14,6 +14,10 @@ const LABELS: Record<DirectiveId, string> = {
   cisma: "Cisma",
 };
 
+function contentName(id: string): string {
+  return STAGES.find((s) => s.id === id)?.name ?? HUNTS.find((h) => h.id === id)?.name ?? id;
+}
+
 export function Battle() {
   const fighting = useGame((s) => s.fighting);
   const directives = useGame((s) => s.directives);
@@ -25,10 +29,17 @@ export function Battle() {
   const cleared = useGame((s) => s.cleared);
   const stamina = useGame((s) => s.stamina);
   const sweep = useGame((s) => s.sweep);
+  const replays = useGame((s) => s.replays);
+  const openReplay = useGame((s) => s.openReplay);
   const [speed, setSpeed] = useState(1);
   const [done, setDone] = useState(false);
   const [huntMsg, setHuntMsg] = useState("");
   const settled = useRef(false);
+
+  useEffect(() => {
+    setDone(false);
+    settled.current = false;
+  }, [fighting?.battleId]);
 
   const toggle = (id: DirectiveId) => {
     const has = directives.includes(id);
@@ -52,6 +63,9 @@ export function Battle() {
           }}
         />
         <div className="panel" style={{ marginTop: 0 }}>
+          <p className="muted">
+            {fighting.mode === "replay" ? "Replay" : "Julgamento"} · {fighting.battleId.slice(0, 8)} · {fighting.hash}
+          </p>
           <div style={{ display: "flex", gap: 8 }}>
             {[1, 2, 3].map((s) => (
               <button key={s} className="cta" style={{ flex: 1 }} onClick={() => setSpeed(s)}>
@@ -77,10 +91,15 @@ export function Battle() {
 
   if (fighting && done) {
     const w = fighting.rewards.win;
+    const replay = fighting.mode === "replay";
     return (
       <div className="panel">
-        <h1>{w ? "O Sono cedeu" : "O Sono pesou"}</h1>
-        {w ? (
+        <h1>{replay ? (w ? "Replay · vitória" : "Replay · derrota") : w ? "O Sono cedeu" : "O Sono pesou"}</h1>
+        {replay ? (
+          <p className="muted">
+            Só playback. Hash {fighting.hash} · seed {fighting.input.seed}
+          </p>
+        ) : w ? (
           <p className="muted">
             +{fighting.rewards.gold} ouro
             {fighting.rewards.letters ? ` · +${fighting.rewards.letters} Letters` : ""} · ledger no servidor
@@ -88,6 +107,9 @@ export function Battle() {
         ) : (
           <p className="muted">Mude a formação ou as diretivas.</p>
         )}
+        <p className="muted">
+          {fighting.battleId.slice(0, 8)} · {contentName(fighting.id)}
+        </p>
         <button
           className="cta"
           onClick={() => {
@@ -149,6 +171,28 @@ export function Battle() {
         ))}
         {huntMsg && <p className="muted">{huntMsg}</p>}
       </div>
+
+      {replays.length > 0 && (
+        <div className="panel">
+          <h2>Replays</h2>
+          <p className="muted">O cliente só assiste o que o servidor já julgou.</p>
+          {replays.slice(0, 8).map((b) => (
+            <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 8, margin: "8px 0" }}>
+              <div style={{ flex: 1 }}>
+                <div>
+                  {contentName(b.contentId)} · {b.winner === "ally" ? "vitória" : "derrota"}
+                </div>
+                <div className="muted">
+                  {(b.durationMs / 1000).toFixed(1)}s · {b.hash}
+                </div>
+              </div>
+              <button className="cta" style={{ width: 96, minHeight: 40 }} onClick={() => void openReplay(b.id)}>
+                Assistir
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {STAGES.map((s, i) => {
         const open = i === 0 || cleared.includes(STAGES[i - 1]!.id);

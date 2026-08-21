@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { DirectiveId } from "@relicwake/shared";
-import type { BattleInput, BattleResult } from "@relicwake/sim";
+import type { BattleInput, BattleRecord, BattleResult } from "@relicwake/sim";
 import { api, setToken } from "./api";
 
 export type Tab = "hub" | "roster" | "battle" | "guild" | "menu";
@@ -28,9 +28,21 @@ export type Remote = {
 
 export type FightPayload = {
   id: string;
+  battleId: string;
+  hash: string;
   input: BattleInput;
   result: BattleResult;
   rewards: { gold: number; letters: number; win: boolean };
+  mode: "live" | "replay";
+};
+
+export type BattleSummary = {
+  id: string;
+  contentId: string;
+  winner: "ally" | "enemy";
+  durationMs: number;
+  hash: string;
+  createdAt: number;
 };
 
 type Store = Remote & {
@@ -38,9 +50,12 @@ type Store = Remote & {
   ready: boolean;
   error: string;
   fighting: FightPayload | null;
+  replays: BattleSummary[];
   setTab: (t: Tab) => void;
   hydrate: () => Promise<void>;
   apply: (state: Remote) => void;
+  loadReplays: () => Promise<void>;
+  openReplay: (battleId: string) => Promise<void>;
   collect: () => Promise<{ gold: number; hours: number }>;
   claimDaily: (id: string) => Promise<boolean>;
   setDirectives: (d: DirectiveId[]) => Promise<void>;
@@ -81,15 +96,41 @@ export const useGame = create<Store>((set, get) => ({
   ready: false,
   error: "",
   fighting: null,
+  replays: [],
   setTab: (tab) => set({ tab }),
   apply: (state) => set({ ...state, ready: true, error: "" }),
   hydrate: async () => {
     try {
       const r = await api<{ state: Remote }>("/api/session", {});
       get().apply(r.state);
+      await get().loadReplays();
     } catch (e) {
       set({ error: e instanceof Error ? e.message : "api", ready: false });
     }
+  },
+  loadReplays: async () => {
+    try {
+      const r = await api<{ battles: BattleSummary[] }>("/api/battles");
+      set({ replays: r.battles });
+    } catch {
+      /* session may not be ready */
+    }
+  },
+  openReplay: async (battleId) => {
+    const r = await api<{ record: BattleRecord }>(`/api/battle/${battleId}`);
+    const rec = r.record;
+    set({
+      fighting: {
+        id: rec.contentId,
+        battleId: rec.id,
+        hash: rec.hash,
+        input: rec.input,
+        result: rec.result,
+        rewards: { gold: 0, letters: 0, win: rec.winner === "ally" },
+        mode: "replay",
+      },
+      tab: "battle",
+    });
   },
   collect: async () => {
     const r = await api<{ gold: number; hours: number; state: Remote }>("/api/wake/collect", {});
@@ -111,22 +152,28 @@ export const useGame = create<Store>((set, get) => ({
   },
   startFight: async (id) => {
     const r = await api<{
+      battleId: string;
       seed: number;
+      input: BattleInput;
       result: BattleResult;
+      hash: string;
       rewards: FightPayload["rewards"];
       state: Remote;
-    }>("/api/battle", { id });
+    }>("/api/battle", { id }, { "idempotency-key": crypto.randomUUID() });
     get().apply(r.state);
-    const { buildInput } = await import("./battleInput");
     set({
       fighting: {
         id,
+        battleId: r.battleId,
+        hash: r.hash,
         result: r.result,
         rewards: r.rewards,
-        input: buildInput(id, get().team, get().directives, r.seed),
+        input: r.input,
+        mode: "live",
       },
       tab: "battle",
     });
+    void get().loadReplays();
   },
   startHunt: async (id) => {
     try {

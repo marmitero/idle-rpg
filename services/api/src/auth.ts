@@ -55,3 +55,15 @@ export function verifyJwt(token: string): { sub: string; dev: string } | null {
 export function validEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 120;
 }
+
+export function signReplay(hash: string): string {
+  return createHmac("sha256", SECRET).update(`rw.replay.${hash}`).digest("hex");
+}
+
+export function verifyReplayMac(hash: string, mac: string): boolean {
+  const expect = signReplay(hash);
+  const a = Buffer.from(mac);
+  const b = Buffer.from(expect);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}

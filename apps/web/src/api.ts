@@ -33,13 +33,14 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T>(path: string, body?: unknown): Promise<T> {
+export async function api<T>(path: string, body?: unknown, extra?: Record<string, string>): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
     "content-type": "application/json",
     "x-device-id": deviceId(),
   };
   if (token) headers.authorization = `Bearer ${token}`;
+  if (extra) Object.assign(headers, extra);
   const res = await fetch(path, {
     method: body === undefined ? "GET" : "POST",
     headers,

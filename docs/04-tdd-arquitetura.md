@@ -144,12 +144,15 @@ Isso permite auditoria, rollback de evento e anti-dupe.
 ### 5.2 Combate autoritativo
 
 ```
-client: submit TeamLoadout + directives + seed_request
+client: POST /api/battle { id } + Idempotency-Key
 api:    valida eligibilidade, trava stamina/ataque,
         roda packages/sim no servidor,
-        persiste BattleRecord (seed, inputs, hash),
-        credita recompensas no ledger,
-        devolve resultado + replay binário
+        persiste BattleRecord (seed, input, events, hash, HMAC),
+        credita recompensas no ledger (ref = battleId),
+        devolve { battleId, input, result, hash, rewards }
+client: Pixi reproduz result.events. Não chama simulate().
+GET /api/battle/:id  → mesmo record (playback)
+GET /api/battles     → índice
 ```
 
 PvP: o defensor é um **snapshot** (time + stats + seed de IA). Não há handshake.

@@ -56,6 +56,59 @@ export type BattleResult = {
   remaining: Record<string, number>;
 };
 
+/** Persistable judged fight. Client plays `result.events`; it does not resimulate. */
+export type BattleRecord = {
+  id: string;
+  contentId: string;
+  contentSemver: string;
+  seed: number;
+  input: BattleInput;
+  result: BattleResult;
+  hash: string;
+  winner: Team;
+  durationMs: number;
+  createdAt: number;
+};
+
+/** Canonical JSON (sorted keys) so the hash is stable across runtimes. */
+export function canonical(value: unknown): string {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+  const obj = value as Record<string, unknown>;
+  const keys = Object.keys(obj).sort();
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${canonical(obj[k])}`).join(",")}}`;
+}
+
+/** FNV-1a 64-bit — portable, no node:crypto (sim runs in Node and in the browser). */
+export function fnv1a64(text: string): string {
+  let h = 0xcbf29ce484222325n;
+  for (let i = 0; i < text.length; i++) {
+    h ^= BigInt(text.charCodeAt(i));
+    h = (h * 0x100000001b3n) & 0xffffffffffffffffn;
+  }
+  return h.toString(16).padStart(16, "0");
+}
+
+export function battleHash(input: BattleInput, result: BattleResult): string {
+  return fnv1a64(
+    canonical({
+      seed: input.seed,
+      allies: input.allies,
+      enemies: input.enemies,
+      directives: input.directives,
+      winner: result.winner,
+      durationMs: result.durationMs,
+      events: result.events,
+      remaining: result.remaining,
+    }),
+  );
+}
+
+/** Re-run sim and compare hashes. Server/CI only — the client must not judge. */
+export function verifyJudgement(input: BattleInput, result: BattleResult): boolean {
+  return battleHash(input, simulate(input)) === battleHash(input, result);
+}
+
 const TICK = 50;
 const LIMIT = 45_000;
 const ULT_COST = 100;
